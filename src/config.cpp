@@ -8,6 +8,7 @@ namespace Config {
 	static mINI::INIStructure Ini;
 	bool Console;
 	bool Borderless;
+	bool Windowed;
 	bool FixRNG;
 
 	static bool Has(const std::string& section, const std::string& key) {
@@ -56,6 +57,7 @@ namespace Config {
 
 		Console = GetBool("General", "Console", false);
 		Borderless = GetBool("Display", "Borderless", true);
+		Windowed = GetBool("Display", "Windowed", false);
 		FixRNG = GetBool("Fixes", "FixRNG", true);
 
 		if (!iniExisted) {
