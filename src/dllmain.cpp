@@ -1,4 +1,5 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
+#include "framework.h"
 #include "Core.h"
 #include "Logging.h"
 #include <iostream>
@@ -22,7 +23,6 @@ EXTERN_DLL_EXPORT BOOL APIENTRY DllMain(HMODULE hModule,
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
     case DLL_PROCESS_DETACH:
-        Core::GetInstance()->Shutdown();
         break;
     }
     return TRUE;
