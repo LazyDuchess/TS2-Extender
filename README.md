@@ -6,10 +6,12 @@ Only tested to work with The Sims 2 Legacy.
 
 ## Current Features
 
-* Borderless and Windowed modes.
+* Borderless fullscreen mode*
 * Skip intro videos.
 * Fixes the game's random number generator, solving Firstborn Syndrome and other random number quirks.
 * Restores removed Lua functionality for modders.
+
+For borderless to work, the game must be set to launch windowed. You can do this by typing "-w" into your game's launch parameters via the platform you own/run the game on.
 
 ## Installation
 
