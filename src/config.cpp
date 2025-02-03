@@ -7,6 +7,7 @@ namespace Config {
 	static const char* ConfigFilename = "TS2Extender.ini";
 	static mINI::INIStructure Ini;
 	bool Console;
+	bool SkipIntro;
 	bool Borderless;
 	bool Windowed;
 	bool FixRNG;
@@ -56,6 +57,7 @@ namespace Config {
 			iniExisted = true;
 
 		Console = GetBool("General", "Console", false);
+		SkipIntro = GetBool("General", "SkipIntro", true);
 		Borderless = GetBool("Display", "Borderless", true);
 		Windowed = GetBool("Display", "Windowed", false);
 		FixRNG = GetBool("Fixes", "FixRNG", true);
