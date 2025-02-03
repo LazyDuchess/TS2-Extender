@@ -2,6 +2,7 @@
 #include "Psapi.h"
 #include "Addresses.h"
 #include "scan.h"
+#include "Logging.h"
 
 namespace Addresses {
 
@@ -33,7 +34,7 @@ namespace Addresses {
 		0x8D, 0x45, 0xB8, 
 		0xC7, 0x45, 0xFC, 0x0C, 0x00, 0x00, 0x00 
 	};
-	static char introEngPushLookupMask[] = "????xxx?xxxxxxxxx????xxxxxxxxxxxxxxx";
+	static char introEngPushLookupMask[] = "????xxxx????xxxxx????xxxxxxxxxxxxxxx";
 
 	static char luaUnregisterLookup[] = { 
 		0x56, 
