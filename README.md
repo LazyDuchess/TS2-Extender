@@ -1,4 +1,4 @@
-# TS2Extender
+# TS2 Extender
  
 An early work in progress mod that aims to extend TS2 by implementing tweaks, fixes and additions.
 
