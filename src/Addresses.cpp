@@ -47,10 +47,25 @@ namespace Addresses {
 	};
 	static char luaUnregisterLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char luaPrintStubLookup[] = { 
+		0xFF, 0x50, 0x10, 
+		0x8B, 0xF8, 
+		0x8B, 0xCE, 
+		0x8B, 0x06, 
+		// Stub from here
+		0x68, 0xF4, 0x0B, 0xA0, 0x01, 
+		0x68, 0xB0, 0xC6, 0xAF, 0x00, 
+		0xFF, 0x90, 0x50, 0x01, 0x00, 0x00, 
+		// End
+		0x68, 0xEF, 0xD8, 0xFF, 0xFF 
+	};
+	static char luaPrintStubLookupMask[] = "xxxxxxxxxx????x????xxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
 	void* LuaUnregister;
+	void* LuaPrintStub;
 
 	bool Initialize() {
 		HMODULE module = GetModuleHandleA(NULL);
@@ -67,6 +82,9 @@ namespace Addresses {
 		if (IntroPush == nullptr) return false;
 		LuaUnregister = ScanInternal(luaUnregisterLookup, luaUnregisterLookupMask, modBase, size);
 		if (LuaUnregister == nullptr) return false;
+		LuaPrintStub = ScanInternal(luaPrintStubLookup, luaPrintStubLookupMask, modBase, size);
+		if (LuaPrintStub == nullptr) return false;
+		LuaPrintStub = (void*)((DWORD)LuaPrintStub + 9);
 		return true;
 	}
 }

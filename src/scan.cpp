@@ -57,3 +57,21 @@ char* ScanInternal(char* pattern, char* mask, char* begin, int size)
     }
     return match;
 }
+
+void Nop(BYTE* pAddress, DWORD dwLen)
+{
+    DWORD dwOldProtect, dwBkup;
+
+    // give the paged memory read/write permissions
+
+    VirtualProtect(pAddress, dwLen, PAGE_EXECUTE_READWRITE, &dwOldProtect);
+
+    for (DWORD x = 0x0; x < dwLen; x++) *(pAddress + x) = 0x90;
+
+    // restore the paged memory permissions saved in dwOldProtect
+
+    VirtualProtect(pAddress, dwLen, dwOldProtect, &dwBkup);
+
+    return;
+
+}

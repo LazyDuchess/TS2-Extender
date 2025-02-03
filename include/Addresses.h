@@ -5,5 +5,6 @@ namespace Addresses {
 	extern void* EALogoPush;
 	extern void* IntroPush;
 	extern void* LuaUnregister;
+	extern void* LuaPrintStub;
 	bool Initialize();
 }

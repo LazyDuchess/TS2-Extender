@@ -132,6 +132,7 @@ bool Core::Initialize() {
 
 	if (Config::ExtendedLua) {
 		WriteToMemory((DWORD)Addresses::LuaUnregister, retOverride, 1);
+		Nop((BYTE*)Addresses::LuaPrintStub, 16);
 	}
 
 	return true;
