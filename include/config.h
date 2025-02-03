@@ -8,4 +8,5 @@ namespace Config {
 	extern bool Borderless;
 	extern bool Windowed;
 	extern bool FixRNG;
+	extern bool ExtendedLua;
 }

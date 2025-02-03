@@ -17,7 +17,8 @@ namespace Addresses {
 		0xBF, 0xB0, 0x54, 0xBB, 0x01, 
 		0x89, 0x7D, 0xB8, 
 		0x33, 0xC0,
-		0xC7, 0x45 , 0xFC , 0x08, 0x00, 0x00, 0x00 };
+		0xC7, 0x45 , 0xFC , 0x08, 0x00, 0x00, 0x00 
+	};
 	static char eaLogoPushLookupMask[] = "????xxxx????xxxxx????xxxxxxxxxxxx";
 
 	// first 4 bytes are a pointer to intro_eng_audio.movie
@@ -30,12 +31,26 @@ namespace Addresses {
 		0x89, 0x7D, 0xB8, 
 		0x6A, 0x00, 
 		0x8D, 0x45, 0xB8, 
-		0xC7, 0x45, 0xFC, 0x0C, 0x00, 0x00, 0x00 };
+		0xC7, 0x45, 0xFC, 0x0C, 0x00, 0x00, 0x00 
+	};
 	static char introEngPushLookupMask[] = "????xxx?xxxxxxxxx????xxxxxxxxxxxxxxx";
+
+	static char luaUnregisterLookup[] = { 
+		0x56, 
+		0x8B, 0x74, 0x24, 0x08, 
+		0x8B, 0xCE, 
+		0xFF, 0x74, 0x24, 0x0C, 
+		0x8B, 0x06, 
+		0xFF, 0x90, 0xD4, 0x00, 0x00, 0x00, 
+		0x8B, 0x06, 
+		0x8B, 0xCE 
+	};
+	static char luaUnregisterLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxx";
 
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
+	void* LuaUnregister;
 
 	bool Initialize() {
 		HMODULE module = GetModuleHandleA(NULL);
@@ -50,6 +65,8 @@ namespace Addresses {
 		if (EALogoPush == nullptr) return false;
 		IntroPush = ScanInternal(introEngPushLookup, introEngPushLookupMask, modBase, size);
 		if (IntroPush == nullptr) return false;
+		LuaUnregister = ScanInternal(luaUnregisterLookup, luaUnregisterLookupMask, modBase, size);
+		if (LuaUnregister == nullptr) return false;
 		return true;
 	}
 }

@@ -11,6 +11,7 @@ namespace Config {
 	bool Borderless;
 	bool Windowed;
 	bool FixRNG;
+	bool ExtendedLua;
 
 	static bool Has(const std::string& section, const std::string& key) {
 		if (!Ini[section].has(key)) return false;
@@ -61,6 +62,7 @@ namespace Config {
 		Borderless = GetBool("Display", "Borderless", true);
 		Windowed = GetBool("Display", "Windowed", false);
 		FixRNG = GetBool("Fixes", "FixRNG", true);
+		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
 
 		if (!iniExisted) {
 			Log("Default config is being written to %s cause it didn't exist.\n", ConfigFilename);

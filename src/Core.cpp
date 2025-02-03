@@ -18,6 +18,7 @@ static RANDOMUINT32UNIFORM fpRandomUint32Uniform = NULL;
 static GETCOMMANDLINEW fpGetCommandLineW = NULL;
 static SETWINDOWPOS fpSetWindowPos = NULL;
 static char placeholderMoviePath[] = "";
+static char retOverride[] = { 0xC3 };
 
 static bool IsGameWindowTitle(std::wstring windowName) {
 	return windowName.find(L"Sims") != std::wstring::npos;
@@ -127,6 +128,10 @@ bool Core::Initialize() {
 	if (MH_EnableHook(&SetWindowPos) != MH_OK)
 	{
 		return false;
+	}
+
+	if (Config::ExtendedLua) {
+		WriteToMemory((DWORD)Addresses::LuaUnregister, retOverride, 1);
 	}
 
 	return true;
