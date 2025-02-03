@@ -60,7 +60,8 @@ namespace Config {
 		Console = GetBool("General", "Console", false);
 		SkipIntro = GetBool("General", "SkipIntro", true);
 		Borderless = GetBool("Display", "Borderless", true);
-		Windowed = GetBool("Display", "Windowed", false);
+		//Windowed = GetBool("Display", "Windowed", false);
+		Windowed = false;
 		FixRNG = GetBool("Fixes", "FixRNG", true);
 		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
 
