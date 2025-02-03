@@ -2,13 +2,14 @@
  
 An early work in progress mod that aims to extend TS2 by implementing tweaks, fixes and additions.
 
-Tested with The Sims 2 Legacy.
+Only tested to work with The Sims 2 Legacy.
 
 ## Current Features
 
 * Borderless and Windowed modes.
 * Skip intro videos.
 * Fixes the game's random number generator, solving Firstborn Syndrome and other random number quirks.
+* Restores removed Lua functionality for modders.
 
 ## Installation
 
