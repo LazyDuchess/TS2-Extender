@@ -2,7 +2,7 @@
  
 An early work in progress mod that aims to extend TS2 by implementing tweaks, fixes and additions.
 
-Only tested to work with The Sims 2 Legacy.
+Only tested to work with The Sims 2 Legacy for Steam. EA App version might not work.
 
 ## Current Features
 
