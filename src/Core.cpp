@@ -17,7 +17,7 @@ typedef BOOL(WINAPI* SETWINDOWPOS)(HWND, HWND, int, int, int, int, UINT);
 static RANDOMUINT32UNIFORM fpRandomUint32Uniform = NULL;
 static GETCOMMANDLINEW fpGetCommandLineW = NULL;
 static SETWINDOWPOS fpSetWindowPos = NULL;
-static char placeholderMoviePath[] = "thismovieshouldnoteverexist.wow";
+static char placeholderMoviePath[] = "";
 
 static bool IsGameWindowTitle(std::wstring windowName) {
 	return windowName.find(L"Sims") != std::wstring::npos;
