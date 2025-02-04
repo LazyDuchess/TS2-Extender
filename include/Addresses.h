@@ -6,5 +6,6 @@ namespace Addresses {
 	extern void* IntroPush;
 	extern void* LuaUnregister;
 	extern void* LuaPrintStub;
+	extern void* GZLua5Open;
 	bool Initialize();
 }

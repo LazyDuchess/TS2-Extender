@@ -13,12 +13,24 @@
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
 typedef LPWSTR(WINAPI* GETCOMMANDLINEW)();
 typedef BOOL(WINAPI* SETWINDOWPOS)(HWND, HWND, int, int, int, int, UINT);
+typedef UINT(__thiscall* LUA5OPEN)(void*,UINT);
 
 static RANDOMUINT32UNIFORM fpRandomUint32Uniform = NULL;
 static GETCOMMANDLINEW fpGetCommandLineW = NULL;
 static SETWINDOWPOS fpSetWindowPos = NULL;
+static LUA5OPEN fpLua5Open = NULL;
 static char placeholderMoviePath[] = "";
 static char retOverride[] = { 0xC3 };
+
+static UINT __fastcall DetourLua5Open(void* me, void* _, UINT flags) {
+	flags |= 0x2;
+	flags |= 0x4;
+	flags |= 0x8;
+	flags |= 0x10;
+	flags |= 0x20;
+	Log("Initializing Lua with Flags %i\n", flags);
+	return fpLua5Open(me, flags);
+}
 
 static bool IsGameWindowTitle(std::wstring windowName) {
 	return windowName.find(L"Sims") != std::wstring::npos;
@@ -133,6 +145,15 @@ bool Core::Initialize() {
 	if (Config::ExtendedLua) {
 		WriteToMemory((DWORD)Addresses::LuaUnregister, retOverride, 1);
 		Nop((BYTE*)Addresses::LuaPrintStub, 16);
+		if (MH_CreateHook(Addresses::GZLua5Open, &DetourLua5Open,
+			reinterpret_cast<LPVOID*>(&fpLua5Open)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::GZLua5Open) != MH_OK)
+		{
+			return false;
+		}
 	}
 
 	return true;
