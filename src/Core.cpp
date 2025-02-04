@@ -28,7 +28,6 @@ static UINT __fastcall DetourLua5Open(void* me, void* _, UINT flags) {
 	flags |= 0x8;
 	flags |= 0x10;
 	flags |= 0x20;
-	Log("Initializing Lua with Flags %i\n", flags);
 	return fpLua5Open(me, flags);
 }
 
