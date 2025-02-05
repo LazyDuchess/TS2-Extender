@@ -7,5 +7,7 @@ namespace Addresses {
 	extern void* LuaUnregister;
 	extern void* LuaPrintStub;
 	extern void* GZLua5Open;
+	extern void* RegisterLuaCommands;
+	extern void* LuaPushString;
 	bool Initialize();
 }

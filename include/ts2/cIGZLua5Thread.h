@@ -3,9 +3,12 @@
 
 namespace TS2 {
 	class cIGZLua5Thread {
-	private:
-		char[0x150] pad;
 	public:
-		virtual void Register(LUAFUNCTION* pFunc, char* funcName) = 0;
+		void Register(LUAFUNCTION* pFunc, const char* funcName) {
+			int vTableAddr = *(int*)this;
+			using RegisterFunc = void(__thiscall*)(cIGZLua5Thread* me, LUAFUNCTION* pFunc, const char*);
+			RegisterFunc func = reinterpret_cast<RegisterFunc>(*(int*)(vTableAddr + 0x150));
+			func(this, pFunc, funcName);
+		}
 	};
 }

@@ -3,4 +3,6 @@ struct lua_State {
 
 };
 
-typedef int(_cdecl* LUAFUNCTION)(lua_State*)
+typedef int(_cdecl LUAFUNCTION)(lua_State*);
+
+void _lua_pushstring(lua_State* luaState, const char* str);

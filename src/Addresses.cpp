@@ -78,12 +78,42 @@ namespace Addresses {
 	};
 	static char lua50OpenLookupMask[] = "xxxxxxx????xxxxxxxxx????xxx";
 
+	static char registerLuaCommandsLookup[] = {
+		0x56,
+		0x8B, 0x74, 0x24, 0x08,
+		0x32, 0xC0,
+		0x85, 0xF6,
+		0x0F, 0x84, 0xCE, 0x01, 0x00, 0x00,
+		0x8B, 0x06,
+		0x8B, 0xCE,
+		0x68, 0x60, 0x3F, 0x08, 0x01,
+		0x68, 0xA0, 0x18, 0x83, 0x00,
+		0xFF, 0x90, 0x50, 0x01, 0x00, 0x00
+	};
+	static char registerLuaCommandsLookupMask[] = "xxxxxxxxxx?????xxxxx????x????xxxxxx";
+
+	static char luaPushStringLookup[] = {
+		0x55,
+		0x8B, 0x6C, 0x24, 0x0C,
+		0x85, 0xED,
+		0x75, 0x0F,
+		0x8B, 0x4C, 0x24, 0x08,
+		0x8B, 0x41, 0x08,
+		0x89, 0x28,
+		0x83, 0x41, 0x08, 0x10,
+		0x5D,
+		0xC3
+	};
+	static char luaPushStringLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
 	void* LuaUnregister;
 	void* LuaPrintStub;
 	void* GZLua5Open;
+	void* RegisterLuaCommands;
+	void* LuaPushString;
 
 	bool Initialize() {
 		HMODULE module = GetModuleHandleA(NULL);
@@ -105,6 +135,10 @@ namespace Addresses {
 		LuaPrintStub = (void*)((DWORD)LuaPrintStub + 9);
 		GZLua5Open = ScanInternal(lua5OpenLookup, lua50OpenLookupMask, modBase, size);
 		if (GZLua5Open == nullptr) return false;
+		RegisterLuaCommands = ScanInternal(registerLuaCommandsLookup, registerLuaCommandsLookupMask, modBase, size);
+		if (RegisterLuaCommands == nullptr) return false;
+		LuaPushString = ScanInternal(luaPushStringLookup, luaPushStringLookupMask, modBase, size);
+		if (LuaPushString == nullptr) return false;
 		return true;
 	}
 }

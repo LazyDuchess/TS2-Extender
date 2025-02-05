@@ -9,6 +9,7 @@
 #include "Addresses.h"
 #include "MinHook.h"
 #include "scan.h"
+#include "LuaExtensions.h"
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
 typedef LPWSTR(WINAPI* GETCOMMANDLINEW)();
@@ -83,6 +84,7 @@ bool Core::Create() {
 	return _instance->Initialize();
 }
 
+
 bool Core::Initialize() {
 	Config::Load();
 
@@ -153,6 +155,7 @@ bool Core::Initialize() {
 		{
 			return false;
 		}
+		if (!LuaExtensions::Initialize()) return false;
 	}
 
 	return true;
