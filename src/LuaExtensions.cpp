@@ -18,7 +18,7 @@ namespace LuaExtensions {
 	}
 
 	static int __cdecl LuaGetExecutableDirectory(lua_State* luaState) {
-		_lua_pushstring(luaState, GetProcessDirectory().c_str());
+		lua_pushstring(luaState, GetProcessDirectory().c_str());
 		return 1;
 	}
 
