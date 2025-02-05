@@ -11,7 +11,7 @@ Only tested to work with The Sims 2 Legacy for Steam. EA App version might not w
 * Fixes the game's random number generator, solving Firstborn Syndrome and other random number quirks.
 * Restores removed Lua functionality for modders.
 
-For borderless to work, the game must be set to launch windowed. You can do this by typing "-w" into your game's launch parameters via the platform you own/run the game on.
+A "Sims2.ini" file is provided that should be placed in TSBin in order for borderless to work. This file should be removed if you wish to play normal fullscreen, as it's there to make the game launch windowed.
 
 ## Installation
 
