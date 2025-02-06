@@ -5,6 +5,10 @@
 #include "Logging.h"
 
 namespace LuaExtensions {
+
+	typedef bool(__cdecl* REGISTERPRIMITIVESUPPORTLUACOMMANDS)(TS2::cIGZLua5Thread*);
+	static REGISTERPRIMITIVESUPPORTLUACOMMANDS fpRegisterPrimitiveSupportLuaCommands = NULL;
+
 	static std::string GetProcessDirectory() {
 		char path[MAX_PATH];
 		if (GetModuleFileName(NULL, path, MAX_PATH)) {
@@ -21,9 +25,6 @@ namespace LuaExtensions {
 		lua_pushstring(luaState, GetProcessDirectory().c_str());
 		return 1;
 	}
-
-	typedef bool(__cdecl* REGISTERPRIMITIVESUPPORTLUACOMMANDS)(TS2::cIGZLua5Thread*);
-	static REGISTERPRIMITIVESUPPORTLUACOMMANDS fpRegisterPrimitiveSupportLuaCommands = NULL;
 
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
