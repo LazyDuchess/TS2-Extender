@@ -3,6 +3,17 @@
 #include "Addresses.h"
 #include "scan.h"
 #include "Logging.h"
+#define ADDRESS(name, lookup) \
+Log("Scanning for %s...\n", #name);\
+name = ScanInternal(lookup, lookup##Mask, modBase, size);\
+if (name == nullptr) {\
+	Log("Failed to find address for %s!\n", #name);\
+	return false;\
+}\
+else\
+{\
+	Log("Found %s at %p\n", #name, name);\
+}\
 
 namespace Addresses {
 
@@ -76,7 +87,7 @@ namespace Addresses {
 		0xE8, 0x06, 0x76, 0xD6, 0xFF,
 		0x83, 0xC4, 0x04
 	};
-	static char lua50OpenLookupMask[] = "xxxxxxx????xxxxxxxxx????xxx";
+	static char lua5OpenLookupMask[] = "xxxxxxx????xxxxxxxxx????xxx";
 
 	static char registerLuaCommandsLookup[] = {
 		0x56,
@@ -319,51 +330,31 @@ namespace Addresses {
 	void* RegisterTSSGCheats;
 
 	static bool ScanBaseAddresses(char* modBase, int size) {
-		RandomUint32Uniform = ScanInternal(randomUint32Lookup, randomUint32LookupMask, modBase, size);
-		if (RandomUint32Uniform == nullptr) return false;
-		EALogoPush = ScanInternal(eaLogoPushLookup, eaLogoPushLookupMask, modBase, size);
-		if (EALogoPush == nullptr) return false;
-		IntroPush = ScanInternal(introEngPushLookup, introEngPushLookupMask, modBase, size);
-		if (IntroPush == nullptr) return false;
-		LuaUnregister = ScanInternal(luaUnregisterLookup, luaUnregisterLookupMask, modBase, size);
-		if (LuaUnregister == nullptr) return false;
-		LuaPrintStub = ScanInternal(luaPrintStubLookup, luaPrintStubLookupMask, modBase, size);
-		if (LuaPrintStub == nullptr) return false;
+		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
+		ADDRESS(EALogoPush, eaLogoPushLookup);
+		ADDRESS(IntroPush, introEngPushLookup);
+		ADDRESS(LuaUnregister, luaUnregisterLookup);
+		ADDRESS(LuaPrintStub, luaPrintStubLookup);
 		LuaPrintStub = (void*)((DWORD)LuaPrintStub + 9);
-		GZLua5Open = ScanInternal(lua5OpenLookup, lua50OpenLookupMask, modBase, size);
-		if (GZLua5Open == nullptr) return false;
-		RegisterLuaCommands = ScanInternal(registerLuaCommandsLookup, registerLuaCommandsLookupMask, modBase, size);
-		if (RegisterLuaCommands == nullptr) return false;
-		LuaPushString = ScanInternal(luaPushStringLookup, luaPushStringLookupMask, modBase, size);
-		if (LuaPushString == nullptr) return false;
-		LuaRawGetI = ScanInternal(luaRawGetILookup, luaRawGetILookupMask, modBase, size);
-		if (LuaRawGetI == nullptr) return false;
-		LuaSetTop = ScanInternal(luaSetTopLookup, luaSetTopLookupMask, modBase, size);
-		if (LuaSetTop == nullptr) return false;
-		LuaPCall = ScanInternal(luaPCallLookup, luaPCallLookupMask, modBase, size);
-		if (LuaPCall == nullptr) return false;
-		LuaPushValue = ScanInternal(luaPushValueLookup, luaPushValueLookupMask, modBase, size);
-		if (LuaPushValue == nullptr) return false;
-		LuaToString = ScanInternal(luaToStringLookup, luaToStringLookupMask, modBase, size);
-		if (LuaToString == nullptr) return false;
-		LuaLRef = ScanInternal(luaLRefLookup, luaLRefLookupMask, modBase, size);
-		if (LuaLRef == nullptr) return false;
+		ADDRESS(GZLua5Open, lua5OpenLookup);
+		ADDRESS(RegisterLuaCommands, registerLuaCommandsLookup);
+		ADDRESS(LuaPushString, luaPushStringLookup);
+		ADDRESS(LuaRawGetI, luaRawGetILookup);
+		ADDRESS(LuaSetTop, luaSetTopLookup);
+		ADDRESS(LuaPCall, luaPCallLookup);
+		ADDRESS(LuaPushValue, luaPushValueLookup);
+		ADDRESS(LuaToString, luaToStringLookup);
+		ADDRESS(LuaLRef, luaLRefLookup);
 		return true;
 	}
 
 	static bool ScanCheatAddresses(char* modBase, int size) {
-		CheatQueryInterface = ScanInternal(cheatQueryInterfaceLookup, cheatQueryInterfaceLookupMask, modBase, size);
-		if (CheatQueryInterface == nullptr) return false;
-		CheatRelease = ScanInternal(cheatReleaseLookup, cheatReleaseLookupMask, modBase, size);
-		if (CheatRelease == nullptr) return false;
-		CheatDestructor = ScanInternal(cheatDestructorLookup, cheatDestructorLookupMask, modBase, size);
-		if (CheatDestructor == nullptr) return false;
-		GetCheatSystem = ScanInternal(getCheatSystemLookup, getCheatSystemLookupMask, modBase, size);
-		if (GetCheatSystem == nullptr) return false;
-		RegisterTestingCheat = ScanInternal(registerTestingCheatLookup, registerTestingCheatLookupMask, modBase, size);
-		if (RegisterTestingCheat == nullptr) return false;
-		RegisterTSSGCheats = ScanInternal(registerTSSGCheatsLookup, registerTSSGCheatsLookupMask, modBase, size);
-		if (RegisterTSSGCheats == nullptr) return false;
+		ADDRESS(CheatQueryInterface, cheatQueryInterfaceLookup);
+		ADDRESS(CheatRelease, cheatReleaseLookup);
+		ADDRESS(CheatDestructor, cheatDestructorLookup);
+		ADDRESS(GetCheatSystem, getCheatSystemLookup);
+		ADDRESS(RegisterTestingCheat, registerTestingCheatLookup);
+		ADDRESS(RegisterTSSGCheats, registerTSSGCheatsLookup);
 		return true;
 	}
 
