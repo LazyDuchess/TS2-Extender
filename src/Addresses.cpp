@@ -124,11 +124,12 @@ namespace Addresses {
 		0x89, 0x41, 0x08,
 		0x75, 0x09,
 		0x8B, 0x01,
+		0x6A, 0x01,
 		0xFF, 0x50, 0x24,
 		0x33, 0xC0,
 		0xC3
 	};
-	static char cheatReleaseLookupMask[] = "xxxxxxxxxxxxxxxxxxx";
+	static char cheatReleaseLookupMask[] = "xxxxxxxxxxxxxxxxxxxxx";
 
 	static char cheatDestructorLookup[] = {
 		0xF6, 0x44, 0x24, 0x04, 0x01,
@@ -140,6 +141,35 @@ namespace Addresses {
 		0x56
 	};
 	static char cheatDestructorLookupMask[] = "xxxxxxxxxx????xxxxx";
+
+	static char getCheatSystemLookup[] = {
+		0x51,
+		0xA1, 0x00, 0x4B, 0x3A, 0x01,
+		0x85, 0xC0,
+		0x75, 0x36,
+		0x89, 0x04, 0x24,
+		0xE8, 0x5D, 0xE7, 0x60, 0xFF,
+		0x8B, 0xC8,
+		0x85, 0xC9,
+		0x74, 0x13
+	};
+	static char getCheatSystemLookupMask[] = "xx????xxxxxxxx????xxxxxx";
+
+	static char registerTestingCheatLookup[] = {
+		0x55,
+		0x8B, 0xEC,
+		0x6A, 0xFF,
+		0x68, 0xEE, 0x68, 0x02, 0x01,
+		0x64, 0xA1, 0x00, 0x00, 0x00, 0x00,
+		0x50,
+		0x64, 0x89, 0x25, 0x00, 0x00, 0x00, 0x00,
+		0x83, 0xEC, 0x30,
+		0x53,
+		0x33, 0xDB,
+		0x89, 0x5D, 0xE4,
+		0x89, 0x5D, 0xEC
+	};
+	static char registerTestingCheatLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 	void* RandomUint32Uniform;
 	void* EALogoPush;
@@ -153,6 +183,8 @@ namespace Addresses {
 	void* CheatQueryInterface;
 	void* CheatRelease;
 	void* CheatDestructor;
+	void* GetCheatSystem;
+	void* RegisterTestingCheat;
 
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		RandomUint32Uniform = ScanInternal(randomUint32Lookup, randomUint32LookupMask, modBase, size);
@@ -182,6 +214,10 @@ namespace Addresses {
 		if (CheatRelease == nullptr) return false;
 		CheatDestructor = ScanInternal(cheatDestructorLookup, cheatDestructorLookupMask, modBase, size);
 		if (CheatDestructor == nullptr) return false;
+		GetCheatSystem = ScanInternal(getCheatSystemLookup, getCheatSystemLookupMask, modBase, size);
+		if (GetCheatSystem == nullptr) return false;
+		RegisterTestingCheat = ScanInternal(registerTestingCheatLookup, registerTestingCheatLookupMask, modBase, size);
+		if (RegisterTestingCheat == nullptr) return false;
 		return true;
 	}
 

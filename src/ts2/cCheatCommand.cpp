@@ -31,8 +31,8 @@ namespace TS2 {
 		return false;
 	}
 	void* cCheatCommand::Destructor(bool freeMemory) {
-		using DestructorFunc = int(__thiscall*)(cCheatCommand* me, bool freeMemory);
-		DestructorFunc func = reinterpret_cast<ReleaseFunc>(Addresses::CheatDestructor);
+		using DestructorFunc = void*(__thiscall*)(cCheatCommand* me, bool freeMemory);
+		DestructorFunc func = reinterpret_cast<DestructorFunc>(Addresses::CheatDestructor);
 		return func(this, freeMemory);
 	}
 	const char* cCheatCommand::Description() {

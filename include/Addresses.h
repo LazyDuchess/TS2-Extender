@@ -13,6 +13,8 @@ namespace Addresses {
 	extern void* CheatQueryInterface;
 	extern void* CheatRelease;
 	extern void* CheatDestructor;
+	extern void* GetCheatSystem;
+	extern void* RegisterTestingCheat;
 
 	bool Initialize();
 }
