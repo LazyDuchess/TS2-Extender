@@ -26,7 +26,11 @@ namespace LuaExtensions {
 	}
 
 	static int __cdecl LuaRegisterTestingCheat(lua_State* luaState) {
-		LuaCheatCommand* luaCheat = new LuaCheatCommand();
+		const char* cheatName = lua_tostring(luaState, 1);
+		const char* cheatDesc = lua_tostring(luaState, 2);
+		lua_pushvalue(luaState, 3);
+		int executeRef = luaL_ref(luaState, LUA_REGISTRYINDEX);
+		LuaCheatCommand* luaCheat = new LuaCheatCommand(cheatName, cheatDesc, executeRef, luaState);
 		TS2::TSRegisterTestingCheat(luaCheat);
 		return 0;
 	}

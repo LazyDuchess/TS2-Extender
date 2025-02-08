@@ -9,6 +9,12 @@ namespace Addresses {
 	extern void* GZLua5Open;
 	extern void* RegisterLuaCommands;
 	extern void* LuaPushString;
+	extern void* LuaRawGetI;
+	extern void* LuaSetTop;
+	extern void* LuaPCall;
+	extern void* LuaPushValue;
+	extern void* LuaToString;
+	extern void* LuaLRef;
 
 	extern void* CheatQueryInterface;
 	extern void* CheatRelease;
