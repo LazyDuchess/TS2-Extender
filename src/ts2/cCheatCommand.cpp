@@ -21,14 +21,14 @@ namespace TS2 {
 	const char* cCheatCommand::Name() {
 		return "";
 	}
-	const char* cCheatCommand::Description(int helpType) {
+	const char* cCheatCommand::DescriptionForHelp(int helpType) {
 		return Description();
 	}
-	bool cCheatCommand::HandlesAllArguments() {
-		return false;
+	int cCheatCommand::HandlesAllArguments() {
+		return 0;
 	}
-	bool cCheatCommand::GetConditionalLevelAdjustment() {
-		return false;
+	int cCheatCommand::GetConditionalLevelAdjustment() {
+		return 0;
 	}
 	void* cCheatCommand::Destructor(bool freeMemory) {
 		using DestructorFunc = void*(__thiscall*)(cCheatCommand* me, bool freeMemory);

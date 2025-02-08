@@ -171,6 +171,21 @@ namespace Addresses {
 	};
 	static char registerTestingCheatLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char registerTSSGCheatsLookup[] = {
+		0x55,
+		0x8B, 0xEC,
+		0x6A, 0xFF,
+		0x68, 0x75, 0x1F, 0xFE, 0x00,
+		0x64, 0xA1, 0x00, 0x00, 0x00, 0x00,
+		0x50,
+		0x64, 0x89, 0x25, 0x00, 0x00, 0x00, 0x00,
+		0x83, 0xEC, 0x08,
+		0xC7, 0x45, 0xEC, 0x00, 0x00, 0x00, 0x00,
+		0xE8, 0x98, 0x18, 0xDA, 0xFF,
+		0x85, 0xC0
+	};
+	static char registerTSSGCheatsLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxx????xx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -185,6 +200,7 @@ namespace Addresses {
 	void* CheatDestructor;
 	void* GetCheatSystem;
 	void* RegisterTestingCheat;
+	void* RegisterTSSGCheats;
 
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		RandomUint32Uniform = ScanInternal(randomUint32Lookup, randomUint32LookupMask, modBase, size);
@@ -218,6 +234,8 @@ namespace Addresses {
 		if (GetCheatSystem == nullptr) return false;
 		RegisterTestingCheat = ScanInternal(registerTestingCheatLookup, registerTestingCheatLookupMask, modBase, size);
 		if (RegisterTestingCheat == nullptr) return false;
+		RegisterTSSGCheats = ScanInternal(registerTSSGCheatsLookup, registerTSSGCheatsLookupMask, modBase, size);
+		if (RegisterTSSGCheats == nullptr) return false;
 		return true;
 	}
 

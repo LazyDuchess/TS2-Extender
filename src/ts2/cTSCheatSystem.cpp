@@ -8,7 +8,7 @@ namespace TS2 {
 		return func();
 	}
 	void TSRegisterTestingCheat(cCheatCommand* cheat) {
-		using RegisterTestingCheatFunc = void(__stdcall*)(cCheatCommand*);
+		using RegisterTestingCheatFunc = void(__cdecl*)(cCheatCommand*);
 		RegisterTestingCheatFunc func = reinterpret_cast<RegisterTestingCheatFunc>(Addresses::RegisterTestingCheat);
 		func(cheat);
 	}

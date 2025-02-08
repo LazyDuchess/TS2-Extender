@@ -15,6 +15,7 @@ namespace Addresses {
 	extern void* CheatDestructor;
 	extern void* GetCheatSystem;
 	extern void* RegisterTestingCheat;
+	extern void* RegisterTSSGCheats;
 
 	bool Initialize();
 }
