@@ -115,13 +115,7 @@ namespace Addresses {
 	void* RegisterLuaCommands;
 	void* LuaPushString;
 
-	bool Initialize() {
-		HMODULE module = GetModuleHandleA(NULL);
-		char* modBase = (char*)module;
-		HANDLE proc = GetCurrentProcess();
-		MODULEINFO modInfo;
-		GetModuleInformation(proc, module, &modInfo, sizeof(MODULEINFO));
-		int size = modInfo.SizeOfImage;
+	static bool ScanBaseAddresses(char* modBase, int size) {
 		RandomUint32Uniform = ScanInternal(randomUint32Lookup, randomUint32LookupMask, modBase, size);
 		if (RandomUint32Uniform == nullptr) return false;
 		EALogoPush = ScanInternal(eaLogoPushLookup, eaLogoPushLookupMask, modBase, size);
@@ -139,6 +133,21 @@ namespace Addresses {
 		if (RegisterLuaCommands == nullptr) return false;
 		LuaPushString = ScanInternal(luaPushStringLookup, luaPushStringLookupMask, modBase, size);
 		if (LuaPushString == nullptr) return false;
+		return true;
+	}
+
+	static bool ScanCheatAddresses(char* modBase, int size) {
+
+	}
+
+	bool Initialize() {
+		HMODULE module = GetModuleHandleA(NULL);
+		char* modBase = (char*)module;
+		HANDLE proc = GetCurrentProcess();
+		MODULEINFO modInfo;
+		GetModuleInformation(proc, module, &modInfo, sizeof(MODULEINFO));
+		int size = modInfo.SizeOfImage;
+		if (!ScanBaseAddresses(modBase, size)) return false;
 		return true;
 	}
 }
