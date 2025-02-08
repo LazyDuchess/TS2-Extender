@@ -106,6 +106,41 @@ namespace Addresses {
 	};
 	static char luaPushStringLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char cheatQueryInterfaceLookup[] = {
+		0x8B, 0x44, 0x24, 0x08,
+		0x85, 0xC0,
+		0x75, 0x04,
+		0x32, 0xC0,
+		0xEB, 0x23,
+		0x83, 0x7C, 0x24, 0x04, 0x01,
+		0x74, 0x13,
+		0x81, 0x7C, 0x24, 0x04, 0xC7, 0x39, 0xDA, 0xAA
+	};
+	static char cheatQueryInterfaceLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+	static char cheatReleaseLookup[] = {
+		0x8B, 0x41, 0x08,
+		0x83, 0xE8, 0x01,
+		0x89, 0x41, 0x08,
+		0x75, 0x09,
+		0x8B, 0x01,
+		0xFF, 0x50, 0x24,
+		0x33, 0xC0,
+		0xC3
+	};
+	static char cheatReleaseLookupMask[] = "xxxxxxxxxxxxxxxxxxx";
+
+	static char cheatDestructorLookup[] = {
+		0xF6, 0x44, 0x24, 0x04, 0x01,
+		0x56,
+		0x8B, 0xF1,
+		0xC7, 0x06, 0x9C, 0x1A, 0x05, 0x01,
+		0x74, 0x0B,
+		0x6A, 0x0C,
+		0x56
+	};
+	static char cheatDestructorLookupMask[] = "xxxxxxxxxx????xxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -114,6 +149,10 @@ namespace Addresses {
 	void* GZLua5Open;
 	void* RegisterLuaCommands;
 	void* LuaPushString;
+
+	void* CheatQueryInterface;
+	void* CheatRelease;
+	void* CheatDestructor;
 
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		RandomUint32Uniform = ScanInternal(randomUint32Lookup, randomUint32LookupMask, modBase, size);
@@ -137,7 +176,13 @@ namespace Addresses {
 	}
 
 	static bool ScanCheatAddresses(char* modBase, int size) {
-
+		CheatQueryInterface = ScanInternal(cheatQueryInterfaceLookup, cheatQueryInterfaceLookupMask, modBase, size);
+		if (CheatQueryInterface == nullptr) return false;
+		CheatRelease = ScanInternal(cheatReleaseLookup, cheatReleaseLookupMask, modBase, size);
+		if (CheatRelease == nullptr) return false;
+		CheatDestructor = ScanInternal(cheatDestructorLookup, cheatDestructorLookupMask, modBase, size);
+		if (CheatDestructor == nullptr) return false;
+		return true;
 	}
 
 	bool Initialize() {
@@ -148,6 +193,7 @@ namespace Addresses {
 		GetModuleInformation(proc, module, &modInfo, sizeof(MODULEINFO));
 		int size = modInfo.SizeOfImage;
 		if (!ScanBaseAddresses(modBase, size)) return false;
+		if (!ScanCheatAddresses(modBase, size)) return false;
 		return true;
 	}
 }

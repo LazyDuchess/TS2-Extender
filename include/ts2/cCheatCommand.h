@@ -3,8 +3,8 @@
 namespace TS2 {
 	class cCheatCommand {
 	private:
-		void* Parser;
-		int ReferenceCount;
+		void* Parser = nullptr;
+		int ReferenceCount = 0;
 	public:
 		virtual void* QueryInterface(int typeId, void** unknown);
 		virtual void AddRef();
