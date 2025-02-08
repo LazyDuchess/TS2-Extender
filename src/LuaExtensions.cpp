@@ -3,7 +3,7 @@
 #include "MinHook.h"
 #include "Addresses.h"
 #include "Logging.h"
-#include "ts2/cTSCheatSystem.h"
+#include "ts2/CheatSystem.h"
 #include "LuaCheatCommand.h"
 
 namespace LuaExtensions {
@@ -42,20 +42,12 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaGetExecutableDirectory, "GetExecutableDirectory");
 			luaThread->Register(&LuaRegisterTestingCheat, "RegisterTestingCheat");
 		}
-		//TS2::cTSCheatSystem* cheatSystem = TS2::CheatSystem();
-		//LuaCheatCommand* luaCheat = new LuaCheatCommand();
-		Log("Register Testing Cheat: %p\n", Addresses::RegisterTestingCheat);
-		//TS2::TSRegisterTestingCheat(luaCheat);
-		//cheatSystem->RegisterCheat(luaCheat);
 		return res;
 	}
 
 	static void __stdcall DetourRegisterTSSGCheats() {
 		Log("Register TSSG cheats!\n");
 		fpRegisterTSSGCheats();
-		auto newCheat = new LuaCheatCommand();
-		TS2::TSRegisterTestingCheat(newCheat);
-		Log("our cheat: %p\n", newCheat);
 	}
 
 	bool Initialize() {
