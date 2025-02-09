@@ -1,4 +1,5 @@
 #pragma once
+#include "ts2/cArguments.h"
 
 namespace TS2 {
 	class cCheatCommand {
@@ -10,7 +11,7 @@ namespace TS2 {
 		virtual void AddRef();
 		virtual int Release();
 		virtual void OnRegister(void* parser, void* unk);
-		virtual void Execute(void* args) = 0;
+		virtual void Execute(nGZCommandParser::cArguments* args) = 0;
 		virtual const char* Name();
 		virtual const char* DescriptionForHelp(int helpType);
 		virtual int HandlesAllArguments();

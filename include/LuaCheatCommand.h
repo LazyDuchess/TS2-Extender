@@ -6,7 +6,7 @@ public:
 	LuaCheatCommand(const char* name, const char* description, int luaCall, lua_State* luaState);
 	const char* Name();
 	const char* Description();
-	void Execute(void* args);
+	void Execute(nGZCommandParser::cArguments* args);
 private:
 	lua_State* pLuaState = nullptr;
 	int iLuaCall = LUA_NOREF;

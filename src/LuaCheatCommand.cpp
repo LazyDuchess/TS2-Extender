@@ -17,7 +17,7 @@ const char* LuaCheatCommand::Description() {
 	return sDescription;
 }
 
-void LuaCheatCommand::Execute(void* args) {
+void LuaCheatCommand::Execute(nGZCommandParser::cArguments* args) {
 	if (pLuaState == nullptr)
 	{
 		Log("Lua State is NULL!\n");
@@ -28,7 +28,10 @@ void LuaCheatCommand::Execute(void* args) {
 		return;
 	}
 	lua_rawgeti(pLuaState, LUA_REGISTRYINDEX, iLuaCall);
-	if (lua_pcall(pLuaState, 0, 0, 0) != 0) {
+	for (int i = 0; i < args->count; i++) {
+		lua_pushstring(pLuaState, (*args)[1 + i]);
+	}
+	if (lua_pcall(pLuaState, args->count, 0, 0) != 0) {
 		Log("Error calling Lua cheat: %s\n", lua_tostring(pLuaState, -1));
 		lua_pop(pLuaState, 1);
 	}
