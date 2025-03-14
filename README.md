@@ -2,16 +2,13 @@
  
 An early work in progress mod that aims to extend TS2 by implementing tweaks, fixes and additions.
 
-Only tested to work with The Sims 2 Legacy for Steam. EA App version might not work.
+Tested to work with The Sims 2 Legacy for Steam.
 
 ## Current Features
 
-* Borderless fullscreen mode*
 * Skip intro videos.
 * Fixes the game's random number generator, solving Firstborn Syndrome and other random number quirks.
-* Restores removed Lua functionality for modders.
-
-A "Sims2.ini" file is provided that should be placed in TSBin in order for borderless to work. This file should be removed if you wish to play normal fullscreen, as it's there to make the game launch windowed.
+* Restores removed Lua functionality for modders, working on adding some new functionality such as custom cheat commands and a custom Lua injector.
 
 ## Installation
 
