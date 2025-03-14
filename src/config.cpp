@@ -8,8 +8,6 @@ namespace Config {
 	static mINI::INIStructure Ini;
 	bool Console;
 	bool SkipIntro;
-	bool Borderless;
-	bool Windowed;
 	bool FixRNG;
 	bool ExtendedLua;
 
@@ -59,9 +57,6 @@ namespace Config {
 
 		Console = GetBool("General", "Console", false);
 		SkipIntro = GetBool("General", "SkipIntro", true);
-		Borderless = GetBool("Display", "Borderless", true);
-		//Windowed = GetBool("Display", "Windowed", false);
-		Windowed = false;
 		FixRNG = GetBool("Fixes", "FixRNG", true);
 		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
 

@@ -12,13 +12,9 @@
 #include "LuaExtensions.h"
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
-typedef LPWSTR(WINAPI* GETCOMMANDLINEW)();
-typedef BOOL(WINAPI* SETWINDOWPOS)(HWND, HWND, int, int, int, int, UINT);
 typedef UINT(__thiscall* LUA5OPEN)(void*,UINT);
 
 static RANDOMUINT32UNIFORM fpRandomUint32Uniform = NULL;
-static GETCOMMANDLINEW fpGetCommandLineW = NULL;
-static SETWINDOWPOS fpSetWindowPos = NULL;
 static LUA5OPEN fpLua5Open = NULL;
 static char placeholderMoviePath[] = "";
 static char retOverride[] = { 0xC3 };
@@ -30,44 +26,6 @@ static UINT __fastcall DetourLua5Open(void* me, void* _, UINT flags) {
 	flags |= 0x10;
 	flags |= 0x20;
 	return fpLua5Open(me, flags);
-}
-
-static bool IsGameWindowTitle(std::wstring windowName) {
-	return windowName.find(L"Sims") != std::wstring::npos;
-}
-
-static bool IsGameWindow(HWND hWnd) {
-	wchar_t windowName[256] = { 0 };
-	int length = GetWindowTextW(hWnd, windowName, sizeof(windowName) / sizeof(windowName[0]));
-
-	if (length > 0) {
-		std::wstring windowStr(windowName);
-		return IsGameWindowTitle(windowStr);
-	}
-	return false;
-}
-
-static BOOL WINAPI DetourSetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags) {
-	if (Config::Borderless && IsGameWindow(hWnd)) {
-		RECT desktopRect;
-		GetWindowRect(GetDesktopWindow(), &desktopRect);
-		SetWindowLong(hWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU);
-		SetWindowLong(hWnd, GWL_EXSTYLE, WS_EX_APPWINDOW);
-		return fpSetWindowPos(hWnd, HWND_TOP, 
-			desktopRect.left, desktopRect.top, desktopRect.right - desktopRect.left, desktopRect.bottom - desktopRect.top,
-			SWP_FRAMECHANGED | SWP_SHOWWINDOW);
-	}
-	return fpSetWindowPos(hWnd, hWndInsertAfter, X, Y, cx, cy, uFlags);
-}
-
-static LPWSTR WINAPI DetourGetCommandLineW() {
-	LPWSTR comm = fpGetCommandLineW();
-	std::wstring newArgs = comm;
-	if (Config::Borderless || Config::Windowed)
-	{
-		newArgs += L" -w";
-	}
-	return const_cast<wchar_t*>(newArgs.c_str());
 }
 
 static unsigned int __fastcall DetourRandomUint32Uniform(TS2::cRZRandom* me, void* _) {
@@ -123,26 +81,6 @@ bool Core::Initialize() {
 		void* addrToMovie = placeholderMoviePath;
 		WriteToMemory((DWORD)Addresses::EALogoPush, &addrToMovie, 4);
 		WriteToMemory((DWORD)Addresses::IntroPush, &addrToMovie, 4);
-	}
-
-	if (MH_CreateHook(&GetCommandLineW, &DetourGetCommandLineW,
-		reinterpret_cast<LPVOID*>(&fpGetCommandLineW)) != MH_OK)
-	{
-		return false;
-	}
-	if (MH_EnableHook(&GetCommandLineW) != MH_OK)
-	{
-		return false;
-	}
-
-	if (MH_CreateHook(&SetWindowPos, &DetourSetWindowPos,
-		reinterpret_cast<LPVOID*>(&fpSetWindowPos)) != MH_OK)
-	{
-		return false;
-	}
-	if (MH_EnableHook(&SetWindowPos) != MH_OK)
-	{
-		return false;
 	}
 
 	if (Config::ExtendedLua) {

@@ -5,8 +5,6 @@ namespace Config {
 
 	extern bool Console;
 	extern bool SkipIntro;
-	extern bool Borderless;
-	extern bool Windowed;
 	extern bool FixRNG;
 	extern bool ExtendedLua;
 }
