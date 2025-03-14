@@ -3,11 +3,15 @@
 #include "MinHook.h"
 #include "Addresses.h"
 #include "Logging.h"
+#include "ts2/CheatSystem.h"
+#include "LuaCheatCommand.h"
 
 namespace LuaExtensions {
 
 	typedef bool(__cdecl* REGISTERPRIMITIVESUPPORTLUACOMMANDS)(TS2::cIGZLua5Thread*);
 	static REGISTERPRIMITIVESUPPORTLUACOMMANDS fpRegisterPrimitiveSupportLuaCommands = NULL;
+	typedef void(__stdcall* REGISTERTSSGCHEATS)();
+	static REGISTERTSSGCHEATS fpRegisterTSSGCheats = NULL;
 
 	static std::string GetProcessDirectory() {
 		char path[MAX_PATH];
@@ -21,6 +25,16 @@ namespace LuaExtensions {
 		return "";
 	}
 
+	static int __cdecl LuaRegisterTestingCheat(lua_State* luaState) {
+		const char* cheatName = lua_tostring(luaState, 1);
+		const char* cheatDesc = lua_tostring(luaState, 2);
+		lua_pushvalue(luaState, 3);
+		int executeRef = luaL_ref(luaState, LUA_REGISTRYINDEX);
+		LuaCheatCommand* luaCheat = new LuaCheatCommand(cheatName, cheatDesc, executeRef, luaState);
+		TS2::TSRegisterTestingCheat(luaCheat);
+		return 0;
+	}
+
 	static int __cdecl LuaGetExecutableDirectory(lua_State* luaState) {
 		lua_pushstring(luaState, GetProcessDirectory().c_str());
 		return 1;
@@ -28,9 +42,16 @@ namespace LuaExtensions {
 
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
-		if (luaThread != NULL)
+		if (luaThread != NULL) {
 			luaThread->Register(&LuaGetExecutableDirectory, "GetExecutableDirectory");
+			luaThread->Register(&LuaRegisterTestingCheat, "RegisterTestingCheat");
+		}
 		return res;
+	}
+
+	static void __stdcall DetourRegisterTSSGCheats() {
+		Log("Register TSSG cheats!\n");
+		fpRegisterTSSGCheats();
 	}
 
 	bool Initialize() {
@@ -40,6 +61,15 @@ namespace LuaExtensions {
 			return false;
 		}
 		if (MH_EnableHook(Addresses::RegisterLuaCommands) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_CreateHook(Addresses::RegisterTSSGCheats, &DetourRegisterTSSGCheats,
+			reinterpret_cast<LPVOID*>(&fpRegisterTSSGCheats)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::RegisterTSSGCheats) != MH_OK)
 		{
 			return false;
 		}

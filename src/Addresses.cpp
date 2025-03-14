@@ -3,6 +3,17 @@
 #include "Addresses.h"
 #include "scan.h"
 #include "Logging.h"
+#define ADDRESS(name, lookup) \
+Log("Scanning for %s...\n", #name);\
+name = ScanInternal(lookup, lookup##Mask, modBase, size);\
+if (name == nullptr) {\
+	Log("Failed to find address for %s!\n", #name);\
+	return false;\
+}\
+else\
+{\
+	Log("Found %s at %p\n", #name, name);\
+}\
 
 namespace Addresses {
 
@@ -76,7 +87,7 @@ namespace Addresses {
 		0xE8, 0x06, 0x76, 0xD6, 0xFF,
 		0x83, 0xC4, 0x04
 	};
-	static char lua50OpenLookupMask[] = "xxxxxxx????xxxxxxxxx????xxx";
+	static char lua5OpenLookupMask[] = "xxxxxxx????xxxxxxxxx????xxx";
 
 	static char registerLuaCommandsLookup[] = {
 		0x56,
@@ -106,6 +117,196 @@ namespace Addresses {
 	};
 	static char luaPushStringLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char cheatQueryInterfaceLookup[] = {
+		0x8B, 0x44, 0x24, 0x08,
+		0x85, 0xC0,
+		0x75, 0x04,
+		0x32, 0xC0,
+		0xEB, 0x23,
+		0x83, 0x7C, 0x24, 0x04, 0x01,
+		0x74, 0x13,
+		0x81, 0x7C, 0x24, 0x04, 0xC7, 0x39, 0xDA, 0xAA
+	};
+	static char cheatQueryInterfaceLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+	static char cheatReleaseLookup[] = {
+		0x8B, 0x41, 0x08,
+		0x83, 0xE8, 0x01,
+		0x89, 0x41, 0x08,
+		0x75, 0x09,
+		0x8B, 0x01,
+		0x6A, 0x01,
+		0xFF, 0x50, 0x24,
+		0x33, 0xC0,
+		0xC3
+	};
+	static char cheatReleaseLookupMask[] = "xxxxxxxxxxxxxxxxxxxxx";
+
+	static char cheatDestructorLookup[] = {
+		0xF6, 0x44, 0x24, 0x04, 0x01,
+		0x56,
+		0x8B, 0xF1,
+		0xC7, 0x06, 0x9C, 0x1A, 0x05, 0x01,
+		0x74, 0x0B,
+		0x6A, 0x0C,
+		0x56
+	};
+	static char cheatDestructorLookupMask[] = "xxxxxxxxxx????xxxxx";
+
+	static char getCheatSystemLookup[] = {
+		0x51,
+		0xA1, 0x00, 0x4B, 0x3A, 0x01,
+		0x85, 0xC0,
+		0x75, 0x36,
+		0x89, 0x04, 0x24,
+		0xE8, 0x5D, 0xE7, 0x60, 0xFF,
+		0x8B, 0xC8,
+		0x85, 0xC9,
+		0x74, 0x13
+	};
+	static char getCheatSystemLookupMask[] = "xx????xxxxxxxx????xxxxxx";
+
+	static char registerTestingCheatLookup[] = {
+		0x55,
+		0x8B, 0xEC,
+		0x6A, 0xFF,
+		0x68, 0xEE, 0x68, 0x02, 0x01,
+		0x64, 0xA1, 0x00, 0x00, 0x00, 0x00,
+		0x50,
+		0x64, 0x89, 0x25, 0x00, 0x00, 0x00, 0x00,
+		0x83, 0xEC, 0x30,
+		0x53,
+		0x33, 0xDB,
+		0x89, 0x5D, 0xE4,
+		0x89, 0x5D, 0xEC
+	};
+	static char registerTestingCheatLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+	static char registerTSSGCheatsLookup[] = {
+		0x55,
+		0x8B, 0xEC,
+		0x6A, 0xFF,
+		0x68, 0x75, 0x1F, 0xFE, 0x00,
+		0x64, 0xA1, 0x00, 0x00, 0x00, 0x00,
+		0x50,
+		0x64, 0x89, 0x25, 0x00, 0x00, 0x00, 0x00,
+		0x83, 0xEC, 0x08,
+		0xC7, 0x45, 0xEC, 0x00, 0x00, 0x00, 0x00,
+		0xE8, 0x98, 0x18, 0xDA, 0xFF,
+		0x85, 0xC0
+	};
+	static char registerTSSGCheatsLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxx????xx";
+
+	static char luaRawGetILookup[] = {
+		0x8B, 0x4C, 0x24, 0x08,
+		0x56,
+		0x8B, 0x74, 0x24, 0x08,
+		0x85, 0xC9,
+		0x7E, 0x0D,
+		0x8B, 0x46, 0x0C,
+		0xC1, 0xE1, 0x04,
+		0x83, 0xC0, 0xF0,
+		0x03, 0xC1,
+		0xEB, 0x0A,
+		0x51,
+		0x56,
+
+		0xE8, 0x2F, 0x07, 0x00, 0x00,
+		0x83, 0xC4, 0x08,
+		0xFF, 0x74, 0x24, 0x10,
+		0xFF, 0x70, 0x08
+	};
+	static char luaRawGetILookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxx";
+
+	static char luaSetTopLookup[] = {
+		0x8B, 0x44, 0x24, 0x08,
+		0x8B, 0x4C, 0x24, 0x04,
+		0x56,
+		0x8B, 0xF0,
+		0xC1, 0xE6, 0x04,
+		0x85, 0xC0,
+		0x78, 0x30,
+		0x8B, 0x51, 0x08,
+		0x57,
+		0x8B, 0x79, 0x0C,
+		0x8D, 0x04, 0x3E,
+		0x3B, 0xD0,
+		0x73, 0x19
+	};
+	static char luaSetTopLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+	static char luaPCallLookup[] = {
+		0x8B, 0x4C, 0x24, 0x10,
+		0x83, 0xEC, 0x08,
+		0x56,
+		0x8B, 0x74, 0x24, 0x10,
+		0x85, 0xC9,
+		0x75, 0x04,
+		0x33, 0xD2,
+		0xEB, 0x1C,
+		0x7E, 0x0B,
+		0xC1, 0xE1, 0x04,
+		0x8D, 0x51, 0xF0,
+		0x03, 0x56, 0x0C,
+		0xEB, 0x0C,
+		0x51,
+		0x56
+	};
+	static char luaPCallLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+	static char luaPushValueLookup[] = {
+		0x8B, 0x4C, 0x24, 0x08,
+		0x56,
+		0x8B, 0x74, 0x24, 0x08,
+		0x85, 0xC9,
+		0x7E, 0x0D,
+		0x8B, 0x46, 0x0C,
+		0xC1, 0xE1, 0x04,
+		0x83, 0xC0, 0xF0,
+		0x03, 0xC1,
+		0xEB, 0x0A,
+		0x51,
+		0x56,
+
+		0xE8, 0x7F, 0x08, 0x00, 0x00,
+		0x83, 0xC4, 0x08,
+		0x8B, 0x56, 0x08,
+		0x8B, 0x08,
+		0x89, 0x0A
+	};
+	static char luaPushValueLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxx";
+
+	static char luaToStringLookup[] = {
+		0x8B, 0x4C, 0x24, 0x08,
+		0x56,
+		0x57,
+		0x8B, 0x7C, 0x24, 0x0C,
+		0x85, 0xC9,
+		0x7E, 0x10,
+		0xC1, 0xE1, 0x04,
+		0x8D, 0x71, 0xF0,
+		0x03, 0x77, 0x0C,
+		0x3B, 0x77, 0x08,
+		0x73, 0x12,
+		0xEB, 0x0C,
+		0x51,
+		0x57
+	};
+	static char luaToStringLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+	static char luaLRefLookup[] = {
+		0x83, 0xEC, 0x08,
+		0x53,
+		0x8B, 0x5C, 0x24, 0x14,
+		0x56,
+		0x8B, 0x74, 0x24, 0x14,
+		0x8D, 0x83, 0x0F, 0x27, 0x00, 0x00,
+		0x3D, 0x0F, 0x27, 0x00, 0x00,
+		0x77, 0x0C,
+		0x56
+	};
+	static char luaLRefLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -114,6 +315,48 @@ namespace Addresses {
 	void* GZLua5Open;
 	void* RegisterLuaCommands;
 	void* LuaPushString;
+	void* LuaRawGetI;
+	void* LuaSetTop;
+	void* LuaPCall;
+	void* LuaPushValue;
+	void* LuaToString;
+	void* LuaLRef;
+
+	void* CheatQueryInterface;
+	void* CheatRelease;
+	void* CheatDestructor;
+	void* GetCheatSystem;
+	void* RegisterTestingCheat;
+	void* RegisterTSSGCheats;
+
+	static bool ScanBaseAddresses(char* modBase, int size) {
+		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
+		ADDRESS(EALogoPush, eaLogoPushLookup);
+		ADDRESS(IntroPush, introEngPushLookup);
+		ADDRESS(LuaUnregister, luaUnregisterLookup);
+		ADDRESS(LuaPrintStub, luaPrintStubLookup);
+		LuaPrintStub = (void*)((DWORD)LuaPrintStub + 9);
+		ADDRESS(GZLua5Open, lua5OpenLookup);
+		ADDRESS(RegisterLuaCommands, registerLuaCommandsLookup);
+		ADDRESS(LuaPushString, luaPushStringLookup);
+		ADDRESS(LuaRawGetI, luaRawGetILookup);
+		ADDRESS(LuaSetTop, luaSetTopLookup);
+		ADDRESS(LuaPCall, luaPCallLookup);
+		ADDRESS(LuaPushValue, luaPushValueLookup);
+		ADDRESS(LuaToString, luaToStringLookup);
+		ADDRESS(LuaLRef, luaLRefLookup);
+		return true;
+	}
+
+	static bool ScanCheatAddresses(char* modBase, int size) {
+		ADDRESS(CheatQueryInterface, cheatQueryInterfaceLookup);
+		ADDRESS(CheatRelease, cheatReleaseLookup);
+		ADDRESS(CheatDestructor, cheatDestructorLookup);
+		ADDRESS(GetCheatSystem, getCheatSystemLookup);
+		ADDRESS(RegisterTestingCheat, registerTestingCheatLookup);
+		ADDRESS(RegisterTSSGCheats, registerTSSGCheatsLookup);
+		return true;
+	}
 
 	bool Initialize() {
 		HMODULE module = GetModuleHandleA(NULL);
@@ -122,23 +365,8 @@ namespace Addresses {
 		MODULEINFO modInfo;
 		GetModuleInformation(proc, module, &modInfo, sizeof(MODULEINFO));
 		int size = modInfo.SizeOfImage;
-		RandomUint32Uniform = ScanInternal(randomUint32Lookup, randomUint32LookupMask, modBase, size);
-		if (RandomUint32Uniform == nullptr) return false;
-		EALogoPush = ScanInternal(eaLogoPushLookup, eaLogoPushLookupMask, modBase, size);
-		if (EALogoPush == nullptr) return false;
-		IntroPush = ScanInternal(introEngPushLookup, introEngPushLookupMask, modBase, size);
-		if (IntroPush == nullptr) return false;
-		LuaUnregister = ScanInternal(luaUnregisterLookup, luaUnregisterLookupMask, modBase, size);
-		if (LuaUnregister == nullptr) return false;
-		LuaPrintStub = ScanInternal(luaPrintStubLookup, luaPrintStubLookupMask, modBase, size);
-		if (LuaPrintStub == nullptr) return false;
-		LuaPrintStub = (void*)((DWORD)LuaPrintStub + 9);
-		GZLua5Open = ScanInternal(lua5OpenLookup, lua50OpenLookupMask, modBase, size);
-		if (GZLua5Open == nullptr) return false;
-		RegisterLuaCommands = ScanInternal(registerLuaCommandsLookup, registerLuaCommandsLookupMask, modBase, size);
-		if (RegisterLuaCommands == nullptr) return false;
-		LuaPushString = ScanInternal(luaPushStringLookup, luaPushStringLookupMask, modBase, size);
-		if (LuaPushString == nullptr) return false;
+		if (!ScanBaseAddresses(modBase, size)) return false;
+		if (!ScanCheatAddresses(modBase, size)) return false;
 		return true;
 	}
 }
