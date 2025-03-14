@@ -18,17 +18,23 @@ FetchContent_MakeAvailable(MinHook)
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*/*.cpp")
 file(GLOB_RECURSE HEADERS "include/*.h" "include/*/*.h")
 
-add_library(TS2Extender SHARED ${SOURCES} ${HEADERS})
+function(setup_ts2extender_target target_name compile_defs)
+    add_library(${target_name} SHARED ${SOURCES} ${HEADERS})
 
-target_include_directories(TS2Extender PRIVATE include minhook/include)
-target_include_directories(TS2Extender PRIVATE include thirdparty/mINI/src/mini)
+    target_include_directories(${target_name} PRIVATE include minhook/include)
+    target_include_directories(${target_name} PRIVATE include thirdparty/mINI/src/mini)
 
-target_link_libraries(TS2Extender PRIVATE minhook)
+    target_link_libraries(${target_name} PRIVATE minhook)
 
-set_target_properties(TS2Extender PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    SUFFIX ".asi"
-)
+    set_target_properties(${target_name} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        SUFFIX ".asi"
+    )
 
-target_compile_definitions(TS2Extender PRIVATE TS2EXTENDER_EXPORTS)
+    target_compile_definitions(${target_name} PRIVATE ${compile_defs})
+endfunction()
+
+setup_ts2extender_target(TS2Extender "TS2EXTENDER_EXPORTS")
+
+setup_ts2extender_target(TS2ExtenderConsole "TS2EXTENDER_EXPORTS;FORCE_CONSOLE")

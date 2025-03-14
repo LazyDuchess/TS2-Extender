@@ -22,6 +22,12 @@ BOOL WINAPI DllMain(HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
+#if FORCE_CONSOLE
+        AllocConsole();
+        freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
+        freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+        freopen_s((FILE**)stderr, "CONOUT$", "w", stderr);
+#endif
         DisableThreadLibraryCalls(hModule);
         if (!IsGame()) return TRUE;
         if (!Core::Create()) {

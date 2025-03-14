@@ -88,12 +88,14 @@ bool Core::Create() {
 bool Core::Initialize() {
 	Config::Load();
 
+#if !FORCE_CONSOLE
 	if (Config::Console) {
 		AllocConsole();
 		freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
 		freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 		freopen_s((FILE**)stderr, "CONOUT$", "w", stderr);
 	}
+#endif
 
 	Log("TS2 Extender %s\n", Version);
 
