@@ -8,6 +8,11 @@ static bool IsGame() {
     char path[MAX_PATH];
     if (GetModuleFileName(NULL, path, MAX_PATH)) {
         std::string filename(path);
+        size_t pos = filename.find_last_of("\\");
+        if (pos != std::string::npos)
+        {
+            filename = filename.substr(pos + 1);
+        }
         if (filename.find("crashpad") != std::string::npos) return false;
         return true;
     }
