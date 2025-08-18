@@ -14,7 +14,8 @@
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
 typedef UINT(__thiscall* LUA5OPEN)(void*,UINT);
 
-typedef unsigned int(__thiscall* CLOTHINGDIALOGONATTACH)(void* me);
+typedef unsigned int(__thiscall* CLOTHINGDIALOGONATTACH)(void* me, int unk1, int unk2);
+typedef unsigned int(__thiscall* CLOTHINGDIALOGONCANCEL)(void* me);
 
 static RANDOMUINT32UNIFORM fpRandomUint32Uniform = NULL;
 static LUA5OPEN fpLua5Open = NULL;
@@ -22,10 +23,14 @@ static char placeholderMoviePath[] = "";
 static char retOverride[] = { 0xC3 };
 
 static CLOTHINGDIALOGONATTACH fpClothingDialogOnAttach = NULL;
+static CLOTHINGDIALOGONCANCEL fpClothingDialogOnCancel = NULL;
 
-static unsigned int __fastcall DetourClothingDialogOnAttach(void* me) {
-	Log("cTSWinProcClothingDialog::onAttach called.\n");
-	return fpClothingDialogOnAttach(me);
+static unsigned int __fastcall DetourClothingDialogOnAttach(void* me, void* _, int unk1, int unk2) {
+	Log("cTSWinProcClothingDialog::onAttach called for %p.\n", me);
+	int res = fpClothingDialogOnAttach(me, unk1, unk2);
+	((void(__thiscall*)(void*))Addresses::ClothingDialogOnCancel)(me);
+	//((int*)(me))[0x1f4] = 4;
+	return 0;
 }
 
 static UINT __fastcall DetourLua5Open(void* me, void* _, UINT flags) {
@@ -116,6 +121,8 @@ bool Core::Initialize() {
 	{
 		return false;
 	}
+
+	fpClothingDialogOnCancel = (CLOTHINGDIALOGONCANCEL)Addresses::ClothingDialogOnCancel;
 
 	return true;
 }
