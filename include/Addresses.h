@@ -19,6 +19,8 @@ namespace Addresses {
 	extern void* ClothingDialogOnCancel;
 	extern void* ClothingDialogOnAttach;
 	extern void* ClothingDialogInitialize;
+	extern void* ClothingDialogSetState;
+	extern void* DressEmployeeDialogOnAttach;
 
 	extern void* CheatQueryInterface;
 	extern void* CheatRelease;
