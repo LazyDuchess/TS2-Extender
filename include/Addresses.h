@@ -15,6 +15,7 @@ namespace Addresses {
 	extern void* LuaPushValue;
 	extern void* LuaToString;
 	extern void* LuaLRef;
+	extern void* DressEmployeeDialogSaveOutfit;
 
 	extern void* CheatQueryInterface;
 	extern void* CheatRelease;

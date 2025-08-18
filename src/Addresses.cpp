@@ -307,6 +307,20 @@ namespace Addresses {
 	};
 	static char luaLRefLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char dressEmployeeDialogSaveOutfitLookup[] = {
+		0xB8, 0x36, 0xA1, 0x00, 0x01,
+		0xE8, 0x44, 0x37, 0x13, 0x00,
+		0x83, 0xEC, 0x38,
+		0x56,
+		0x8B, 0xF1,
+		0x89, 0x75, 0xDC,
+		0x80, 0xBE, 0x98, 0x00, 0x00, 0x00, 0x00,
+		0x75, 0x07,
+		0xB0, 0x01,
+		0xE9, 0x01, 0x02, 0x00, 0x00
+	};
+	static char dressEmployeeDialogSaveOutfitLookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxxxx????";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -321,6 +335,7 @@ namespace Addresses {
 	void* LuaPushValue;
 	void* LuaToString;
 	void* LuaLRef;
+	void* DressEmployeeDialogSaveOutfit;
 
 	void* CheatQueryInterface;
 	void* CheatRelease;
@@ -345,6 +360,7 @@ namespace Addresses {
 		ADDRESS(LuaPushValue, luaPushValueLookup);
 		ADDRESS(LuaToString, luaToStringLookup);
 		ADDRESS(LuaLRef, luaLRefLookup);
+		ADDRESS(DressEmployeeDialogSaveOutfit, dressEmployeeDialogSaveOutfitLookup);
 		return true;
 	}
 
