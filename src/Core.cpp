@@ -149,32 +149,34 @@ bool Core::Initialize() {
 		if (!LuaExtensions::Initialize()) return false;
 	}
 
-	if (MH_CreateHook(Addresses::ClothingDialogOnAttach, &DetourClothingDialogOnAttach,
-		reinterpret_cast<LPVOID*>(&fpClothingDialogOnAttach)) != MH_OK)
-	{
-		return false;
-	}
-	if (MH_EnableHook(Addresses::ClothingDialogOnAttach) != MH_OK)
-	{
-		return false;
-	}
+	if (Config::FixOFBUniform) {
+		if (MH_CreateHook(Addresses::ClothingDialogOnAttach, &DetourClothingDialogOnAttach,
+			reinterpret_cast<LPVOID*>(&fpClothingDialogOnAttach)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::ClothingDialogOnAttach) != MH_OK)
+		{
+			return false;
+		}
 
-	if (MH_CreateHook(Addresses::DressEmployeeDialogOnAttach, &DetourDressEmployeeDialogOnAttach,
-		reinterpret_cast<LPVOID*>(&fpDressEmployeeDialogOnAttach)) != MH_OK)
-	{
-		return false;
-	}
-	if (MH_EnableHook(Addresses::DressEmployeeDialogOnAttach) != MH_OK)
-	{
-		return false;
-	}
+		if (MH_CreateHook(Addresses::DressEmployeeDialogOnAttach, &DetourDressEmployeeDialogOnAttach,
+			reinterpret_cast<LPVOID*>(&fpDressEmployeeDialogOnAttach)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::DressEmployeeDialogOnAttach) != MH_OK)
+		{
+			return false;
+		}
 
-	Nop((BYTE*)Addresses::ClothingDialogSetState, 10);
+		Nop((BYTE*)Addresses::ClothingDialogSetState, 10);
 
-	ClothingDialogHook1Return = (void*)((DWORD)Addresses::ClothingDialogHack1 + 6);
-	ClothingDialogHook2Return = (void*)((DWORD)Addresses::ClothingDialogHack2 + 7);
-	MakeJMP((BYTE*)Addresses::ClothingDialogHack1, (DWORD)ClothingDialogHook1, 6);
-	MakeJMP((BYTE*)Addresses::ClothingDialogHack2, (DWORD)ClothingDialogHook2, 7);
+		ClothingDialogHook1Return = (void*)((DWORD)Addresses::ClothingDialogHack1 + 6);
+		ClothingDialogHook2Return = (void*)((DWORD)Addresses::ClothingDialogHack2 + 7);
+		MakeJMP((BYTE*)Addresses::ClothingDialogHack1, (DWORD)ClothingDialogHook1, 6);
+		MakeJMP((BYTE*)Addresses::ClothingDialogHack2, (DWORD)ClothingDialogHook2, 7);
+	}
 
 	return true;
 }

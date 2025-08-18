@@ -307,20 +307,6 @@ namespace Addresses {
 	};
 	static char luaLRefLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
-	static char dressEmployeeDialogSaveOutfitLookup[] = {
-		0xB8, 0x36, 0xA1, 0x00, 0x01,
-		0xE8, 0x44, 0x37, 0x13, 0x00,
-		0x83, 0xEC, 0x38,
-		0x56,
-		0x8B, 0xF1,
-		0x89, 0x75, 0xDC,
-		0x80, 0xBE, 0x98, 0x00, 0x00, 0x00, 0x00,
-		0x75, 0x07,
-		0xB0, 0x01,
-		0xE9, 0x01, 0x02, 0x00, 0x00
-	};
-	static char dressEmployeeDialogSaveOutfitLookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxxxx????";
-
 	static char clothingDialogOnCancelLookup[] = {
 		0x56,
 		0x8B, 0xF1,
@@ -348,22 +334,6 @@ namespace Addresses {
 		0xE8, 0x6B, 0x31, 0xA7, 0xFF
 	};
 	static char clothingDialogOnAttachLookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxx????";
-
-	static char clothingDialogInitializeLookup[] = {
-		0xB8, 0xA4, 0x0F, 0x00, 0x01,
-		0xE8, 0x53, 0x53, 0x15, 0x00,
-		0x51,
-		0x51,
-		0x53,
-		0x57,
-		0x8B, 0xF9,
-		0x33, 0xDB,
-		0x39, 0x9F, 0x74, 0x01, 0x00, 0x00,
-		0x0F, 0x85, 0x9F, 0x00, 0x00, 0x00,
-		0x56,
-		0x89, 0x5D, 0xF0
-	};
-	static char clothingDialogInitializeLookupMask[] = "x????x????xxxxxxxxxxxxxxxx????xxxx";
 
 	static char clothingDialogSetStateLookup[] = {
 		0xC7, 0x86, 0x90, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
@@ -434,10 +404,8 @@ namespace Addresses {
 	void* LuaPushValue;
 	void* LuaToString;
 	void* LuaLRef;
-	void* DressEmployeeDialogSaveOutfit;
 	void* ClothingDialogOnCancel;
 	void* ClothingDialogOnAttach;
-	void* ClothingDialogInitialize;
 	void* ClothingDialogSetState;
 	void* DressEmployeeDialogOnAttach;
 	void* ClothingDialogHack1;
@@ -466,10 +434,8 @@ namespace Addresses {
 		ADDRESS(LuaPushValue, luaPushValueLookup);
 		ADDRESS(LuaToString, luaToStringLookup);
 		ADDRESS(LuaLRef, luaLRefLookup);
-		ADDRESS(DressEmployeeDialogSaveOutfit, dressEmployeeDialogSaveOutfitLookup);
 		ADDRESS(ClothingDialogOnCancel, clothingDialogOnCancelLookup);
 		ADDRESS(ClothingDialogOnAttach, clothingDialogOnAttachLookup);
-		ADDRESS(ClothingDialogInitialize, clothingDialogInitializeLookup);
 		ADDRESS(ClothingDialogSetState, clothingDialogSetStateLookup);
 		ADDRESS(DressEmployeeDialogOnAttach, dressEmployeeDialogOnAttachLookup);
 		ADDRESS(ClothingDialogHack1, clothingDialogHack1Lookup);

@@ -6,5 +6,6 @@ namespace Config {
 	extern bool Console;
 	extern bool SkipIntro;
 	extern bool FixRNG;
+	extern bool FixOFBUniform;
 	extern bool ExtendedLua;
 }

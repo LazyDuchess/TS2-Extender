@@ -9,6 +9,7 @@ namespace Config {
 	bool Console;
 	bool SkipIntro;
 	bool FixRNG;
+	bool FixOFBUniform;
 	bool ExtendedLua;
 
 	static bool Has(const std::string& section, const std::string& key) {
@@ -58,6 +59,7 @@ namespace Config {
 		Console = GetBool("General", "Console", false);
 		SkipIntro = GetBool("General", "SkipIntro", true);
 		FixRNG = GetBool("Fixes", "FixRNG", true);
+		FixOFBUniform = GetBool("Fixes", "FixOFBUniform", true);
 		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
 
 		if (!iniExisted) {

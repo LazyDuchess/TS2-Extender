@@ -15,10 +15,8 @@ namespace Addresses {
 	extern void* LuaPushValue;
 	extern void* LuaToString;
 	extern void* LuaLRef;
-	extern void* DressEmployeeDialogSaveOutfit;
 	extern void* ClothingDialogOnCancel;
 	extern void* ClothingDialogOnAttach;
-	extern void* ClothingDialogInitialize;
 	extern void* ClothingDialogSetState;
 	extern void* DressEmployeeDialogOnAttach;
 	extern void* ClothingDialogHack1;
