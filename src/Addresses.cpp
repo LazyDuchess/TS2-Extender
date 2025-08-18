@@ -321,6 +321,50 @@ namespace Addresses {
 	};
 	static char dressEmployeeDialogSaveOutfitLookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxxxx????";
 
+	static char clothingDialogOnCancelLookup[] = {
+		0x56,
+		0x8B, 0xF1,
+		0x83, 0xBE, 0x74, 0x01, 0x00, 0x00, 0x00,
+		0x74, 0x34,
+		0x8B, 0x8E, 0x68, 0x01, 0x00, 0x00,
+		0x85, 0xC9,
+		0x74, 0x0D,
+		0x8B, 0x11,
+		0x0F, 0xB6,	0x86, 0xAC, 0x01, 0x00, 0x00,
+		0x50
+	};
+	static char clothingDialogOnCancelLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+	static char clothingDialogOnAttachLookup[] = {
+		0xB8, 0xFD, 0xCB, 0xFC, 0x00,
+		0xE8, 0x9A, 0x3C, 0x15, 0x00,
+		0x83, 0xEC, 0x18,
+		0x53,
+		0x8B, 0xD9,
+		0x56,
+		0xFF, 0x75, 0x08,
+		0x8D, 0xB3, 0x74, 0x01, 0x00, 0x00,
+		0x8B, 0xCE,
+		0xE8, 0x6B, 0x31, 0xA7, 0xFF
+	};
+	static char clothingDialogOnAttachLookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxx????";
+
+	static char clothingDialogInitializeLookup[] = {
+		0xB8, 0xA4, 0x0F, 0x00, 0x01,
+		0xE8, 0x53, 0x53, 0x15, 0x00,
+		0x51,
+		0x51,
+		0x53,
+		0x57,
+		0x8B, 0xF9,
+		0x33, 0xDB,
+		0x39, 0x9F, 0x74, 0x01, 0x00, 0x00,
+		0x0F, 0x85, 0x9F, 0x00, 0x00, 0x00,
+		0x56,
+		0x89, 0x5D, 0xF0
+	};
+	static char clothingDialogInitializeLookupMask[] = "x????x????xxxxxxxxxxxxxxxx????xxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -336,6 +380,9 @@ namespace Addresses {
 	void* LuaToString;
 	void* LuaLRef;
 	void* DressEmployeeDialogSaveOutfit;
+	void* ClothingDialogOnCancel;
+	void* ClothingDialogOnAttach;
+	void* ClothingDialogInitialize;
 
 	void* CheatQueryInterface;
 	void* CheatRelease;
@@ -361,6 +408,9 @@ namespace Addresses {
 		ADDRESS(LuaToString, luaToStringLookup);
 		ADDRESS(LuaLRef, luaLRefLookup);
 		ADDRESS(DressEmployeeDialogSaveOutfit, dressEmployeeDialogSaveOutfitLookup);
+		ADDRESS(ClothingDialogOnCancel, clothingDialogOnCancelLookup);
+		ADDRESS(ClothingDialogOnAttach, clothingDialogOnAttachLookup);
+		ADDRESS(ClothingDialogInitialize, clothingDialogInitializeLookup);
 		return true;
 	}
 
