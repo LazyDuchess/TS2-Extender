@@ -27,6 +27,28 @@ static DIALOGONATTACH fpDressEmployeeDialogOnAttach = NULL;
 static CLOTHINGDIALOGONCANCEL fpClothingDialogOnCancel = NULL;
 
 static bool CancelNextClothingDialog = false;
+static void* ClothingDialogHook1Return;
+static void* ClothingDialogHook2Return;
+
+static void __declspec(naked) ClothingDialogHook1() {
+	__asm {
+		cmp[esi + 0xE8], 0x00000000
+		je goBack
+		mov[esi + 0x000000E8], ecx
+		goBack :
+			jmp [ClothingDialogHook1Return]
+	}
+}
+
+static void __declspec(naked) ClothingDialogHook2() {
+	__asm {
+		cmp[esi+0xE8], 0x00000000
+		je goBack
+		or dword ptr [esi+0xE8],0x01
+		goBack:
+			jmp [ClothingDialogHook2Return]
+	}
+}
 
 static unsigned int __fastcall DetourDressEmployeeDialogOnAttach(void* me, void* _, void* unk1, int unk2) {
 	CancelNextClothingDialog = true;
@@ -39,10 +61,10 @@ static unsigned int __fastcall DetourClothingDialogOnAttach(void* me, void* _, v
 		CancelNextClothingDialog = false;
 		int res = fpClothingDialogOnAttach(me, unk1, unk2);
 		((void(__thiscall*)(void*))Addresses::ClothingDialogOnCancel)(me);
-		((char*)unk1)[0xE8] = 0;
-		((char*)unk1)[0xE9] = 0;
-		((char*)unk1)[0xEA] = 0;
-		((char*)unk1)[0xEB] = 0;
+		((char*)unk1)[0xE8] = 0x00;
+		((char*)unk1)[0xE9] = 0x00;
+		((char*)unk1)[0xEA] = 0x00;
+		((char*)unk1)[0xEB] = 0x00;
 		return 0;
 	}
 	return fpClothingDialogOnAttach(me, unk1, unk2);
@@ -148,6 +170,11 @@ bool Core::Initialize() {
 	}
 
 	Nop((BYTE*)Addresses::ClothingDialogSetState, 10);
+
+	ClothingDialogHook1Return = (void*)((DWORD)Addresses::ClothingDialogHack1 + 6);
+	ClothingDialogHook2Return = (void*)((DWORD)Addresses::ClothingDialogHack2 + 7);
+	MakeJMP((BYTE*)Addresses::ClothingDialogHack1, (DWORD)ClothingDialogHook1, 6);
+	MakeJMP((BYTE*)Addresses::ClothingDialogHack2, (DWORD)ClothingDialogHook2, 7);
 
 	return true;
 }

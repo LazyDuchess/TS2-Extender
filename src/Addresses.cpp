@@ -395,6 +395,31 @@ namespace Addresses {
 	};
 	static char dressEmployeeDialogOnAttachLookupMask[] = "xxxxxxxxxxxx????xxxxxxxxxxxxxxxx";
 
+	static char clothingDialogHack1Lookup[]{
+		0x89, 0x8E, 0xE8, 0x00, 0x00, 0x00,
+		0x3B, 0xCA,
+		0x75, 0x07,
+		0x8B, 0xC1,
+		0xE9, 0x21, 0x02, 0x00, 0x00,
+		0x57,
+		0x83, 0xE8, 0x01,
+		0x0F, 0x84, 0x42, 0x01, 0x00, 0x00,
+		0x83, 0xE8, 0x01,
+		0x0F, 0x84, 0x01, 0x01, 0x00, 0x00
+	};
+	static char clothingDialogHack1LookupMask[] = "xxxxxxxxxxxxx????xxxxxx????xxxxx????";
+
+	static char clothingDialogHack2Lookup[]{
+		0x83, 0x8E, 0xE8, 0x00, 0x00, 0x00, 0x01,
+		0x8B, 0x01,
+		0xFF, 0x90, 0xA4, 0x01, 0x00, 0x00,
+		0x84, 0xDB,
+		0x75, 0x07,
+		0x83, 0xA6, 0xE8, 0x00, 0x00, 0x00, 0xFE,
+		0xF7, 0x86, 0xE8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08
+	};
+	static char clothingDialogHack2LookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -415,6 +440,8 @@ namespace Addresses {
 	void* ClothingDialogInitialize;
 	void* ClothingDialogSetState;
 	void* DressEmployeeDialogOnAttach;
+	void* ClothingDialogHack1;
+	void* ClothingDialogHack2;
 
 	void* CheatQueryInterface;
 	void* CheatRelease;
@@ -445,6 +472,8 @@ namespace Addresses {
 		ADDRESS(ClothingDialogInitialize, clothingDialogInitializeLookup);
 		ADDRESS(ClothingDialogSetState, clothingDialogSetStateLookup);
 		ADDRESS(DressEmployeeDialogOnAttach, dressEmployeeDialogOnAttachLookup);
+		ADDRESS(ClothingDialogHack1, clothingDialogHack1Lookup);
+		ADDRESS(ClothingDialogHack2, clothingDialogHack2Lookup);
 		return true;
 	}
 
