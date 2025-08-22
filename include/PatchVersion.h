@@ -1,2 +1,2 @@
 #pragma once
-const char* Version = "0.4.0";
+const char* Version = "0.6.0";

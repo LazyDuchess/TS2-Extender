@@ -5,6 +5,7 @@
 #include "Logging.h"
 #include "ts2/CheatSystem.h"
 #include "LuaCheatCommand.h"
+#include "PatchVersion.h"
 
 namespace LuaExtensions {
 
@@ -40,11 +41,16 @@ namespace LuaExtensions {
 		return 1;
 	}
 
+	static int __cdecl LuaGetTS2ExtenderVersion(lua_State* luaState) {
+		lua_pushstring(luaState, Version);
+	}
+
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
 		if (luaThread != NULL) {
 			luaThread->Register(&LuaGetExecutableDirectory, "GetExecutableDirectory");
 			luaThread->Register(&LuaRegisterTestingCheat, "RegisterTestingCheat");
+			luaThread->Register(&LuaRegisterTestingCheat, "GetTS2ExtenderVersion");
 		}
 		return res;
 	}
