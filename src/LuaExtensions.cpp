@@ -43,6 +43,7 @@ namespace LuaExtensions {
 
 	static int __cdecl LuaGetTS2ExtenderVersion(lua_State* luaState) {
 		lua_pushstring(luaState, Version);
+		return 1;
 	}
 
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
@@ -50,7 +51,7 @@ namespace LuaExtensions {
 		if (luaThread != NULL) {
 			luaThread->Register(&LuaGetExecutableDirectory, "GetExecutableDirectory");
 			luaThread->Register(&LuaRegisterTestingCheat, "RegisterTestingCheat");
-			luaThread->Register(&LuaRegisterTestingCheat, "GetTS2ExtenderVersion");
+			luaThread->Register(&LuaGetTS2ExtenderVersion, "GetTS2ExtenderVersion");
 		}
 		return res;
 	}
