@@ -19,9 +19,12 @@ Tested to work with The Sims 2 Legacy for Steam.
 
 ## Installation
 
-Firstly, download the latest version from the [releases](https://github.com/LazyDuchess/TS2-Extender/releases/latest) tab.
-Extract the zip. Inside you will find a "TSBin", a "Downloads" and a "TSData" folder.
-The "TSBin" and "TSData" folders go into your game's installation directory -> EP9, overriding the folders that are already there. Example: "E:\Steam\steamapps\common\The Sims 2 Legacy Collection\EP9"
-The "Downloads" folder goes into your "Documents/EA Games/The Sims 2 Legacy" folder. Make sure custom content is enabled in your in-game settings.
+* Firstly, download the latest version from the [releases](https://github.com/LazyDuchess/TS2-Extender/releases/latest) tab.
+* Extract the zip. Inside you will find a "TSBin", a "Downloads" and a "TSData" folder.
+* The "TSBin" and "TSData" folders go into your game's installation directory -> EP9, overriding the folders that are already there. Example: "E:\Steam\steamapps\common\The Sims 2 Legacy Collection\EP9"
+* The "Downloads" folder goes into your "Documents/EA Games/The Sims 2 Legacy" folder. Make sure custom content is enabled in your in-game settings.
+* If everything went well, you should have the new features in your game, and you will also have a new cheat command: "ts2extender", which will tell you the current TS2 Extender version (Cheat console can be opened with Shift+Control+C) :
+  <img width="1912" height="232" alt="image" src="https://github.com/user-attachments/assets/20dbb242-33c3-40e6-8e1f-65a0cacab284" />
+
 
 The mod can be configured via the .ini file.
