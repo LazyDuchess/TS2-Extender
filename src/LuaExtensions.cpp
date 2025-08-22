@@ -26,13 +26,14 @@ namespace LuaExtensions {
 		return "";
 	}
 
-	static int __cdecl LuaRegisterTestingCheat(lua_State* luaState) {
+	static int __cdecl LuaRegisterCheat(lua_State* luaState) {
 		const char* cheatName = lua_tostring(luaState, 1);
 		const char* cheatDesc = lua_tostring(luaState, 2);
 		lua_pushvalue(luaState, 3);
 		int executeRef = luaL_ref(luaState, LUA_REGISTRYINDEX);
 		LuaCheatCommand* luaCheat = new LuaCheatCommand(cheatName, cheatDesc, executeRef, luaState);
-		TS2::TSRegisterTestingCheat(luaCheat);
+		TS2::cTSCheatSystem* cheatSystem = TS2::CheatSystem();
+		cheatSystem->RegisterCheat(luaCheat);
 		return 0;
 	}
 
@@ -50,7 +51,7 @@ namespace LuaExtensions {
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
 		if (luaThread != NULL) {
 			luaThread->Register(&LuaGetExecutableDirectory, "GetExecutableDirectory");
-			luaThread->Register(&LuaRegisterTestingCheat, "RegisterTestingCheat");
+			luaThread->Register(&LuaRegisterCheat, "RegisterCheat");
 			luaThread->Register(&LuaGetTS2ExtenderVersion, "GetTS2ExtenderVersion");
 		}
 		return res;

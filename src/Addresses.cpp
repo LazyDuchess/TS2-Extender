@@ -390,6 +390,26 @@ namespace Addresses {
 	};
 	static char clothingDialogHack2LookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char cheatSystemLookup[]{
+		0x51,
+		0xA1, 0x00, 0x4B, 0x3A, 0x01,
+		0x85, 0xC0,
+		0x75, 0x36,
+		0x89, 0x04, 0x24,
+		0xE8, 0x5D, 0xE7, 0x60, 0xFF,
+		0x8B, 0xC8,
+		0x85, 0xC9,
+		0x74, 0x13,
+		0x8B, 0x01,
+		0x8D, 0x14, 0x24,
+		0x52,
+		0x68, 0x00, 0x0E, 0x49, 0x4A,
+		0x68, 0xEA, 0x15, 0x49, 0x2A,
+		0xFF, 0x50, 0x14,
+
+	};
+	static char cheatSystemLookupMask[] = "xx????xxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -417,6 +437,7 @@ namespace Addresses {
 	void* GetCheatSystem;
 	void* RegisterTestingCheat;
 	void* RegisterTSSGCheats;
+	void* CheatSystem;
 
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
@@ -440,6 +461,7 @@ namespace Addresses {
 		ADDRESS(DressEmployeeDialogOnAttach, dressEmployeeDialogOnAttachLookup);
 		ADDRESS(ClothingDialogHack1, clothingDialogHack1Lookup);
 		ADDRESS(ClothingDialogHack2, clothingDialogHack2Lookup);
+		ADDRESS(CheatSystem, cheatSystemLookup);
 		return true;
 	}
 

@@ -28,6 +28,7 @@ namespace Addresses {
 	extern void* GetCheatSystem;
 	extern void* RegisterTestingCheat;
 	extern void* RegisterTSSGCheats;
+	extern void* CheatSystem;
 
 	bool Initialize();
 }
