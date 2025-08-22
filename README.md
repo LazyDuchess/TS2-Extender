@@ -7,7 +7,7 @@ Tested to work with The Sims 2 Legacy for Steam.
 ## Features
 
 * Skip intro videos.
-* Restores removed Lua functionality for modders, working on adding some new functionality such as custom cheat commands and a custom Lua injector.
+* Adds completely new Lua functionality for modders, plus a Lua script loader.
 
 ## Fixes
 
