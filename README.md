@@ -20,7 +20,7 @@ Tested to work with The Sims 2 Legacy for Steam.
 ## Installation
 
 Firstly, download the latest version from the [releases](https://github.com/LazyDuchess/TS2-Extender/releases/latest) tab.
-Extract the zip. Inside you will find a "TSBin", a "Downloads" and a TSData folder.
+Extract the zip. Inside you will find a "TSBin", a "Downloads" and a "TSData" folder.
 The "TSBin" and "TSData" folders go into your game's installation directory -> EP9, overriding the folders that are already there. Example: "E:\Steam\steamapps\common\The Sims 2 Legacy Collection\EP9"
 The "Downloads" folder goes into your "Documents/EA Games/The Sims 2 Legacy" folder. Make sure custom content is enabled in your in-game settings.
 
