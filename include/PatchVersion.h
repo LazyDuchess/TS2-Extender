@@ -1,2 +1,2 @@
 #pragma once
-static const char* Version = "0.6.0";
+static const char* Version = "0.7.0";
