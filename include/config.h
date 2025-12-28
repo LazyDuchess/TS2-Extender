@@ -8,4 +8,5 @@ namespace Config {
 	extern bool FixRNG;
 	extern bool FixOFBUniform;
 	extern bool ExtendedLua;
+	extern bool Separates4All;
 }

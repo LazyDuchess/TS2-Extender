@@ -30,6 +30,9 @@ static bool CancelNextClothingDialog = false;
 static void* ClothingDialogHook1Return;
 static void* ClothingDialogHook2Return;
 
+// Simply a PUSH 01 with 2 NOPS. Tells function to always keep separates visible in UI.
+static char separatesPatch[] = { 0x6A, 0x01, 0x90, 0x90 };
+
 static void __declspec(naked) ClothingDialogHook1() {
 	__asm {
 		cmp[esi + 0xE8], 0x00000000
@@ -176,6 +179,10 @@ bool Core::Initialize() {
 		ClothingDialogHook2Return = (void*)((DWORD)Addresses::ClothingDialogHack2 + 7);
 		MakeJMP((BYTE*)Addresses::ClothingDialogHack1, (DWORD)ClothingDialogHook1, 6);
 		MakeJMP((BYTE*)Addresses::ClothingDialogHack2, (DWORD)ClothingDialogHook2, 7);
+	}
+
+	if (Config::Separates4All) {
+		WriteToMemory((DWORD)Addresses::CalculateOutfitPartVisibility, &separatesPatch, 4);
 	}
 
 	return true;

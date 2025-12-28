@@ -410,6 +410,21 @@ namespace Addresses {
 	};
 	static char cheatSystemLookupMask[] = "xx????xxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char calculateOutfitPartVisibilityLookup[] = {
+		0xFF, 0x74, 0x24, 0x0C,
+		0x8B, 0xC8,
+		0x6A, 0x01,
+		0x8B, 0x10,
+		0xFF, 0x92, 0x4C, 0x01, 0x00, 0x00,
+		0x8B, 0x36,
+		0x3B, 0x77, 0x54,
+		0x75, 0xDD,
+		0x5F,
+		0x5E,
+		0xC2, 0x04, 0x00,
+	};
+	static char calculateOutfitPartVisibilityLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -439,6 +454,8 @@ namespace Addresses {
 	void* RegisterTSSGCheats;
 	void* CheatSystem;
 
+	void* CalculateOutfitPartVisibility;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -462,6 +479,7 @@ namespace Addresses {
 		ADDRESS(ClothingDialogHack1, clothingDialogHack1Lookup);
 		ADDRESS(ClothingDialogHack2, clothingDialogHack2Lookup);
 		ADDRESS(CheatSystem, cheatSystemLookup);
+		ADDRESS(CalculateOutfitPartVisibility, calculateOutfitPartVisibilityLookup);
 		return true;
 	}
 

@@ -30,5 +30,7 @@ namespace Addresses {
 	extern void* RegisterTSSGCheats;
 	extern void* CheatSystem;
 
+	extern void* CalculateOutfitPartVisibility;
+
 	bool Initialize();
 }
