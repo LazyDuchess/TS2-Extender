@@ -8,6 +8,7 @@ Tested to work with The Sims 2 Legacy for Steam.
 
 * Skip intro videos.
 * Adds completely new Lua functionality for modders, plus a Lua script loader.
+* Allows you to use separate top/bottom clothes in outfit categories other than just Everyday, if you have the CC for it. Can be enabled via the .ini.
 
 ## Fixes
 
