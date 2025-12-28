@@ -425,6 +425,40 @@ namespace Addresses {
 	};
 	static char calculateOutfitPartVisibilityLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char calculateBuyPartVisibilityLookup[] = {
+		0xFF, 0x75, 0xEF,
+		0x56,
+		0xFF, 0x73, 0x14,
+		0xE8, 0xA0, 0x29, 0x26, 0x00,
+		0x6A, 0x01,
+		0xFF, 0x75, 0xEF,
+		0x57,
+		0xFF, 0x73, 0x14,
+		0xE8, 0x92, 0x29, 0x26, 0x00,
+		0x6A, 0x01,
+		0xFF, 0x75, 0xEF,
+		0x68, 0x02, 0x00, 0xC7, 0xEC,
+		0xFF, 0x73, 0x14,
+	};
+	static char calculateBuyPartVisibilityLookupMask[] = "xxxxxxxx????xxxxxxxxxx????xxxxxxxxxxxxx";
+
+	static char calculateTryOnPartVisibilityLookup[] = {
+		0xFF, 0x75, 0xEC,
+		0x56,
+		0xFF, 0x73, 0x10,
+		0xE8, 0xD6, 0xFC, 0x25, 0x00,
+		0x6A, 0x01,
+		0xFF, 0x75, 0xEC,
+		0x57,
+		0xFF, 0x73, 0x10,
+		0xE8, 0xC8, 0xFC, 0x25, 0x00,
+		0x6A, 0x01,
+		0xFF, 0x75, 0xEC,
+		0x68, 0x02, 0x00, 0xC7, 0xEC,
+		0xFF, 0x73, 0x10,
+	};
+	static char calculateTryOnPartVisibilityLookupMask[] = "xxxxxxxx????xxxxxxxxxx????xxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -455,6 +489,8 @@ namespace Addresses {
 	void* CheatSystem;
 
 	void* CalculateOutfitPartVisibility;
+	void* CalculateBuyPartVisibility;
+	void* CalculateTryOnPartVisibility;
 
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
@@ -480,6 +516,8 @@ namespace Addresses {
 		ADDRESS(ClothingDialogHack2, clothingDialogHack2Lookup);
 		ADDRESS(CheatSystem, cheatSystemLookup);
 		ADDRESS(CalculateOutfitPartVisibility, calculateOutfitPartVisibilityLookup);
+		ADDRESS(CalculateBuyPartVisibility, calculateBuyPartVisibilityLookup);
+		ADDRESS(CalculateTryOnPartVisibility, calculateTryOnPartVisibilityLookup);
 		return true;
 	}
 

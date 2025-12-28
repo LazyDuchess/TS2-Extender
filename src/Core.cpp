@@ -32,6 +32,8 @@ static void* ClothingDialogHook2Return;
 
 // Simply a PUSH 01 with 2 NOPS. Tells function to always keep separates visible in UI.
 static char separatesPatch[] = { 0x6A, 0x01, 0x90, 0x90 };
+// PUSH 01 with 1 NOP. Tells buy and try on to keep separates visibles in UI.
+static char separatesBuyPatch[] = { 0x6A, 0x01, 0x90 };
 
 static void __declspec(naked) ClothingDialogHook1() {
 	__asm {
@@ -183,6 +185,14 @@ bool Core::Initialize() {
 
 	if (Config::Separates4All) {
 		WriteToMemory((DWORD)Addresses::CalculateOutfitPartVisibility, &separatesPatch, 4);
+
+		WriteToMemory((DWORD)Addresses::CalculateBuyPartVisibility, &separatesBuyPatch, 3);
+		WriteToMemory((DWORD)Addresses::CalculateBuyPartVisibility + 0xE, &separatesBuyPatch, 3);
+		WriteToMemory((DWORD)Addresses::CalculateBuyPartVisibility + 0xE + 0xE, &separatesBuyPatch, 3);
+
+		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility, &separatesBuyPatch, 3);
+		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0xE, &separatesBuyPatch, 3);
+		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0xE + 0xE, &separatesBuyPatch, 3);
 	}
 
 	return true;

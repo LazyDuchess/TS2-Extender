@@ -31,6 +31,8 @@ namespace Addresses {
 	extern void* CheatSystem;
 
 	extern void* CalculateOutfitPartVisibility;
+	extern void* CalculateBuyPartVisibility;
+	extern void* CalculateTryOnPartVisibility;
 
 	bool Initialize();
 }
