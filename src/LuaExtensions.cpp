@@ -6,6 +6,7 @@
 #include "ts2/CheatSystem.h"
 #include "LuaCheatCommand.h"
 #include "PatchVersion.h"
+#include "ts2/cUserInput.h"
 
 namespace LuaExtensions {
 
@@ -47,12 +48,31 @@ namespace LuaExtensions {
 		return 1;
 	}
 
+	static int __cdecl LuaGetUserInput(lua_State* luaState) {
+		cUserInput* userInput = cUserInput::GetInstance();
+		Log("UserInput: %p\n", userInput);
+		if (userInput == nullptr)
+		{
+			lua_pushstring(luaState, "");
+			return 1;
+		}
+		const char* userString = userInput->GetString();
+		Log("UserString: %p\n", userString);
+		if (userString == nullptr) {
+			lua_pushstring(luaState, "");
+			return 1;
+		}
+		lua_pushstring(luaState, userString);
+		return 1;
+	}
+
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
 		if (luaThread != NULL) {
 			luaThread->Register(&LuaGetExecutableDirectory, "GetExecutableDirectory");
 			luaThread->Register(&LuaRegisterCheat, "RegisterCheat");
 			luaThread->Register(&LuaGetTS2ExtenderVersion, "GetTS2ExtenderVersion");
+			luaThread->Register(&LuaGetUserInput, "GetUserInput");
 		}
 		return res;
 	}

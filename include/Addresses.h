@@ -34,5 +34,7 @@ namespace Addresses {
 	extern void* CalculateBuyPartVisibility;
 	extern void* CalculateTryOnPartVisibility;
 
+	extern void* GetNodeTextInputField;
+
 	bool Initialize();
 }

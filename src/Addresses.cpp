@@ -3,6 +3,7 @@
 #include "Addresses.h"
 #include "scan.h"
 #include "Logging.h"
+#include "ts2/cUserInput.h"
 #define ADDRESS(name, lookup) \
 Log("Scanning for %s...\n", #name);\
 name = ScanInternal(lookup, lookup##Mask, modBase, size);\
@@ -459,6 +460,15 @@ namespace Addresses {
 	};
 	static char calculateTryOnPartVisibilityLookupMask[] = "xxxxxxxx????xxxxxxxxxx????xxxxxxxxxxxxx";
 
+	static char getNodeTextInputFieldLookup[] = {
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0x85, 0xC0,
+		0x75, 0x1C,
+		0x8D, 0x4D, 0xFC,
+		0xE8, 0x7C, 0xFD, 0xFF, 0xFF
+	};
+	static char getNodeTextInputFieldLookupMask[] = "????xxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -492,6 +502,8 @@ namespace Addresses {
 	void* CalculateBuyPartVisibility;
 	void* CalculateTryOnPartVisibility;
 
+	void* GetNodeTextInputField;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -518,6 +530,9 @@ namespace Addresses {
 		ADDRESS(CalculateOutfitPartVisibility, calculateOutfitPartVisibilityLookup);
 		ADDRESS(CalculateBuyPartVisibility, calculateBuyPartVisibilityLookup);
 		ADDRESS(CalculateTryOnPartVisibility, calculateTryOnPartVisibilityLookup);
+		ADDRESS(GetNodeTextInputField, getNodeTextInputFieldLookup);
+		cUserInput::m_GlobalUserInputPtr = (cUserInput**)*((cUserInput***)GetNodeTextInputField);
+		Log("User Input: %p\n", cUserInput::m_GlobalUserInputPtr);
 		return true;
 	}
 
