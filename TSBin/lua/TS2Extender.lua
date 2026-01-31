@@ -44,6 +44,70 @@ function UnpackString(data)
 	return result
 end
 
+DataWriter = {}
+DataWriter.__index = DataWriter
+
+function DataWriter.new()
+	local dw = {
+		index = 1,
+		data = {}
+	}
+	setmetatable(dw, DataWriter)
+	return dw
+end
+
+function DataWriter:Write(value)
+	data[index] = value
+	index = index + 1
+end
+
+function DataWriter:WriteString(str)
+	local packedString = PackString(str)
+	local packLength = table.getn(packedString)
+	self:Write(packLength)
+	for i = 1, packLength do
+		self:Write(packedString[i])
+	end
+end
+
+function DataWriter:ApplyToToken(token)
+	token:clearProperties()
+	token:setProperties(self.data)
+end
+
+DataReader = {}
+DataReader.__index = DataReader
+
+function DataReader.new()
+	local dr = {
+		index = 1,
+		data = {}
+	}
+	setmetatable(dr, DataReader)
+	return dr
+end
+
+function DataReader.FromToken(token)
+	local dr = DataReader.new()
+	dr.data = token:getPropertiesCopy()
+	return dr
+end
+
+function DataReader:Read()
+	local val = self.data[index]
+	index = index + 1
+	return val
+end
+
+function DataReader:ReadString()
+	local strlen = self:Read()
+	local packedString = {}
+	for i = 1, strlen do
+		table.insert(packedString, self:Read())
+	end
+	return UnpackString(packedString)
+end
+
 local function TS2ExtenderCheatExecute()
 	nUI.ShowTextNotification(1,"TS2 Extender Version: " .. GetTS2ExtenderVersion())
 end
