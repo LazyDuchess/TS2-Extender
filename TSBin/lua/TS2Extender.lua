@@ -3,8 +3,20 @@ function PackString(text)
 	
 	local byteCount = string.len(text)
 	
-	for i = 1, byteCount do
-		table.insert(packed, string.byte(text, i))
+	local i = 1
+	while i <= byteCount do
+		local byte1 = BitShiftLeft(string.byte(text, i), 8)
+		local byte2 = string.byte(text, i+1)
+		
+		if byte2 == nil then
+			byte2 = 0
+		end
+		
+		local value = BitwiseOr(byte1, byte2)
+
+		table.insert(packed, value)
+		
+		i = i + 2
 	end
 	
 	return packed
@@ -16,8 +28,17 @@ function UnpackString(data)
 	local byteCount = table.getn(data)
 	
 	for i = 1, byteCount do
-		local ch = string.char(data[i])
+		local short = data[i]
+		local byte1 = BitwiseAnd(BitShiftRight(short, 8), 255)
+		local byte2 = BitwiseAnd(short, 255)
+
+		local ch = string.char(byte1)
 		result = result .. ch
+		
+		if byte2 ~= 0 then
+			local ch2 = string.char(byte2)
+			result = result .. ch2
+		end
 	end
 	
 	return result
