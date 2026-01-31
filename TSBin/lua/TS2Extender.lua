@@ -1,3 +1,5 @@
+TS2Extender = true
+
 function PackString(text)
 	local packed = {}
 	
