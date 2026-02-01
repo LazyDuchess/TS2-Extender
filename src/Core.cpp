@@ -102,7 +102,7 @@ void Core::CacheUserData() {
 		HKEY_CURRENT_USER,
 		L"SOFTWARE\\Electronic Arts\\The Sims 2 Ultimate Collection 25",
 		0,
-		KEY_READ | KEY_QUERY_VALUE | KEY_WOW64_32KEY,
+		KEY_READ | KEY_WOW64_32KEY,
 		&nameKey
 	);
 
