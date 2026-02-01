@@ -1,4 +1,4 @@
-local exeDir = GetExecutableDirectory() .. "/lua"
+local exeDir = GetUserDirectory() .. "/Lua"
 print("Lua Loader Initializing.")
 
 local function listFiles(dir)

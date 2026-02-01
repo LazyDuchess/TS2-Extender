@@ -7,9 +7,10 @@
 #include "LuaCheatCommand.h"
 #include "PatchVersion.h"
 #include "ts2/cUserInput.h"
+#include "Core.h"
+#include "Utils.h"
 
 namespace LuaExtensions {
-
 	typedef bool(__cdecl* REGISTERPRIMITIVESUPPORTLUACOMMANDS)(TS2::cIGZLua5Thread*);
 	static REGISTERPRIMITIVESUPPORTLUACOMMANDS fpRegisterPrimitiveSupportLuaCommands = NULL;
 	typedef void(__stdcall* REGISTERTSSGCHEATS)();
@@ -38,6 +39,12 @@ namespace LuaExtensions {
 		return 0;
 	}
 
+	static int __cdecl LuaGetUserDirectory(lua_State* luaState) {
+		std::string utf8Dir = WCharToString(Core::_instance->m_UserDataPath.c_str());
+		lua_pushstring(luaState, utf8Dir.c_str());
+		return 1;
+	}
+
 	static int __cdecl LuaGetExecutableDirectory(lua_State* luaState) {
 		lua_pushstring(luaState, GetProcessDirectory().c_str());
 		return 1;
@@ -50,14 +57,12 @@ namespace LuaExtensions {
 
 	static int __cdecl LuaGetUserInput(lua_State* luaState) {
 		cUserInput* userInput = cUserInput::GetInstance();
-		Log("UserInput: %p\n", userInput);
 		if (userInput == nullptr)
 		{
 			lua_pushstring(luaState, "");
 			return 1;
 		}
 		const char* userString = userInput->GetString();
-		Log("UserString: %p\n", userString);
 		if (userString == nullptr) {
 			lua_pushstring(luaState, "");
 			return 1;
@@ -70,6 +75,7 @@ namespace LuaExtensions {
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
 		if (luaThread != NULL) {
 			luaThread->Register(&LuaGetExecutableDirectory, "GetExecutableDirectory");
+			luaThread->Register(&LuaGetUserDirectory, "GetUserDirectory");
 			luaThread->Register(&LuaRegisterCheat, "RegisterCheat");
 			luaThread->Register(&LuaGetTS2ExtenderVersion, "GetTS2ExtenderVersion");
 			luaThread->Register(&LuaGetUserInput, "GetUserInput");

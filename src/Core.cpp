@@ -10,6 +10,8 @@
 #include "MinHook.h"
 #include "scan.h"
 #include "LuaExtensions.h"
+#include <windows.h>
+#include <Shlobj.h>
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
 typedef UINT(__thiscall* LUA5OPEN)(void*,UINT);
@@ -93,6 +95,55 @@ static unsigned int __fastcall DetourRandomUint32Uniform(TS2::cRZRandom* me, voi
 
 Core* Core::_instance = nullptr;
 
+void Core::CacheUserData() {
+	HKEY nameKey;
+
+	LSTATUS keyStatus = RegOpenKeyExW(
+		HKEY_CURRENT_USER,
+		L"SOFTWARE\\Electronic Arts\\The Sims 2 Ultimate Collection 25",
+		0,
+		KEY_READ | KEY_QUERY_VALUE | KEY_WOW64_32KEY,
+		&nameKey
+	);
+
+	if (keyStatus != ERROR_SUCCESS) return;
+
+	DWORD finalSize = 0;
+	const wchar_t keyName[] = L"displayname";
+
+	LSTATUS valueStatus = RegGetValueW(
+		nameKey,
+		NULL,
+		keyName,
+		RRF_RT_REG_SZ,
+		NULL,
+		NULL,
+		&finalSize
+	);
+
+	if (valueStatus != ERROR_SUCCESS) return;
+
+	m_GameDisplayName.resize(finalSize / sizeof(wchar_t));
+
+	RegGetValueW(
+		nameKey,
+		NULL,
+		keyName,
+		RRF_RT_REG_SZ,
+		NULL,
+		m_GameDisplayName.data(),
+		&finalSize
+	);
+
+	PWSTR path_pwstr;
+	HRESULT hr = SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &path_pwstr);
+
+	if (SUCCEEDED(hr)) {
+		m_UserDataPath = std::wstring(path_pwstr) + L"\\EA Games\\" + m_GameDisplayName;
+		CoTaskMemFree(path_pwstr);
+	}
+}
+
 bool Core::Create() {
 	_instance = new Core();
 	return _instance->Initialize();
@@ -116,6 +167,8 @@ bool Core::Initialize() {
 	Log("Core initializing\n");
 
 	if (!Addresses::Initialize()) return false;
+
+	Core::_instance->CacheUserData();
 
 	// Initialize MinHook.
 	if (MH_Initialize() != MH_OK)
