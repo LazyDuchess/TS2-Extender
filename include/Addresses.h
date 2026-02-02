@@ -36,5 +36,7 @@ namespace Addresses {
 
 	extern void* GetNodeTextInputField;
 
+	extern void* TSStringLoad;
+
 	bool Initialize();
 }

@@ -12,6 +12,7 @@
 #include "LuaExtensions.h"
 #include <windows.h>
 #include <Shlobj.h>
+#include "ts2/cTSString.h"
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
 typedef UINT(__thiscall* LUA5OPEN)(void*,UINT);
@@ -19,6 +20,9 @@ typedef UINT(__thiscall* LUA5OPEN)(void*,UINT);
 typedef unsigned int(__thiscall* DIALOGONATTACH)(void* me, void* unk1, int unk2);
 typedef unsigned int(__thiscall* CLOTHINGDIALOGONCANCEL)(void* me);
 
+typedef bool(__thiscall* TSSTRINGLOAD)(void* me);
+
+static TSSTRINGLOAD fpTSStringLoad = NULL;
 static RANDOMUINT32UNIFORM fpRandomUint32Uniform = NULL;
 static LUA5OPEN fpLua5Open = NULL;
 static char placeholderMoviePath[] = "";
@@ -55,6 +59,15 @@ static void __declspec(naked) ClothingDialogHook2() {
 		goBack:
 			jmp [ClothingDialogHook2Return]
 	}
+}
+
+static bool __fastcall DetourTSStringLoad(cTSString* me, void* _) {
+	bool res = fpTSStringLoad(me);
+	Log("TSString: %p, Instance: %X, Group: %X, UserInput: %p\n", me, me->GetInstance(), me->GetGroup(), me->GetString());
+	if (me->GetInstance() == 0x12D && me->GetGroup() == 0x6236BFDD) {
+		me->GetString()->SetString("Penis.");
+	}
+	return res;
 }
 
 static unsigned int __fastcall DetourDressEmployeeDialogOnAttach(void* me, void* _, void* unk1, int unk2) {
@@ -246,6 +259,16 @@ bool Core::Initialize() {
 		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility, &separatesBuyPatch, 3);
 		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0xE, &separatesBuyPatch, 3);
 		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0xE + 0xE, &separatesBuyPatch, 3);
+	}
+
+	if (MH_CreateHook(Addresses::TSStringLoad, &DetourTSStringLoad,
+		reinterpret_cast<LPVOID*>(&fpTSStringLoad)) != MH_OK)
+	{
+		return false;
+	}
+	if (MH_EnableHook(Addresses::TSStringLoad) != MH_OK)
+	{
+		return false;
 	}
 
 	return true;
