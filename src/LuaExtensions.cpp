@@ -71,6 +71,38 @@ namespace LuaExtensions {
 		return 1;
 	}
 
+	// OverrideString(originalindex, originalinstance, originalgroup, repindex, repinstance, repgroup)
+	static int __cdecl LuaOverrideString(lua_State* luaState) {
+
+		uint16_t oIndex = static_cast<uint16_t>(lua_tonumber(luaState, 1));
+		uint16_t oInstance = static_cast<uint16_t>(lua_tonumber(luaState, 2));
+		uint32_t oGroup = static_cast<uint32_t>(lua_tonumber(luaState, 3));
+
+		uint16_t nIndex = static_cast<uint16_t>(lua_tonumber(luaState, 4));
+		uint16_t nInstance = static_cast<uint16_t>(lua_tonumber(luaState, 5));
+		uint32_t nGroup = static_cast<uint32_t>(lua_tonumber(luaState, 6));
+
+		Core::_instance->m_StringOverrides[StringId(oIndex, oInstance, oGroup)] = StringId(nIndex, nInstance, nGroup);
+		Log("Added override for Index: %X, Instance: %X, Group: %X - With Index: %X, Instance: %X, Group: %X", oIndex, oInstance, oGroup, nIndex, nInstance, nGroup);
+		return 0;
+	}
+
+	// ClearStringOverride(originalindex, originalinstance, originalgroup)
+	static int __cdecl LuaClearStringOverride(lua_State* luaState) {
+
+		uint16_t oIndex = static_cast<uint16_t>(lua_tonumber(luaState, 1));
+		uint16_t oInstance = static_cast<uint16_t>(lua_tonumber(luaState, 2));
+		uint32_t oGroup = static_cast<uint32_t>(lua_tonumber(luaState, 3));
+
+		StringId strId = StringId(oIndex, oInstance, oGroup);
+		auto it = Core::_instance->m_StringOverrides.find(strId);
+
+		if (it != Core::_instance->m_StringOverrides.end()) {
+			Core::_instance->m_StringOverrides.erase(it);
+		}
+		return 0;
+	}
+
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
 		if (luaThread != NULL) {
@@ -79,6 +111,8 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaRegisterCheat, "RegisterCheat");
 			luaThread->Register(&LuaGetTS2ExtenderVersion, "GetTS2ExtenderVersion");
 			luaThread->Register(&LuaGetUserInput, "GetUserInput");
+			luaThread->Register(&LuaOverrideString, "OverrideString");
+			luaThread->Register(&LuaClearStringOverride, "ClearStringOverride");
 		}
 		return res;
 	}

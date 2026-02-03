@@ -42,3 +42,9 @@ int luaL_ref(lua_State* luaState, int t) {
 	LuaLRefFunc func = reinterpret_cast<LuaLRefFunc>(Addresses::LuaLRef);
 	return func(luaState, t);
 }
+
+double lua_tonumber(lua_State* luaState, int idx) {
+	using LuaToNumberFunc = double (__cdecl*)(lua_State*, int);
+	LuaToNumberFunc func = reinterpret_cast<LuaToNumberFunc>(Addresses::LuaToNumber);
+	return func(luaState, idx);
+}

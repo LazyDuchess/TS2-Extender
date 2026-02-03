@@ -15,5 +15,6 @@ int lua_pcall(lua_State* luaState, int nargs, int nresults, int errfunc);
 void lua_pushvalue(lua_State* luaState, int idx);
 const char* lua_tostring(lua_State* luaState, int idx);
 int luaL_ref(lua_State* luaState, int t);
+double lua_tonumber(lua_State* luaState, int idx);
 
 #define lua_pop(L, n) lua_settop(L, -(n)-1)

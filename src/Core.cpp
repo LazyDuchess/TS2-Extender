@@ -62,6 +62,13 @@ static void __declspec(naked) ClothingDialogHook2() {
 }
 
 static bool __fastcall DetourTSStringLoad(cTSString* me, void* _) {
+	auto it = Core::_instance->m_StringOverrides.find(StringId(me->GetIndex(), me->GetInstance(), me->GetGroup()));
+	if (it != Core::_instance->m_StringOverrides.end()) {
+		me->SetIndex(it->second.Index());
+		me->SetInstance(it->second.Instance());
+		me->SetGroup(it->second.Group());
+		Log("Overriding String\n");
+	}
 	return fpTSStringLoad(me);
 }
 
