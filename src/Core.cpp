@@ -67,7 +67,6 @@ static bool __fastcall DetourTSStringLoad(cTSString* me, void* _) {
 		me->SetIndex(it->second.Index());
 		me->SetInstance(it->second.Instance());
 		me->SetGroup(it->second.Group());
-		Log("Overriding String\n");
 	}
 	return fpTSStringLoad(me);
 }

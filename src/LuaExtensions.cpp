@@ -83,7 +83,6 @@ namespace LuaExtensions {
 		uint32_t nGroup = static_cast<uint32_t>(lua_tonumber(luaState, 6));
 
 		Core::_instance->m_StringOverrides[StringId(oIndex, oInstance, oGroup)] = StringId(nIndex, nInstance, nGroup);
-		Log("Added override for Index: %X, Instance: %X, Group: %X - With Index: %X, Instance: %X, Group: %X", oIndex, oInstance, oGroup, nIndex, nInstance, nGroup);
 		return 0;
 	}
 
