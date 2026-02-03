@@ -503,6 +503,19 @@ namespace Addresses {
 	};
 	static char tsStringLoadLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxx";
 
+	static char loadUiScriptLookup[] = {
+		0x55,
+		0x8B, 0xEC,
+		0x6A, 0xFF,
+		0x68, 0xFF, 0xFF, 0xFF, 0xFF,
+		0x64, 0xA1, 0x00, 0x00, 0x00, 0x00,
+		0x50,
+		0x64, 0x89, 0x25, 0x00, 0x00, 0x00, 0x00,
+		0x81, 0xEC, 0x88, 0x00, 0x00, 0x00,
+		0xC7, 0x45, 0xD4, 0x00, 0x00, 0x00, 0x00
+	};
+	static char loadUiScriptLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -541,6 +554,8 @@ namespace Addresses {
 
 	void* TSStringLoad;
 
+	void* LoadUIScript;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -571,6 +586,7 @@ namespace Addresses {
 		ADDRESS(GetNodeTextInputField, getNodeTextInputFieldLookup);
 		cUserInput::m_GlobalUserInputPtr = (cUserInput**)*((cUserInput***)GetNodeTextInputField);
 		ADDRESS(TSStringLoad, tsStringLoadLookup);
+		ADDRESS(LoadUIScript, loadUiScriptLookup);
 		return true;
 	}
 

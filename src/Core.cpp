@@ -22,6 +22,9 @@ typedef unsigned int(__thiscall* CLOTHINGDIALOGONCANCEL)(void* me);
 
 typedef bool(__thiscall* TSSTRINGLOAD)(void* me);
 
+typedef bool(__stdcall* LOADUISCRIPT)(uint32_t instance, void* unk1, void* unk2, void* unk3, bool resolution);
+
+static LOADUISCRIPT fpLoadUiScript = NULL;
 static TSSTRINGLOAD fpTSStringLoad = NULL;
 static RANDOMUINT32UNIFORM fpRandomUint32Uniform = NULL;
 static LUA5OPEN fpLua5Open = NULL;
@@ -59,6 +62,14 @@ static void __declspec(naked) ClothingDialogHook2() {
 		goBack:
 			jmp [ClothingDialogHook2Return]
 	}
+}
+
+static bool __stdcall DetourLoadUIScript(uint32_t instance, void* unk1, void* unk2, void* unk3, bool resolution) {
+	auto it = Core::_instance->m_UIOverrides.find(instance);
+	if (it != Core::_instance->m_UIOverrides.end()) {
+		instance = it->second;
+	}
+	return fpLoadUiScript(instance, unk1, unk2, unk3, resolution);
 }
 
 static bool __fastcall DetourTSStringLoad(cTSString* me, void* _) {
@@ -269,6 +280,16 @@ bool Core::Initialize() {
 		return false;
 	}
 	if (MH_EnableHook(Addresses::TSStringLoad) != MH_OK)
+	{
+		return false;
+	}
+
+	if (MH_CreateHook(Addresses::LoadUIScript, &DetourLoadUIScript,
+		reinterpret_cast<LPVOID*>(&fpLoadUiScript)) != MH_OK)
+	{
+		return false;
+	}
+	if (MH_EnableHook(Addresses::LoadUIScript) != MH_OK)
 	{
 		return false;
 	}

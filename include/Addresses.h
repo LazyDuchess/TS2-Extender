@@ -39,5 +39,7 @@ namespace Addresses {
 
 	extern void* TSStringLoad;
 
+	extern void* LoadUIScript;
+
 	bool Initialize();
 }

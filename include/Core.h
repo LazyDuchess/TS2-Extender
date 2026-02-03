@@ -11,6 +11,7 @@ public:
 	std::wstring m_UserDataPath;
 	static Core* _instance;
 	std::unordered_map<StringId, StringId> m_StringOverrides;
+	std::unordered_map<uint32_t, uint32_t> m_UIOverrides;
 private:
 	void CacheUserData();
 };

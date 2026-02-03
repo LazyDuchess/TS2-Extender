@@ -102,6 +102,28 @@ namespace LuaExtensions {
 		return 0;
 	}
 
+	// OverrideUI(originalInstance, newInstance)
+	static int __cdecl LuaOverrideUI(lua_State* luaState) {
+		uint32_t oUI = static_cast<uint32_t>(lua_tonumber(luaState, 1));
+
+		uint32_t nUI = static_cast<uint32_t>(lua_tonumber(luaState, 2));
+
+		Core::_instance->m_UIOverrides[oUI] = nUI;
+		return 0;
+	}
+
+	// ClearUIOverride(originalInstance)
+	static int __cdecl LuaClearUIOverride(lua_State* luaState) {
+		uint32_t oUI = static_cast<uint32_t>(lua_tonumber(luaState, 1));
+
+		auto it = Core::_instance->m_UIOverrides.find(oUI);
+
+		if (it != Core::_instance->m_UIOverrides.end()) {
+			Core::_instance->m_UIOverrides.erase(it);
+		}
+		return 0;
+	}
+
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
 		if (luaThread != NULL) {
@@ -112,6 +134,8 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaGetUserInput, "GetUserInput");
 			luaThread->Register(&LuaOverrideString, "OverrideString");
 			luaThread->Register(&LuaClearStringOverride, "ClearStringOverride");
+			luaThread->Register(&LuaOverrideUI, "OverrideUI");
+			luaThread->Register(&LuaClearUIOverride, "ClearUIOverride");
 		}
 		return res;
 	}
