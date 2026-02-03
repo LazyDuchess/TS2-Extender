@@ -4,7 +4,12 @@
 class cTSString {
 public:
 	cUserInput* GetString();
-	int GetInstance();
-	int GetIndex();
+
+	short GetInstance();
+	short GetIndex();
 	int GetGroup();
+
+	void SetInstance(short instance);
+	void SetIndex(short index);
+	void SetGroup(int group);
 };

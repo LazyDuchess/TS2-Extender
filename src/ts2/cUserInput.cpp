@@ -18,16 +18,8 @@ bool cUserInput::IsStringEmbedded() {
 }
 
 void cUserInput::SetString(const char* str) {
-	if (!IsStringEmbedded()) {
-		// idk
-		free((void*)GetString());
-	}
-	// idk
-	(*(char*)(this + 0x9C + 0x14)) = 0x7F;
-
-	size_t len = strlen(str) + 1;
-	void* newMem = malloc(len);
-	memcpy(newMem, str, len);
-
-	(*(int*)(this + 0x9C)) = (int)newMem;
+	(*(char*)(this + 0x9C + 0x14)) = 0x0F;
+	size_t len = strlen(str);
+	memcpy((this + 0x9C), str, len);
+	(*(char*)(this + 0x9C + len + 1)) = 0x00;
 }

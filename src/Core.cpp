@@ -62,12 +62,7 @@ static void __declspec(naked) ClothingDialogHook2() {
 }
 
 static bool __fastcall DetourTSStringLoad(cTSString* me, void* _) {
-	bool res = fpTSStringLoad(me);
-	Log("TSString: %p, Instance: %X, Group: %X, UserInput: %p\n", me, me->GetInstance(), me->GetGroup(), me->GetString());
-	if (me->GetInstance() == 0x12D && me->GetGroup() == 0x6236BFDD) {
-		me->GetString()->SetString("Penis.");
-	}
-	return res;
+	return fpTSStringLoad(me);
 }
 
 static unsigned int __fastcall DetourDressEmployeeDialogOnAttach(void* me, void* _, void* unk1, int unk2) {
@@ -261,6 +256,7 @@ bool Core::Initialize() {
 		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0xE + 0xE, &separatesBuyPatch, 3);
 	}
 
+	
 	if (MH_CreateHook(Addresses::TSStringLoad, &DetourTSStringLoad,
 		reinterpret_cast<LPVOID*>(&fpTSStringLoad)) != MH_OK)
 	{

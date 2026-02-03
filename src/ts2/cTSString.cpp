@@ -4,14 +4,26 @@ cUserInput* cTSString::GetString() {
 	return (cUserInput*)(this + 0x30 + 0x40 - 0x28 - 0x14 - 0x9C);
 }
 
-int cTSString::GetInstance() {
-	return (*(int*)(this + 0x14));
+short cTSString::GetInstance() {
+	return (*(short*)(this + 0x2A));
 }
 
-int cTSString::GetIndex() {
-	return (*(int*)(this + 0x18));
+short cTSString::GetIndex() {
+	return (*(short*)(this + 0x28));
 }
 
 int cTSString::GetGroup() {
-	return (*(int*)(this + 0x1C));
+	return (*(int*)(this + 0x24));
+}
+
+void cTSString::SetInstance(short instance) {
+	(*(short*)(this + 0x2A)) = instance;
+}
+
+void cTSString::SetIndex(short index) {
+	(*(short*)(this + 0x28)) = index;
+}
+
+void cTSString::SetGroup(int group) {
+	(*(int*)(this + 0x24)) = group;
 }
