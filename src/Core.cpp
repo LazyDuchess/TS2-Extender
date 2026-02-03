@@ -22,7 +22,7 @@ typedef unsigned int(__thiscall* CLOTHINGDIALOGONCANCEL)(void* me);
 
 typedef bool(__thiscall* TSSTRINGLOAD)(void* me);
 
-typedef bool(__stdcall* LOADUISCRIPT)(uint32_t instance, void* unk1, void* unk2, void* unk3, bool resolution);
+typedef bool(__cdecl* LOADUISCRIPT)(uint32_t instance, void* unk1, void* unk2, void* unk3, bool resolution);
 
 static LOADUISCRIPT fpLoadUiScript = NULL;
 static TSSTRINGLOAD fpTSStringLoad = NULL;
@@ -64,7 +64,7 @@ static void __declspec(naked) ClothingDialogHook2() {
 	}
 }
 
-static bool __stdcall DetourLoadUIScript(uint32_t instance, void* unk1, void* unk2, void* unk3, bool resolution) {
+static bool __cdecl DetourLoadUIScript(uint32_t instance, void* unk1, void* unk2, void* unk3, bool resolution) {
 	auto it = Core::_instance->m_UIOverrides.find(instance);
 	if (it != Core::_instance->m_UIOverrides.end()) {
 		instance = it->second;
