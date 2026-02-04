@@ -516,6 +516,21 @@ namespace Addresses {
 	};
 	static char loadUiScriptLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char crzstringFromCharLookup[] = {
+		0x83, 0xC1, 0x04,
+		0x83, 0x7C, 0x24, 0x04, 0x00,
+		0x74, 0x1E,
+		0x8B, 0x54, 0x24, 0x04,
+		0x57,
+		0x8D, 0x7A, 0x01,
+		0x8A, 0x02,
+		0x42,
+		0x84, 0xC0,
+		0x75, 0xF9,
+		0x2B, 0xD7
+	};
+	static char crzstringFromCharLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -556,6 +571,8 @@ namespace Addresses {
 
 	void* LoadUIScript;
 
+	void* CRZStringFromChar;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -587,6 +604,7 @@ namespace Addresses {
 		cUserInput::m_GlobalUserInputPtr = (cUserInput**)*((cUserInput***)GetNodeTextInputField);
 		ADDRESS(TSStringLoad, tsStringLoadLookup);
 		ADDRESS(LoadUIScript, loadUiScriptLookup);
+		ADDRESS(CRZStringFromChar, crzstringFromCharLookup);
 		return true;
 	}
 

@@ -41,5 +41,7 @@ namespace Addresses {
 
 	extern void* LoadUIScript;
 
+	extern void* CRZStringFromChar;
+
 	bool Initialize();
 }
