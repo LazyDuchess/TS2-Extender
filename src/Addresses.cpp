@@ -531,6 +531,22 @@ namespace Addresses {
 	};
 	static char crzstringFromCharLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char uiMakeMoneyStringLookup[] = {
+		0x55,
+		0x89, 0xE5,
+		0x56,
+		0x53,
+		0x83, 0xEC, 0x20,
+		0x8B, 0x75, 0x08,
+		0x80, 0x3D, 0xFF, 0xFF, 0xFF, 0xFF, 0x00,
+		0x75, 0x45,
+		0xC7, 0x04, 0x24, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xE8, 0x32, 0x2D, 0x71, 0x01,
+		0x85, 0xC0,
+		0x74, 0x35
+	};
+	static char uiMakeMoneyStringLookupMask[] = "xxxxxxxxxxxxx????xxxxxx????xxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -573,6 +589,8 @@ namespace Addresses {
 
 	void* CRZStringFromChar;
 
+	void* UIMakeMoneyString;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -605,6 +623,7 @@ namespace Addresses {
 		ADDRESS(TSStringLoad, tsStringLoadLookup);
 		ADDRESS(LoadUIScript, loadUiScriptLookup);
 		ADDRESS(CRZStringFromChar, crzstringFromCharLookup);
+		ADDRESS(UIMakeMoneyString, uiMakeMoneyStringLookup);
 		return true;
 	}
 

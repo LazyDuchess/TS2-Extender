@@ -43,5 +43,7 @@ namespace Addresses {
 
 	extern void* CRZStringFromChar;
 
+	extern void* UIMakeMoneyString;
+
 	bool Initialize();
 }
