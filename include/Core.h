@@ -2,6 +2,7 @@
 #include <string>
 #include <unordered_map>
 #include "StringId.h"
+#include "ts2/lua.h"
 
 class Core {
 public:
@@ -12,6 +13,9 @@ public:
 	static Core* _instance;
 	std::unordered_map<StringId, StringId> m_StringOverrides;
 	std::unordered_map<uint32_t, uint32_t> m_UIOverrides;
+
+	lua_State* m_MakeMoneyStringLuaState = nullptr;
+	int m_MakeMoneyStringLuaCall = LUA_NOREF;
 private:
 	void CacheUserData();
 };

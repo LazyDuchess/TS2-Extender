@@ -124,6 +124,23 @@ namespace LuaExtensions {
 		return 0;
 	}
 
+	// OverrideMakeMoneyString(function)
+	// function return: string
+	// function params: money (number)
+	static int __cdecl LuaOverrideMakeMoneyString(lua_State* luaState) {
+		lua_pushvalue(luaState, 1);
+		int executeRef = luaL_ref(luaState, LUA_REGISTRYINDEX);
+		Core::_instance->m_MakeMoneyStringLuaCall = executeRef;
+		Core::_instance->m_MakeMoneyStringLuaState = luaState;
+		return 0;
+	}
+
+	static int __cdecl LuaClearMakeMoneyStringOverride(lua_State* luaState) {
+		Core::_instance->m_MakeMoneyStringLuaCall = LUA_NOREF;
+		Core::_instance->m_MakeMoneyStringLuaState = nullptr;
+		return 0;
+	}
+
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
 		if (luaThread != NULL) {
@@ -136,6 +153,8 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaClearStringOverride, "ClearStringOverride");
 			luaThread->Register(&LuaOverrideUI, "OverrideUI");
 			luaThread->Register(&LuaClearUIOverride, "ClearUIOverride");
+			luaThread->Register(&LuaOverrideMakeMoneyString, "OverrideMakeMoneyString");
+			luaThread->Register(&LuaClearMakeMoneyStringOverride, "ClearMakeMoneyStringOverride");
 		}
 		return res;
 	}
