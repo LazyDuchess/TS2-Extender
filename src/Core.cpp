@@ -13,6 +13,7 @@
 #include <windows.h>
 #include <Shlobj.h>
 #include "ts2/cTSString.h"
+#include "ts2/cRZString.h"
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
 typedef UINT(__thiscall* LUA5OPEN)(void*,UINT);
@@ -23,7 +24,9 @@ typedef unsigned int(__thiscall* CLOTHINGDIALOGONCANCEL)(void* me);
 typedef bool(__thiscall* TSSTRINGLOAD)(void* me);
 
 typedef bool(__cdecl* LOADUISCRIPT)(uint32_t instance, void* unk1, void* unk2, void* unk3, bool resolution);
+typedef cRZString*(__cdecl* MAKEMONEYSTRING)(int money);
 
+static MAKEMONEYSTRING fpMakeMoneyString = NULL;
 static LOADUISCRIPT fpLoadUiScript = NULL;
 static TSSTRINGLOAD fpTSStringLoad = NULL;
 static RANDOMUINT32UNIFORM fpRandomUint32Uniform = NULL;
@@ -62,6 +65,27 @@ static void __declspec(naked) ClothingDialogHook2() {
 		goBack:
 			jmp [ClothingDialogHook2Return]
 	}
+}
+
+static cRZString* __cdecl DetourMakeMoneyString(int money) {
+	cRZString* result = fpMakeMoneyString(money);
+	if (Core::_instance->m_MakeMoneyStringLuaState == nullptr)
+		return result;
+	lua_State* luaState = Core::_instance->m_MakeMoneyStringLuaState;
+	int luaCall = Core::_instance->m_MakeMoneyStringLuaCall;
+	lua_rawgeti(luaState, LUA_REGISTRYINDEX, luaCall);
+	lua_pushnumber(luaState, static_cast<double>(money));
+	if (lua_pcall(luaState, 1, 1, 0) != 0) {
+		Log("Lua MakeMoneyString Override failed: %s\n", lua_tostring(luaState, -1));
+		lua_pop(luaState, 1);
+	}
+	else
+	{
+		const char* str = lua_tostring(luaState, -1);
+		result->FromChar(str);
+		lua_pop(luaState, 1);
+	}
+	return result;
 }
 
 static bool __cdecl DetourLoadUIScript(uint32_t instance, void* unk1, void* unk2, void* unk3, bool resolution) {
@@ -290,6 +314,16 @@ bool Core::Initialize() {
 		return false;
 	}
 	if (MH_EnableHook(Addresses::LoadUIScript) != MH_OK)
+	{
+		return false;
+	}
+
+	if (MH_CreateHook(Addresses::UIMakeMoneyString, &DetourMakeMoneyString,
+		reinterpret_cast<LPVOID*>(&fpMakeMoneyString)) != MH_OK)
+	{
+		return false;
+	}
+	if (MH_EnableHook(Addresses::UIMakeMoneyString) != MH_OK)
 	{
 		return false;
 	}

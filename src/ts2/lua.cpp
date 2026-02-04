@@ -48,3 +48,9 @@ double lua_tonumber(lua_State* luaState, int idx) {
 	LuaToNumberFunc func = reinterpret_cast<LuaToNumberFunc>(Addresses::LuaToNumber);
 	return func(luaState, idx);
 }
+
+void lua_pushnumber(lua_State* luaState, double number) {
+	using LuaPushNumberFunc = void(__cdecl*)(lua_State*, double);
+	LuaPushNumberFunc func = reinterpret_cast<LuaPushNumberFunc>(Addresses::LuaPushNumber);
+	func(luaState, number);
+}

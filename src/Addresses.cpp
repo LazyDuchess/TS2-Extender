@@ -326,6 +326,17 @@ namespace Addresses {
 	};
 	static char luaToNumberLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char luaPushNumberLookup[] = {
+		0x8B, 0x4C, 0x24, 0x04,
+		0xF2, 0x0F, 0x10, 0x44, 0x24, 0x08,
+		0x8B, 0x41, 0x08,
+		0xC7, 0x00, 0x03, 0x00, 0x00, 0x00,
+		0xF2, 0x0F, 0x11, 0x40, 0x08,
+		0x83, 0x41, 0x08, 0x10,
+		0xC3
+	};
+	static char luaPushNumberLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
 	static char clothingDialogOnCancelLookup[] = {
 		0x56,
 		0x8B, 0xF1,
@@ -532,20 +543,18 @@ namespace Addresses {
 	static char crzstringFromCharLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 	static char uiMakeMoneyStringLookup[] = {
-		0x55,
-		0x89, 0xE5,
-		0x56,
+		0xB8, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xE8, 0xFF, 0xFF, 0xFF, 0xFF,
+		0x51,
+		0x64, 0xA1, 0x2C, 0x00, 0x00, 0x00,
+		0x8B, 0x0D, 0xFF, 0xFF, 0xFF, 0xFF,
 		0x53,
-		0x83, 0xEC, 0x20,
-		0x8B, 0x75, 0x08,
-		0x80, 0x3D, 0xFF, 0xFF, 0xFF, 0xFF, 0x00,
-		0x75, 0x45,
-		0xC7, 0x04, 0x24, 0xFF, 0xFF, 0xFF, 0xFF,
-		0xE8, 0x32, 0x2D, 0x71, 0x01,
-		0x85, 0xC0,
-		0x74, 0x35
+		0x56,
+		0x57,
+		0x8B, 0x0C, 0x88,
+		0xBB, 0xFF, 0xFF, 0xFF, 0xFF
 	};
-	static char uiMakeMoneyStringLookupMask[] = "xxxxxxxxxxxxx????xxxxxx????xxxxxxxxx";
+	static char uiMakeMoneyStringLookupMask[] = "x????x????xxxxxxxxx????xxxxxxx????";
 
 	void* RandomUint32Uniform;
 	void* EALogoPush;
@@ -562,6 +571,8 @@ namespace Addresses {
 	void* LuaToString;
 	void* LuaLRef;
 	void* LuaToNumber;
+	void* LuaPushNumber;
+
 	void* ClothingDialogOnCancel;
 	void* ClothingDialogOnAttach;
 	void* ClothingDialogSetState;
@@ -608,6 +619,7 @@ namespace Addresses {
 		ADDRESS(LuaToString, luaToStringLookup);
 		ADDRESS(LuaLRef, luaLRefLookup);
 		ADDRESS(LuaToNumber, luaToNumberLookup);
+		ADDRESS(LuaPushNumber, luaPushNumberLookup);
 		ADDRESS(ClothingDialogOnCancel, clothingDialogOnCancelLookup);
 		ADDRESS(ClothingDialogOnAttach, clothingDialogOnAttachLookup);
 		ADDRESS(ClothingDialogSetState, clothingDialogSetStateLookup);
