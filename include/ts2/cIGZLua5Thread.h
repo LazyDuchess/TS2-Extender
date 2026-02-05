@@ -10,5 +10,9 @@ namespace TS2 {
 			RegisterFunc func = reinterpret_cast<RegisterFunc>(*(int*)(vTableAddr + 0x150));
 			func(this, pFunc, funcName);
 		}
+
+		lua_State* GetLuaState() {
+			return *(lua_State**)(this + 8);
+		}
 	};
 }
