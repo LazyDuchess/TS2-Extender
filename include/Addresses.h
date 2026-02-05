@@ -49,5 +49,7 @@ namespace Addresses {
 
 	extern void* AppendInteractionsForMenu;
 
+	extern void* AddCheatInteraction;
+
 	bool Initialize();
 }
