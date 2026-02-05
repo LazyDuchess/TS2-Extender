@@ -141,6 +141,25 @@ namespace LuaExtensions {
 		return 0;
 	}
 
+	// number id AddGameCallback(number delegate, function callback, number priority)
+	static int __cdecl LuaAddGameCallback(lua_State* luaState) {
+		int delegate = lua_tonumber(luaState, 1);
+		int priority = lua_tonumber(luaState, 3);
+		lua_pushvalue(luaState, 2);
+		int executeRef = luaL_ref(luaState, LUA_REGISTRYINDEX);
+		Id64 result = Core::_instance->m_LuaDelegates[delegate].AddCallback({ executeRef, luaState, priority });
+		lua_pushnumber(luaState, static_cast<double>(result.m_Value));
+		return 1;
+	}
+
+	// RemoveGameCallback(number delegate, number id)
+	static int __cdecl LuaRemoveGameCallback(lua_State* luaState) {
+		int delegate = lua_tonumber(luaState, 1);
+		Id64 callbackId = Id64(static_cast<uint64_t>(lua_tonumber(luaState, 2)));
+		Core::_instance->m_LuaDelegates[delegate].RemoveCallback(callbackId);
+		return 0;
+	}
+
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
 		if (luaThread != NULL) {
@@ -155,6 +174,8 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaClearUIOverride, "ClearUIOverride");
 			luaThread->Register(&LuaOverrideMakeMoneyString, "OverrideMakeMoneyString");
 			luaThread->Register(&LuaClearMakeMoneyStringOverride, "ClearMakeMoneyStringOverride");
+			luaThread->Register(&LuaAddGameCallback, "AddGameCallback");
+			luaThread->Register(&LuaRemoveGameCallback, "RemoveGameCallback");
 		}
 		return res;
 	}

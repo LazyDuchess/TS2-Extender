@@ -3,6 +3,11 @@
 #include <unordered_map>
 #include "StringId.h"
 #include "ts2/lua.h"
+#include "LuaCallback.h"
+
+enum class Delegates {
+	OnBuildPieMenu = 0
+};
 
 class Core {
 public:
@@ -16,6 +21,8 @@ public:
 
 	lua_State* m_MakeMoneyStringLuaState = nullptr;
 	int m_MakeMoneyStringLuaCall = LUA_NOREF;
+
+	LuaDelegate m_LuaDelegates[1];
 private:
 	void CacheUserData();
 };
