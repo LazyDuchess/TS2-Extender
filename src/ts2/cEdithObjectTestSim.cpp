@@ -6,6 +6,6 @@ cTSPerson* cEdithObjectTestSim::GetPerson() {
 	return *(cTSPerson**)(this + 0x8);
 }
 
-cTSObject** cEdithObjectTestSim::GetObject() {
+cTSObject* cEdithObjectTestSim::GetObj() {
 	return *(cTSObject**)(this + 0xC);
 }

@@ -14,6 +14,9 @@
 #include <Shlobj.h>
 #include "ts2/cTSString.h"
 #include "ts2/cRZString.h"
+#include "ts2/cTSGlobals.h"
+#include "ts2/cEdithObjectTestSim.h"
+#include "ts2/cTSPerson.h"
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
 typedef UINT(__thiscall* LUA5OPEN)(void*,UINT);
@@ -25,7 +28,7 @@ typedef bool(__thiscall* TSSTRINGLOAD)(void* me);
 
 typedef bool(__cdecl* LOADUISCRIPT)(uint32_t instance, void* unk1, void* unk2, void* unk3, bool resolution);
 typedef cRZString*(__cdecl* MAKEMONEYSTRING)(int money);
-typedef void(__thiscall* APPENDINTERACTIONSFORMENU)(void* testSim, std::vector<void*>* interactions, bool debug);
+typedef void(__thiscall* APPENDINTERACTIONSFORMENU)(cEdithObjectTestSim* testSim, std::vector<void*>* interactions, bool debug);
 
 static APPENDINTERACTIONSFORMENU fpAppendInteractionsForMenu = NULL;
 static MAKEMONEYSTRING fpMakeMoneyString = NULL;
@@ -73,7 +76,7 @@ static void AddCheatInteraction(std::vector<void*>* interactions, void* person, 
 	((void(__cdecl*)(std::vector<void*>*, void*, void*, int, short, const char*, short))Addresses::AddCheatInteraction)(interactions, person, object, interactionType, flags, name, instanceId);
 }
 
-static void __fastcall DetourAppendInteractionsForMenu(void* testSim, void* _, std::vector<void*>* interactions, bool debug) {
+static void __fastcall DetourAppendInteractionsForMenu(cEdithObjectTestSim* testSim, void* _, std::vector<void*>* interactions, bool debug) {
 	fpAppendInteractionsForMenu(testSim, interactions, debug);
 }
 
