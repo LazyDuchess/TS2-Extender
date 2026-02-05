@@ -69,6 +69,10 @@ static void __declspec(naked) ClothingDialogHook2() {
 	}
 }
 
+static void AddCheatInteraction(std::vector<void*>* interactions, void* person, void* object, int interactionType, short flags, const char* name, short instanceId) {
+	((void(__cdecl*)(std::vector<void*>*, void*, void*, int, short, const char*, short))Addresses::AddCheatInteraction)(interactions, person, object, interactionType, flags, name, instanceId);
+}
+
 static void __fastcall DetourAppendInteractionsForMenu(void* testSim, void* _, std::vector<void*>* interactions, bool debug) {
 	fpAppendInteractionsForMenu(testSim, interactions, debug);
 }
