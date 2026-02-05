@@ -18,6 +18,7 @@ namespace Addresses {
 	extern void* LuaToNumber;
 	extern void* LuaPushNumber;
 	extern void* LuaNewTable;
+	extern void* LuaPushCClosure;
 
 	extern void* ClothingDialogOnCancel;
 	extern void* ClothingDialogOnAttach;

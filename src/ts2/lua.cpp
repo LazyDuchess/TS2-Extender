@@ -60,3 +60,9 @@ void lua_newtable(lua_State* luaState) {
 	LuaNewTableFunc func = reinterpret_cast<LuaNewTableFunc>(Addresses::LuaNewTable);
 	func(luaState);
 }
+
+void lua_pushcclosure(lua_State* luaState, LUAFUNCTION fn, int n) {
+	using LuaPushCClosureFunc = void(__cdecl*)(lua_State*, LUAFUNCTION, int);
+	LuaPushCClosureFunc func = reinterpret_cast<LuaPushCClosureFunc>(Addresses::LuaPushCClosure);
+	func(luaState, fn, n);
+}
