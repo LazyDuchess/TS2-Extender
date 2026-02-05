@@ -17,5 +17,6 @@ const char* lua_tostring(lua_State* luaState, int idx);
 int luaL_ref(lua_State* luaState, int t);
 double lua_tonumber(lua_State* luaState, int idx);
 void lua_pushnumber(lua_State* luaState, double number);
+void lua_newtable(lua_State* luaState);
 
 #define lua_pop(L, n) lua_settop(L, -(n)-1)

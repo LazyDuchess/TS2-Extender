@@ -54,3 +54,9 @@ void lua_pushnumber(lua_State* luaState, double number) {
 	LuaPushNumberFunc func = reinterpret_cast<LuaPushNumberFunc>(Addresses::LuaPushNumber);
 	func(luaState, number);
 }
+
+void lua_newtable(lua_State* luaState) {
+	using LuaNewTableFunc = void(__cdecl*)(lua_State*);
+	LuaNewTableFunc func = reinterpret_cast<LuaNewTableFunc>(Addresses::LuaNewTable);
+	func(luaState);
+}
