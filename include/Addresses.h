@@ -47,5 +47,7 @@ namespace Addresses {
 
 	extern void* UIMakeMoneyString;
 
+	extern void* AppendInteractionsForMenu;
+
 	bool Initialize();
 }

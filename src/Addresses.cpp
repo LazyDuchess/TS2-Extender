@@ -556,6 +556,21 @@ namespace Addresses {
 	};
 	static char uiMakeMoneyStringLookupMask[] = "x????x????xxxxxxxxx????xxxxxxx????";
 
+	static char appendInteractionsForMenuLookup[] = {
+		0x55,
+		0x8B, 0xEC,
+		0x6A, 0xFF,
+		0x68, 0xFF, 0xFF, 0xFF, 0xFF,
+		0x64, 0xA1, 0x00, 0x00, 0x00, 0x00,
+		0x50,
+		0x64, 0x89, 0x25, 0x00, 0x00, 0x00, 0x00,
+		0x83, 0xEC, 0x28,
+		0x53,
+		0x8B, 0xD9,
+		0xC7, 0x45, 0xD8, 0x00, 0x00, 0x00, 0x00
+	};
+	static char appendInteractionsForMenuLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -602,6 +617,8 @@ namespace Addresses {
 
 	void* UIMakeMoneyString;
 
+	void* AppendInteractionsForMenu;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -636,6 +653,7 @@ namespace Addresses {
 		ADDRESS(LoadUIScript, loadUiScriptLookup);
 		ADDRESS(CRZStringFromChar, crzstringFromCharLookup);
 		ADDRESS(UIMakeMoneyString, uiMakeMoneyStringLookup);
+		ADDRESS(AppendInteractionsForMenu, appendInteractionsForMenuLookup);
 		return true;
 	}
 
