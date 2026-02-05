@@ -586,6 +586,21 @@ namespace Addresses {
 	};
 	static char addCheatInteractionLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char tsGlobalsCallLookup[] = {
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0x8B, 0xC8,
+		0x8B, 0x10,
+		0x8B, 0x42, 0x60,
+		0xFF, 0xD0,
+		0x8B, 0x4D, 0xE4,
+		0x8B, 0xF8,
+		0x8D, 0x45, 0xD4,
+		0x89, 0x7D, 0xF0,
+		0x50,
+		0x8B, 0x11
+	};
+	static char tsGlobalsCallLookupMask[] = "????xxxxxxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -636,6 +651,9 @@ namespace Addresses {
 
 	void* AddCheatInteraction;
 
+	void* TSGlobalsCall;
+	void* TSGlobals;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -672,6 +690,11 @@ namespace Addresses {
 		ADDRESS(UIMakeMoneyString, uiMakeMoneyStringLookup);
 		ADDRESS(AppendInteractionsForMenu, appendInteractionsForMenuLookup);
 		ADDRESS(AddCheatInteraction, addCheatInteractionLookup);
+		ADDRESS(TSGlobalsCall, tsGlobalsCallLookup);
+
+		DWORD relativeCall = *(DWORD*)TSGlobalsCall;
+
+		TSGlobals = (void*)((DWORD)TSGlobalsCall + relativeCall + 4);
 		return true;
 	}
 

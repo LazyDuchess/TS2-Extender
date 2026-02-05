@@ -51,5 +51,8 @@ namespace Addresses {
 
 	extern void* AddCheatInteraction;
 
+	extern void* TSGlobalsCall;
+	extern void* TSGlobals;
+
 	bool Initialize();
 }
