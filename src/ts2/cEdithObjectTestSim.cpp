@@ -1,9 +1,11 @@
 #include "ts2/cEdithObjectTestSim.h"
+#include "ts2/cTSPerson.h"
+#include "ts2/cTSObject.h"
 
-void* cEdithObjectTestSim::GetPerson() {
-	return *(void**)(this + 0x8);
+cTSPerson* cEdithObjectTestSim::GetPerson() {
+	return *(cTSPerson**)(this + 0x8);
 }
 
-void* cEdithObjectTestSim::GetObject() {
-	return *(void**)(this + 0xC);
+cTSObject** cEdithObjectTestSim::GetObject() {
+	return *(cTSObject**)(this + 0xC);
 }

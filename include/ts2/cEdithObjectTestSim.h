@@ -2,6 +2,6 @@
 
 class cEdithObjectTestSim {
 public:
-	void* GetPerson();
-	void* GetObject();
+	cTSPerson* GetPerson();
+	cTSObject* GetObject();
 };
