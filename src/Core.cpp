@@ -25,7 +25,9 @@ typedef bool(__thiscall* TSSTRINGLOAD)(void* me);
 
 typedef bool(__cdecl* LOADUISCRIPT)(uint32_t instance, void* unk1, void* unk2, void* unk3, bool resolution);
 typedef cRZString*(__cdecl* MAKEMONEYSTRING)(int money);
+typedef void(__thiscall* APPENDINTERACTIONSFORMENU)(void* testSim, std::vector<void*>* interactions, bool debug);
 
+static APPENDINTERACTIONSFORMENU fpAppendInteractionsForMenu = NULL;
 static MAKEMONEYSTRING fpMakeMoneyString = NULL;
 static LOADUISCRIPT fpLoadUiScript = NULL;
 static TSSTRINGLOAD fpTSStringLoad = NULL;
@@ -65,6 +67,10 @@ static void __declspec(naked) ClothingDialogHook2() {
 		goBack:
 			jmp [ClothingDialogHook2Return]
 	}
+}
+
+static void __fastcall DetourAppendInteractionsForMenu(void* testSim, void* _, std::vector<void*>* interactions, bool debug) {
+	fpAppendInteractionsForMenu(testSim, interactions, debug);
 }
 
 static cRZString* __cdecl DetourMakeMoneyString(int money) {
@@ -324,6 +330,16 @@ bool Core::Initialize() {
 		return false;
 	}
 	if (MH_EnableHook(Addresses::UIMakeMoneyString) != MH_OK)
+	{
+		return false;
+	}
+
+	if (MH_CreateHook(Addresses::AppendInteractionsForMenu, &DetourAppendInteractionsForMenu,
+		reinterpret_cast<LPVOID*>(&fpAppendInteractionsForMenu)) != MH_OK)
+	{
+		return false;
+	}
+	if (MH_EnableHook(Addresses::AppendInteractionsForMenu) != MH_OK)
 	{
 		return false;
 	}
