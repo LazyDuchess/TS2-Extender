@@ -79,6 +79,15 @@ static void AddCheatInteraction(std::vector<cTSInteraction*>* interactions, cTSP
 
 static void __fastcall DetourAppendInteractionsForMenu(cEdithObjectTestSim* testSim, void* _, std::vector<cTSInteraction*>* interactions, bool debug) {
 	fpAppendInteractionsForMenu(testSim, interactions, debug);
+	Core* core = Core::_instance;
+	for (auto it = core->m_LuaDelegates[(int)Delegates::OnBuildPieMenu].m_Callbacks.begin(); it != core->m_LuaDelegates[(int)Delegates::OnBuildPieMenu].m_Callbacks.end();) {
+		lua_rawgeti(it->m_luaState, LUA_REGISTRYINDEX, it->m_LuaCall);
+		if (lua_pcall(it->m_luaState, 0, 0, 0) != 0) {
+			Log("Error calling Lua callback: %s\n", lua_tostring(it->m_luaState, -1));
+			lua_pop(it->m_luaState, 1);
+		}
+		++it;
+	}
 }
 
 static cRZString* __cdecl DetourMakeMoneyString(int money) {

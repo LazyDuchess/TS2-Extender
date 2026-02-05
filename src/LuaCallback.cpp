@@ -1,4 +1,5 @@
 #include "LuaCallback.h"
+#include <algorithm>
 
 LuaCallback::LuaCallback(int luaCall, lua_State* luaState, int priority) {
 	m_LuaCall = luaCall;
@@ -30,7 +31,7 @@ void LuaDelegate::RemoveCallback(Id64 callbackId) {
 
 void LuaDelegate::Sort() {
 	std::sort(m_Callbacks.begin(), m_Callbacks.end(),
-		[](const Callback& a, const Callback& b)
+		[](const LuaCallback& a, const LuaCallback& b)
 		{
 			return a.m_Priority < b.m_Priority;
 		});
