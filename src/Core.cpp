@@ -20,7 +20,7 @@
 #include "ts2/cTSInteraction.h"
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
-typedef UINT(__thiscall* LUA5OPEN)(void*,UINT);
+typedef UINT(__thiscall* LUA5OPEN)(void*, UINT);
 
 typedef unsigned int(__thiscall* DIALOGONATTACH)(void* me, void* unk1, int unk2);
 typedef unsigned int(__thiscall* CLOTHINGDIALOGONCANCEL)(void* me);
@@ -28,7 +28,7 @@ typedef unsigned int(__thiscall* CLOTHINGDIALOGONCANCEL)(void* me);
 typedef bool(__thiscall* TSSTRINGLOAD)(void* me);
 
 typedef bool(__cdecl* LOADUISCRIPT)(uint32_t instance, void* unk1, void* unk2, void* unk3, bool resolution);
-typedef cRZString*(__cdecl* MAKEMONEYSTRING)(int money);
+typedef cRZString* (__cdecl* MAKEMONEYSTRING)(int money);
 typedef void(__thiscall* APPENDINTERACTIONSFORMENU)(cEdithObjectTestSim* testSim, std::vector<cTSInteraction*>* interactions, bool debug);
 
 static APPENDINTERACTIONSFORMENU fpAppendInteractionsForMenu = NULL;
@@ -59,17 +59,17 @@ static void __declspec(naked) ClothingDialogHook1() {
 		je goBack
 		mov[esi + 0x000000E8], ecx
 		goBack :
-			jmp [ClothingDialogHook1Return]
+		jmp[ClothingDialogHook1Return]
 	}
 }
 
 static void __declspec(naked) ClothingDialogHook2() {
 	__asm {
-		cmp[esi+0xE8], 0x00000000
+		cmp[esi + 0xE8], 0x00000000
 		je goBack
-		or dword ptr [esi+0xE8],0x01
+		or dword ptr[esi + 0xE8], 0x01
 		goBack:
-			jmp [ClothingDialogHook2Return]
+		jmp[ClothingDialogHook2Return]
 	}
 }
 
@@ -77,24 +77,53 @@ static void AddCheatInteraction(std::vector<cTSInteraction*>* interactions, cTSP
 	((void(__cdecl*)(std::vector<cTSInteraction*>*, void*, void*, int, short, const char*, short))Addresses::AddCheatInteraction)(interactions, person, object, interactionType, flags, name, instanceId);
 }
 
-static void __fastcall DetourAppendInteractionsForMenu(cEdithObjectTestSim* testSim, void* _, std::vector<cTSInteraction*>* interactions, bool debug) {
-	fpAppendInteractionsForMenu(testSim, interactions, debug);
+static int __cdecl LuaVectorClear(lua_State* luaState) {
+	lua_pushstring(luaState, "_handle");
+	lua_gettable(luaState, 1);
+	std::vector<cTSInteraction*>* vec = (std::vector<cTSInteraction*>*)static_cast<DWORD>(lua_tonumber(luaState, -1));
+	lua_pop(luaState, 1);
+	vec->clear();
+	return 0;
+}
+
+static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTSInteraction*>* vec){
+	lua_newtable(luaState);
+	int tableId = lua_gettop(luaState);
+
+	lua_pushstring(luaState, "_handle");
+	lua_pushnumber(luaState, (DWORD)vec);
+	lua_settable(luaState, -3);
+
+	lua_pushstring(luaState, "Clear");
+	lua_pushcclosure(luaState, &LuaVectorClear, 0);
+	lua_settable(luaState, -3);
+
+	return tableId;
+}
+
+// Callback(vec Interactions, number SimId, number ObjectId, bool clicked)
+static void __fastcall DetourAppendInteractionsForMenu(cEdithObjectTestSim* testSim, void* _, std::vector<cTSInteraction*>* interactions, bool clicked) {
+	fpAppendInteractionsForMenu(testSim, interactions, clicked);
 	Core* core = Core::_instance;
-	for (auto it = core->m_LuaDelegates[(int)Delegates::OnBuildPieMenu].m_Callbacks.begin(); it != core->m_LuaDelegates[(int)Delegates::OnBuildPieMenu].m_Callbacks.end();) {
-		lua_rawgeti(it->m_luaState, LUA_REGISTRYINDEX, it->m_LuaCall);
-		if (lua_pcall(it->m_luaState, 0, 0, 0) != 0) {
-			Log("Error calling Lua callback: %s\n", lua_tostring(it->m_luaState, -1));
-			lua_pop(it->m_luaState, 1);
+	int tableId = MakeLuaTableForInteractionVector(core->m_LuaState, interactions);
+	for (auto& cb : core->m_LuaDelegates[(int)Delegates::OnBuildPieMenu].m_Callbacks) {
+		lua_rawgeti(cb.m_luaState, LUA_REGISTRYINDEX, cb.m_LuaCall);
+		lua_pushvalue(cb.m_luaState, tableId);
+		lua_pushnumber(cb.m_luaState, testSim->GetPerson()->AsEdithObject()->GetID());
+		lua_pushnumber(cb.m_luaState, testSim->GetObj()->GetID());
+		lua_pushboolean(cb.m_luaState, clicked ? 1 : 0);
+		if (lua_pcall(cb.m_luaState, 4, 0, 0) != 0) {
+			Log("Error calling Lua callback: %s\n", lua_tostring(cb.m_luaState, -1));
+			lua_pop(cb.m_luaState, 1);
 		}
-		++it;
 	}
 }
 
 static cRZString* __cdecl DetourMakeMoneyString(int money) {
 	cRZString* result = fpMakeMoneyString(money);
-	if (Core::_instance->m_MakeMoneyStringLuaState == nullptr)
+	if (Core::_instance->m_MakeMoneyStringLuaCall == LUA_NOREF)
 		return result;
-	lua_State* luaState = Core::_instance->m_MakeMoneyStringLuaState;
+	lua_State* luaState = Core::_instance->m_LuaState;
 	int luaCall = Core::_instance->m_MakeMoneyStringLuaCall;
 	lua_rawgeti(luaState, LUA_REGISTRYINDEX, luaCall);
 	lua_pushnumber(luaState, static_cast<double>(money));

@@ -66,3 +66,33 @@ void lua_pushcclosure(lua_State* luaState, LUAFUNCTION fn, int n) {
 	LuaPushCClosureFunc func = reinterpret_cast<LuaPushCClosureFunc>(Addresses::LuaPushCClosure);
 	func(luaState, fn, n);
 }
+
+int lua_gettop(lua_State* luaState) {
+	using LuaGetTopFunc = int(__cdecl*)(lua_State*);
+	LuaGetTopFunc func = reinterpret_cast<LuaGetTopFunc>(Addresses::LuaGetTop);
+	return func(luaState);
+}
+
+void lua_gettable(lua_State* luaState, int idx) {
+	using LuaGetTableFunc = void(__cdecl*)(lua_State*, int);
+	LuaGetTableFunc func = reinterpret_cast<LuaGetTableFunc>(Addresses::LuaGetTable);
+	func(luaState, idx);
+}
+
+void lua_settable(lua_State* luaState, int idx) {
+	using LuaSetTableFunc = void(__cdecl*)(lua_State*, int);
+	LuaSetTableFunc func = reinterpret_cast<LuaSetTableFunc>(Addresses::LuaSetTable);
+	func(luaState, idx);
+}
+
+void lua_pushboolean(lua_State* luaState, int b) {
+	using LuaPushBooleanFunc = void(__cdecl*)(lua_State*, int);
+	LuaPushBooleanFunc func = reinterpret_cast<LuaPushBooleanFunc>(Addresses::LuaPushBoolean);
+	func(luaState, b);
+}
+
+void luaL_unref(lua_State* luaState, int t, int ref) {
+	using LuaLUnrefFunc = void(__cdecl*)(lua_State*, int, int);
+	LuaLUnrefFunc func = reinterpret_cast<LuaLUnrefFunc>(Addresses::LuaLUnref);
+	func(luaState, t, ref);
+}

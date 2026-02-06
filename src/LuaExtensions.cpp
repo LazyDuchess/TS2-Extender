@@ -131,13 +131,11 @@ namespace LuaExtensions {
 		lua_pushvalue(luaState, 1);
 		int executeRef = luaL_ref(luaState, LUA_REGISTRYINDEX);
 		Core::_instance->m_MakeMoneyStringLuaCall = executeRef;
-		Core::_instance->m_MakeMoneyStringLuaState = luaState;
 		return 0;
 	}
 
 	static int __cdecl LuaClearMakeMoneyStringOverride(lua_State* luaState) {
 		Core::_instance->m_MakeMoneyStringLuaCall = LUA_NOREF;
-		Core::_instance->m_MakeMoneyStringLuaState = nullptr;
 		return 0;
 	}
 
@@ -161,6 +159,7 @@ namespace LuaExtensions {
 	}
 
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
+		Core::_instance->m_LuaState = luaThread->GetLuaState();
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
 		if (luaThread != NULL) {
 			luaThread->Register(&LuaGetExecutableDirectory, "GetExecutableDirectory");

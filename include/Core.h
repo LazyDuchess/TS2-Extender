@@ -19,7 +19,7 @@ public:
 	std::unordered_map<StringId, StringId> m_StringOverrides;
 	std::unordered_map<uint32_t, uint32_t> m_UIOverrides;
 
-	lua_State* m_MakeMoneyStringLuaState = nullptr;
+	lua_State* m_LuaState = nullptr;
 	int m_MakeMoneyStringLuaCall = LUA_NOREF;
 
 	LuaDelegate m_LuaDelegates[1];

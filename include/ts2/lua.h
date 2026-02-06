@@ -6,7 +6,7 @@ struct lua_State {
 
 };
 
-typedef int(_cdecl* LUAFUNCTION)(lua_State*);
+typedef int(_cdecl LUAFUNCTION)(lua_State*);
 
 void lua_pushstring(lua_State* luaState, const char* str);
 void lua_rawgeti(lua_State* luaState, int idx, int n);
@@ -18,6 +18,11 @@ int luaL_ref(lua_State* luaState, int t);
 double lua_tonumber(lua_State* luaState, int idx);
 void lua_pushnumber(lua_State* luaState, double number);
 void lua_newtable(lua_State* luaState);
-void lua_pushcclosure(lua_State* luaState, LUAFUNCTION fn, int n);
+void lua_pushcclosure(lua_State* luaState, LUAFUNCTION* fn, int n);
+int lua_gettop(lua_State* luaState);
+void lua_gettable(lua_State* luaState, int idx);
+void lua_settable(lua_State* luaState, int idx);
+void lua_pushboolean(lua_State* luaState, int b);
+void luaL_unref(lua_State* luaState, int t, int ref);
 
 #define lua_pop(L, n) lua_settop(L, -(n)-1)

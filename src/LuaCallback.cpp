@@ -20,6 +20,7 @@ void LuaDelegate::RemoveCallback(Id64 callbackId) {
 		auto callback = it;
 		if (callback->m_Id.m_Value == callbackId.m_Value)
 		{
+			luaL_unref(callback->m_luaState, LUA_REGISTRYINDEX, callback->m_LuaCall);
 			m_IdManager.Release(callbackId);
 			it = m_Callbacks.erase(it);
 			return;
