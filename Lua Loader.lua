@@ -1,31 +1,14 @@
-local exeDir = GetUserDirectory() .. "/Lua"
+local luaDir = GetUserDirectory() .. "/Lua"
 print("Lua Loader Initializing.")
 
-local function listFiles(dir)
-	local files = {}
+local luaFiles = GetFilesInDirectory(luaDir, ".lua")
 
-	os.execute('dir /b "' .. dir .. '" > temp.txt')
-
-	local f = io.open("temp.txt", "r")
-	if f ~= nil then
-		for line in f:lines() do
-			table.insert(files, dir .. "\\" .. line)
-		end
-		f:close()
-		os.remove("temp.txt")
-	end
-
-	return files
-end
-
-local scripts = listFiles(exeDir)
-
-for _, path in ipairs(scripts) do
-	print("Executing " .. path)
-	local ok, err = pcall(dofile, path)
+for k, v in ipairs(luaFiles) do
+	print("Executing " .. v)
+	local ok, err = pcall(dofile, v)
 
 	if not ok then
-		print("Error executing " .. path)
+		print("Error executing " .. v)
 		print(err)
 	end
 end

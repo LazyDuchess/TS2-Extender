@@ -9,6 +9,8 @@
 #include "ts2/cUserInput.h"
 #include "Core.h"
 #include "Utils.h"
+#include <filesystem>
+#include <algorithm>
 
 namespace LuaExtensions {
 	typedef bool(__cdecl* REGISTERPRIMITIVESUPPORTLUACOMMANDS)(TS2::cIGZLua5Thread*);
@@ -26,6 +28,51 @@ namespace LuaExtensions {
 			}
 		}
 		return "";
+	}
+
+	// EnsureDirectory(string path)
+	static int __cdecl LuaEnsureDirectory(lua_State* luaState) {
+		const char* path = lua_tostring(luaState, 1);
+
+		std::filesystem::path fPath = std::filesystem::u8path(path);
+
+		std::filesystem::create_directories(fPath);
+		return 0;
+	}
+
+	// {string, string...} GetFilesInDirectory(string path, string extension)
+	static int __cdecl LuaGetFilesInDirectory(lua_State* luaState) {
+		const char* path = lua_tostring(luaState, 1);
+		const char* ext = lua_tostring(luaState, 2);
+
+		std::string checkExtension = "";
+		if (ext != nullptr)
+			checkExtension = std::string(ext);
+
+		std::filesystem::path fPath = std::filesystem::u8path(path);
+
+		std::transform(checkExtension.begin(), checkExtension.end(), checkExtension.begin(), ::tolower);
+
+		lua_newtable(luaState);
+
+		int index = 1;
+
+		for (const auto& entry : std::filesystem::recursive_directory_iterator(fPath)) {
+			if (entry.is_regular_file()) {
+				std::string fext = entry.path().extension().u8string();
+				std::transform(fext.begin(), fext.end(), fext.begin(), ::tolower);
+
+				if (fext == checkExtension || checkExtension == "")
+				{
+					lua_pushnumber(luaState, index);
+					lua_pushstring(luaState, entry.path().u8string().c_str());
+					lua_settable(luaState, -3);
+					index++;
+				}
+			}
+		}
+
+		return 1;
 	}
 
 	static int __cdecl LuaRegisterCheat(lua_State* luaState) {
@@ -176,6 +223,8 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaClearMakeMoneyStringOverride, "ClearMakeMoneyStringOverride");
 			luaThread->Register(&LuaAddGameCallback, "AddGameCallback");
 			luaThread->Register(&LuaRemoveGameCallback, "RemoveGameCallback");
+			luaThread->Register(&LuaEnsureDirectory, "EnsureDirectory");
+			luaThread->Register(&LuaGetFilesInDirectory, "GetFilesInDirectory");
 		}
 		return res;
 	}
