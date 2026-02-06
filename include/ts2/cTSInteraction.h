@@ -3,6 +3,6 @@
 
 class cTSInteraction {
 public:
-	void SetStackVars(short param0, short param1, short param2, short param3);
+	void SetStackVars(short vars[]);
 	void SetTargetObject(cTSObject* targetObject);
 };

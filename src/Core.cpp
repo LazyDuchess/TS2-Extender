@@ -117,7 +117,8 @@ static int __cdecl LuaAddInteraction(lua_State* luaState) {
 	cTSInteraction* newInteraction = vec->back();
 
 	newInteraction->SetTargetObject(core->m_CurrentTestSim->GetObj());
-	newInteraction->SetStackVars(param0, param1, param2, param3);
+	short stackVars[] = { param0, param1, param2, param3 };
+	newInteraction->SetStackVars(stackVars);
 	return 0;
 }
 
