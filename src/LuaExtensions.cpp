@@ -139,21 +139,22 @@ namespace LuaExtensions {
 		return 0;
 	}
 
-	// number id AddGameCallback(number delegate, function callback, number priority)
+	// string id AddGameCallback(number delegate, function callback, number priority)
 	static int __cdecl LuaAddGameCallback(lua_State* luaState) {
 		int delegate = lua_tonumber(luaState, 1);
 		int priority = lua_tonumber(luaState, 3);
 		lua_pushvalue(luaState, 2);
 		int executeRef = luaL_ref(luaState, LUA_REGISTRYINDEX);
 		Id64 result = Core::_instance->m_LuaDelegates[delegate].AddCallback({ executeRef, luaState, priority });
-		lua_pushnumber(luaState, static_cast<double>(result.m_Value));
+		lua_pushstring(luaState, std::to_string(result.m_Value).c_str());
 		return 1;
 	}
 
-	// RemoveGameCallback(number delegate, number id)
+	// RemoveGameCallback(number delegate, string id)
 	static int __cdecl LuaRemoveGameCallback(lua_State* luaState) {
 		int delegate = lua_tonumber(luaState, 1);
-		Id64 callbackId = Id64(static_cast<uint64_t>(lua_tonumber(luaState, 2)));
+		std::string idString = lua_tostring(luaState, 2);
+		Id64 callbackId = Id64(static_cast<uint64_t>(std::stoll(idString, nullptr)));
 		Core::_instance->m_LuaDelegates[delegate].RemoveCallback(callbackId);
 		return 0;
 	}

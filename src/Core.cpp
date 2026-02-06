@@ -18,6 +18,7 @@
 #include "ts2/cEdithObjectTestSim.h"
 #include "ts2/cTSPerson.h"
 #include "ts2/cTSInteraction.h"
+#include <string>
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
 typedef UINT(__thiscall* LUA5OPEN)(void*, UINT);
@@ -80,7 +81,8 @@ static void AddCheatInteraction(std::vector<cTSInteraction*>* interactions, cTSP
 static int __cdecl LuaVectorClear(lua_State* luaState) {
 	lua_pushstring(luaState, "_handle");
 	lua_gettable(luaState, 1);
-	std::vector<cTSInteraction*>* vec = (std::vector<cTSInteraction*>*)static_cast<DWORD>(lua_tonumber(luaState, -1));
+	std::string handleStr(lua_tostring(luaState, -1));
+	std::vector<cTSInteraction*>* vec = (std::vector<cTSInteraction*>*)std::stoi(handleStr, nullptr);
 	lua_pop(luaState, 1);
 	vec->clear();
 	return 0;
@@ -94,7 +96,8 @@ static int __cdecl LuaAddInteraction(lua_State* luaState) {
 
 	lua_pushstring(luaState, "_handle");
 	lua_gettable(luaState, 1);
-	std::vector<cTSInteraction*>* vec = (std::vector<cTSInteraction*>*)static_cast<DWORD>(lua_tonumber(luaState, -1));
+	std::string handleStr(lua_tostring(luaState, -1));
+	std::vector<cTSInteraction*>* vec = (std::vector<cTSInteraction*>*)std::stoi(handleStr, nullptr);
 	lua_pop(luaState, 1);
 
 	short instance = static_cast<short>(lua_tonumber(luaState, 2));
@@ -124,7 +127,7 @@ static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTS
 	int tableId = lua_gettop(luaState);
 
 	lua_pushstring(luaState, "_handle");
-	lua_pushnumber(luaState, (DWORD)vec);
+	lua_pushstring(luaState, std::to_string((DWORD)vec).c_str());
 	lua_settable(luaState, -3);
 
 	lua_pushstring(luaState, "Clear");
