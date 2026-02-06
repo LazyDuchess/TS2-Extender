@@ -96,3 +96,9 @@ void luaL_unref(lua_State* luaState, int t, int ref) {
 	LuaLUnrefFunc func = reinterpret_cast<LuaLUnrefFunc>(Addresses::LuaLUnref);
 	func(luaState, t, ref);
 }
+
+int lua_toboolean(lua_State* luaState, int idx) {
+	using LuaToBooleanFunc = int(__cdecl*)(lua_State*, int);
+	LuaToBooleanFunc func = reinterpret_cast<LuaToBooleanFunc>(Addresses::LuaToBoolean);
+	return func(luaState, idx);
+}

@@ -24,5 +24,6 @@ void lua_gettable(lua_State* luaState, int idx);
 void lua_settable(lua_State* luaState, int idx);
 void lua_pushboolean(lua_State* luaState, int b);
 void luaL_unref(lua_State* luaState, int t, int ref);
+int lua_toboolean(lua_State* luaState, int idx);
 
 #define lua_pop(L, n) lua_settop(L, -(n)-1)

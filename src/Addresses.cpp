@@ -450,6 +450,37 @@ namespace Addresses {
 	};
 	static char luaLUnrefLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char luaToBooleanLookup[] = {
+		0x8B, 0x54, 0x24, 0x08,
+		0x85, 0xD2,
+		0x7E, 0x17,
+		0x8B, 0x4C, 0x24, 0x04,
+		0xC1, 0xE2, 0x04,
+		0x8B, 0x41, 0x0C,
+		0x83, 0xC0, 0xF0,
+		0x03, 0xC2,
+		0x3B, 0x41, 0x08,
+		0x72, 0x10,
+		0x33, 0xC0,
+		0xC3,
+		0x52,
+		0xFF, 0x74, 0x24, 0x08,
+		0xE8, 0xFF, 0xFF, 0xFF, 0xFF,
+		0x83, 0xC4, 0x08,
+		0x85, 0xC0,
+		0x74, 0xEC,
+		0x8B, 0x08,
+		0x85, 0xC9,
+		0x74, 0xE6,
+		0x83, 0xF9, 0x01,
+		0x75, 0x06,
+		0x83, 0x78, 0x08, 0x00,
+		0x74, 0xDB,
+		0xB8, 0x01, 0x00, 0x00, 0x00,
+		0xC3
+	};
+	static char luaToBooleanLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
 	static char clothingDialogOnCancelLookup[] = {
 		0x56,
 		0x8B, 0xF1,
@@ -751,6 +782,7 @@ namespace Addresses {
 	void* LuaSetTable;
 	void* LuaPushBoolean;
 	void* LuaLUnref;
+	void* LuaToBoolean;
 
 	void* ClothingDialogOnCancel;
 	void* ClothingDialogOnAttach;
@@ -813,6 +845,7 @@ namespace Addresses {
 		ADDRESS(LuaSetTable, luaSetTableLookup);
 		ADDRESS(LuaPushBoolean, luaPushBooleanLookup);
 		ADDRESS(LuaLUnref, luaLUnrefLookup);
+		ADDRESS(LuaToBoolean, luaToBooleanLookup);
 		ADDRESS(ClothingDialogOnCancel, clothingDialogOnCancelLookup);
 		ADDRESS(ClothingDialogOnAttach, clothingDialogOnAttachLookup);
 		ADDRESS(ClothingDialogSetState, clothingDialogSetStateLookup);

@@ -4,6 +4,7 @@
 #include "StringId.h"
 #include "ts2/lua.h"
 #include "LuaCallback.h"
+#include "ts2/cEdithObjectTestSim.h"
 
 enum class Delegates {
 	OnBuildPieMenu = 0
@@ -23,6 +24,8 @@ public:
 	int m_MakeMoneyStringLuaCall = LUA_NOREF;
 
 	LuaDelegate m_LuaDelegates[1];
+
+	cEdithObjectTestSim* m_CurrentTestSim = nullptr;
 private:
 	void CacheUserData();
 };

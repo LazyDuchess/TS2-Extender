@@ -86,6 +86,39 @@ static int __cdecl LuaVectorClear(lua_State* luaState) {
 	return 0;
 }
 
+// vec:AddInteraction(number interactionInstanceId, number interactionObjectId, bool blocking, string interactionName, number param0, number param1, number param2, number param3)
+static int __cdecl LuaAddInteraction(lua_State* luaState) {
+	Core* core = Core::_instance;
+	cTSGlobals* globals = cTSGlobals::GetInstance();
+	cEdithObjectModule* objManager = globals->ObjectManager();
+
+	lua_pushstring(luaState, "_handle");
+	lua_gettable(luaState, 1);
+	std::vector<cTSInteraction*>* vec = (std::vector<cTSInteraction*>*)static_cast<DWORD>(lua_tonumber(luaState, -1));
+	lua_pop(luaState, 1);
+
+	short instance = static_cast<short>(lua_tonumber(luaState, 2));
+	short interactionObjectId = static_cast<short>(lua_tonumber(luaState, 3));
+	bool blocking = lua_toboolean(luaState, 4) != 0;
+	const char* name = lua_tostring(luaState, 5);
+
+	short param0 = static_cast<short>(lua_tonumber(luaState, 6));
+	short param1 = static_cast<short>(lua_tonumber(luaState, 7));
+	short param2 = static_cast<short>(lua_tonumber(luaState, 8));
+	short param3 = static_cast<short>(lua_tonumber(luaState, 9));
+
+	cTSObject* interactionObject = objManager->GetObjectFromID(interactionObjectId);
+
+	AddCheatInteraction(vec, core->m_CurrentTestSim->GetPerson(), interactionObject, blocking ? -1 : -2, 0x32, name, instance);
+	cTSInteraction* newInteraction = vec->back();
+	
+	newInteraction->SetTargetObject(core->m_CurrentTestSim->GetObj());
+	newInteraction->SetStackVars(param0, param1, param2, param3);
+	return 0;
+}
+
+
+// vec:Clear()
 static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTSInteraction*>* vec){
 	lua_newtable(luaState);
 	int tableId = lua_gettop(luaState);
@@ -98,6 +131,10 @@ static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTS
 	lua_pushcclosure(luaState, &LuaVectorClear, 0);
 	lua_settable(luaState, -3);
 
+	lua_pushstring(luaState, "AddInteraction");
+	lua_pushcclosure(luaState, &LuaAddInteraction, 0);
+	lua_settable(luaState, -3);
+
 	return tableId;
 }
 
@@ -105,6 +142,7 @@ static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTS
 static void __fastcall DetourAppendInteractionsForMenu(cEdithObjectTestSim* testSim, void* _, std::vector<cTSInteraction*>* interactions, bool clicked) {
 	fpAppendInteractionsForMenu(testSim, interactions, clicked);
 	Core* core = Core::_instance;
+	core->m_CurrentTestSim = testSim;
 	cTSGlobals* globals = cTSGlobals::GetInstance();
 	bool debug = testSim->GetObj()->GetMiscFlag(0x2000) && globals->TestingCheatsEnabled();
 	int tableId = MakeLuaTableForInteractionVector(core->m_LuaState, interactions);
@@ -120,6 +158,7 @@ static void __fastcall DetourAppendInteractionsForMenu(cEdithObjectTestSim* test
 			lua_pop(cb.m_luaState, 1);
 		}
 	}
+	core->m_CurrentTestSim = nullptr;
 }
 
 static cRZString* __cdecl DetourMakeMoneyString(int money) {

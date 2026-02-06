@@ -24,6 +24,7 @@ namespace Addresses {
 	extern void* LuaSetTable;
 	extern void* LuaPushBoolean;
 	extern void* LuaLUnref;
+	extern void* LuaToBoolean;
 
 	extern void* ClothingDialogOnCancel;
 	extern void* ClothingDialogOnAttach;
