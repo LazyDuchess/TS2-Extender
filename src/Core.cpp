@@ -113,13 +113,13 @@ static int __cdecl LuaAddInteraction(lua_State* luaState) {
 	cTSObject* interactionObject = objManager->GetObjectFromID(interactionObjectId);
 
 	AddCheatInteraction(vec, core->m_CurrentTestSim->GetPerson(), interactionObject, blocking ? -1 : -2, 0x32, name, instance);
+
 	cTSInteraction* newInteraction = vec->back();
-	
+
 	newInteraction->SetTargetObject(core->m_CurrentTestSim->GetObj());
 	newInteraction->SetStackVars(param0, param1, param2, param3);
 	return 0;
 }
-
 
 // vec:Clear()
 static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTSInteraction*>* vec){
