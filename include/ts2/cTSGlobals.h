@@ -5,4 +5,5 @@ class cTSGlobals {
 public:
 	static cTSGlobals* GetInstance();
 	cEdithObjectModule* ObjectManager();
+	bool TestingCheatsEnabled();
 };

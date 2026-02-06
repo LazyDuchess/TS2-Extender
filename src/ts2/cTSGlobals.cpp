@@ -9,3 +9,8 @@ cEdithObjectModule* cTSGlobals::ObjectManager() {
 	int vTableAddr = *(int*)this;
 	return ((cEdithObjectModule * (__thiscall*)(cTSGlobals*)) * (int*)(vTableAddr + 0x68))(this);
 }
+
+bool cTSGlobals::TestingCheatsEnabled() {
+	int vTableAddr = *(int*)this;
+	return ((bool (__thiscall*)(cTSGlobals*)) * (int*)(vTableAddr + 0x7C))(this);
+}

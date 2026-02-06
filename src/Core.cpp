@@ -101,10 +101,12 @@ static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTS
 	return tableId;
 }
 
-// Callback(vec Interactions, number SimId, number ObjectId, bool clicked)
+// Callback(vec Interactions, number SimId, number ObjectId, bool clicked, bool debug)
 static void __fastcall DetourAppendInteractionsForMenu(cEdithObjectTestSim* testSim, void* _, std::vector<cTSInteraction*>* interactions, bool clicked) {
 	fpAppendInteractionsForMenu(testSim, interactions, clicked);
 	Core* core = Core::_instance;
+	cTSGlobals* globals = cTSGlobals::GetInstance();
+	bool debug = testSim->GetObj()->GetMiscFlag(0x2000) && globals->TestingCheatsEnabled();
 	int tableId = MakeLuaTableForInteractionVector(core->m_LuaState, interactions);
 	for (auto& cb : core->m_LuaDelegates[(int)Delegates::OnBuildPieMenu].m_Callbacks) {
 		lua_rawgeti(cb.m_luaState, LUA_REGISTRYINDEX, cb.m_LuaCall);
@@ -112,7 +114,8 @@ static void __fastcall DetourAppendInteractionsForMenu(cEdithObjectTestSim* test
 		lua_pushnumber(cb.m_luaState, testSim->GetPerson()->AsEdithObject()->GetID());
 		lua_pushnumber(cb.m_luaState, testSim->GetObj()->GetID());
 		lua_pushboolean(cb.m_luaState, clicked ? 1 : 0);
-		if (lua_pcall(cb.m_luaState, 4, 0, 0) != 0) {
+		lua_pushboolean(cb.m_luaState, debug ? 1 : 0);
+		if (lua_pcall(cb.m_luaState, 5, 0, 0) != 0) {
 			Log("Error calling Lua callback: %s\n", lua_tostring(cb.m_luaState, -1));
 			lua_pop(cb.m_luaState, 1);
 		}
