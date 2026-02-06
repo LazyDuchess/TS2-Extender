@@ -11,6 +11,7 @@
 #include "Utils.h"
 #include <filesystem>
 #include <algorithm>
+#include <fstream>
 
 namespace LuaExtensions {
 	typedef bool(__cdecl* REGISTERPRIMITIVESUPPORTLUACOMMANDS)(TS2::cIGZLua5Thread*);
@@ -206,6 +207,50 @@ namespace LuaExtensions {
 		return 0;
 	}
 
+	// string ReadFile(string path)
+	static int __cdecl LuaReadFile(lua_State* luaState) {
+		const char* path = lua_tostring(luaState, 1);
+		std::filesystem::path fPath = std::filesystem::u8path(path);
+
+		if (!std::filesystem::exists(fPath)) {
+			lua_pushstring(luaState, "");
+			return 1;
+		}
+
+		std::ifstream file(fPath, std::ios::in | std::ios::binary);
+
+		if (!file)
+			throw std::runtime_error("Failed to open file!");
+
+		std::string fstr = std::string(
+			std::istreambuf_iterator<char>(file),
+			std::istreambuf_iterator<char>()
+		);
+
+		file.close();
+
+		lua_pushstring(luaState, fstr.c_str());
+		return 1;
+	}
+
+	// WriteFile(string path, string contents)
+	static int __cdecl LuaWriteFile(lua_State* luaState) {
+		const char* path = lua_tostring(luaState, 1);
+		const char* content = lua_tostring(luaState, 2);
+
+		std::filesystem::path fPath = std::filesystem::u8path(path);
+
+		std::ofstream file(path, std::ios::binary | std::ios::out | std::ios::trunc);
+
+		if (!file)
+			throw std::runtime_error("Failed to open file!");
+
+		file.write(content, strlen(content));
+
+		file.close();
+		return 0;
+	}
+
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
 		Core::_instance->m_LuaState = luaThread->GetLuaState();
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
@@ -225,6 +270,8 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaRemoveGameCallback, "RemoveGameCallback");
 			luaThread->Register(&LuaEnsureDirectory, "EnsureDirectory");
 			luaThread->Register(&LuaGetFilesInDirectory, "GetFilesInDirectory");
+			luaThread->Register(&LuaReadFile, "ReadFile");
+			luaThread->Register(&LuaWriteFile, "WriteFile");
 		}
 		return res;
 	}
