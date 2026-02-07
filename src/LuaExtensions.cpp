@@ -251,6 +251,11 @@ namespace LuaExtensions {
 		return 0;
 	}
 
+	static int __cdecl LuaSetLoadUIScriptDebug(lua_State* luaState) {
+		Core::_instance->m_LoadUIScriptDebug = lua_toboolean(luaState, 1) != 0;
+		return 0;
+	}
+
 	static bool __cdecl DetourRegisterPrimitiveSupportLuaCommands(TS2::cIGZLua5Thread* luaThread) {
 		Core::_instance->m_LuaState = luaThread->GetLuaState();
 		bool res = fpRegisterPrimitiveSupportLuaCommands(luaThread);
@@ -272,6 +277,7 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaGetFilesInDirectory, "GetFilesInDirectory");
 			luaThread->Register(&LuaReadFile, "ReadFile");
 			luaThread->Register(&LuaWriteFile, "WriteFile");
+			luaThread->Register(&LuaSetLoadUIScriptDebug, "SetLoadUIScriptDebug");
 		}
 		return res;
 	}

@@ -191,6 +191,8 @@ static bool __cdecl DetourLoadUIScript(uint32_t instance, void* unk1, void* unk2
 	if (it != Core::_instance->m_UIOverrides.end()) {
 		instance = it->second;
 	}
+	if (Core::_instance->m_LoadUIScriptDebug)
+		Log("Loading UIScript %X\n", instance);
 	return fpLoadUiScript(instance, unk1, unk2, unk3, resolution);
 }
 

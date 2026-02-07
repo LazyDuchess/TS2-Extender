@@ -26,6 +26,7 @@ public:
 	LuaDelegate m_LuaDelegates[1];
 
 	cEdithObjectTestSim* m_CurrentTestSim = nullptr;
+	bool m_LoadUIScriptDebug = false;
 private:
 	void CacheUserData();
 };
