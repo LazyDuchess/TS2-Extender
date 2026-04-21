@@ -12,7 +12,7 @@ Tested to work with the Steam version.
 
 ## Fixes
 
-* Fixes a Maxis oversight that caused pink flashing on 64 bit computers. Thanks to @spockthewok for discovering this.
+* Fixes a Maxis oversight that caused pink flashing on 64 bit computers. Thanks to [@spockthewok](https://github.com/spockthewok) for discovering this.
 * Fixes the game's random number generator, solving Firstborn Syndrome and other random number quirks.
 * Fixes Open For Business uniforms messing up employee's faces.
 * Fixes broken date stood up timer.
