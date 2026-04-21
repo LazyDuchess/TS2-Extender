@@ -758,6 +758,17 @@ namespace Addresses {
 	};
 	static char luaPushBooleanLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char laaPointerCheckLookup[] = {
+		0x85, 0xC9,
+		0x7D, 0x04,
+		0xF7, 0xD9,
+		0xEB, 0x14,
+		0x8D, 0x45, 0x10,
+		0x50,
+		0x51
+	};
+	static char laaPointerCheckLookupMask[] = "xxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -820,6 +831,8 @@ namespace Addresses {
 	void* TSGlobalsCall;
 	void* TSGlobals;
 
+	void* LAAPointerCheck;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -865,6 +878,7 @@ namespace Addresses {
 		ADDRESS(AppendInteractionsForMenu, appendInteractionsForMenuLookup);
 		ADDRESS(AddCheatInteraction, addCheatInteractionLookup);
 		ADDRESS(TSGlobalsCall, tsGlobalsCallLookup);
+		ADDRESS(LAAPointerCheck, laaPointerCheckLookup);
 
 		DWORD relativeCall = *(DWORD*)TSGlobalsCall;
 

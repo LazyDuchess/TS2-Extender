@@ -62,5 +62,7 @@ namespace Addresses {
 	extern void* TSGlobalsCall;
 	extern void* TSGlobals;
 
+	extern void* LAAPointerCheck;
+
 	bool Initialize();
 }

@@ -10,6 +10,7 @@ namespace Config {
 	bool SkipIntro;
 	bool FixRNG;
 	bool FixOFBUniform;
+	bool FixPinkFlashing;
 	bool ExtendedLua;
 	bool Separates4All;
 
@@ -61,6 +62,7 @@ namespace Config {
 		SkipIntro = GetBool("General", "SkipIntro", true);
 		FixRNG = GetBool("Fixes", "FixRNG", true);
 		FixOFBUniform = GetBool("Fixes", "FixOFBUniform", true);
+		FixPinkFlashing = GetBool("Fixes", "FixPinkFlashing", true);
 		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
 		Separates4All = GetBool("Enhancements", "Separates4All", false);
 

@@ -356,6 +356,10 @@ bool Core::Initialize() {
 		if (!LuaExtensions::Initialize()) return false;
 	}
 
+	if (Config::FixPinkFlashing) {
+		Nop((BYTE*)Addresses::LAAPointerCheck, 4);
+	}
+
 	if (Config::FixOFBUniform) {
 		if (MH_CreateHook(Addresses::ClothingDialogOnAttach, &DetourClothingDialogOnAttach,
 			reinterpret_cast<LPVOID*>(&fpClothingDialogOnAttach)) != MH_OK)
