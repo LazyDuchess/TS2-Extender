@@ -244,7 +244,17 @@ static unsigned int __fastcall DetourRandomUint32Uniform(TS2::cRZRandom* me, voi
 
 Core* Core::_instance = nullptr;
 
-void Core::CacheUserData() {
+void Core::DoDefaultUserData() {
+	m_GameDisplayName = L"The Sims 2";
+	PWSTR path_pwstr;
+	HRESULT hr = SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &path_pwstr);
+	if (SUCCEEDED(hr)) {
+		m_UserDataPath = std::wstring(path_pwstr) + L"\\EA Games\\" + m_GameDisplayName;
+		CoTaskMemFree(path_pwstr);
+	}
+}
+
+bool Core::CacheUserData() {
 	HKEY nameKey;
 
 	LSTATUS keyStatus = RegOpenKeyExW(
@@ -255,7 +265,7 @@ void Core::CacheUserData() {
 		&nameKey
 	);
 
-	if (keyStatus != ERROR_SUCCESS) return;
+	if (keyStatus != ERROR_SUCCESS) return false;
 
 	DWORD finalSize = 0;
 	const wchar_t keyName[] = L"displayname";
@@ -270,7 +280,7 @@ void Core::CacheUserData() {
 		&finalSize
 	);
 
-	if (valueStatus != ERROR_SUCCESS) return;
+	if (valueStatus != ERROR_SUCCESS) return false;
 
 	m_GameDisplayName.resize(finalSize / sizeof(wchar_t));
 
@@ -290,7 +300,9 @@ void Core::CacheUserData() {
 	if (SUCCEEDED(hr)) {
 		m_UserDataPath = std::wstring(path_pwstr) + L"\\EA Games\\" + m_GameDisplayName;
 		CoTaskMemFree(path_pwstr);
+		return true;
 	}
+	return false;
 }
 
 bool Core::Create() {
@@ -317,7 +329,11 @@ bool Core::Initialize() {
 
 	if (!Addresses::Initialize()) return false;
 
-	Core::_instance->CacheUserData();
+	if (!Core::_instance->CacheUserData())
+	{
+		Core::_instance->DoDefaultUserData();
+		Log("Failed to find registry for game user folder, using default Documents/EA Games/The Sims 2 folder.");
+	}
 
 	// Initialize MinHook.
 	if (MH_Initialize() != MH_OK)

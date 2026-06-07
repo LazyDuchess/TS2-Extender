@@ -28,5 +28,6 @@ public:
 	cEdithObjectTestSim* m_CurrentTestSim = nullptr;
 	bool m_LoadUIScriptDebug = false;
 private:
-	void CacheUserData();
+	bool CacheUserData();
+	void DoDefaultUserData();
 };
