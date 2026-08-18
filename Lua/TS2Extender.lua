@@ -5,22 +5,31 @@ Delegates = {}
 Delegates.OnBuildPieMenu = 0
 
 -- Returns an UTF-8 string as a table, with each character as an element in the table. Can be useful for string manipulation or length checks.
+-- spec from https://en.wikipedia.org/wiki/UTF-8
 function UTF8StringToTable(str)
 	local chars = {}
 	local i = 1
 	local length = string.len(str)
 
 	while i <= length do
-		local by = string.byte(str, i)
-		local charLength = 0
-		if by < 128 then
+		local b = string.byte(str, i)
+		local charLength
+		
+		-- 0xxxxxxx - 1 byte character
+		if BitwiseAnd(b,128) == 0 then
 			charLength = 1
-		elseif by < 224 then
+		-- 110xxxxx - 2 byte character
+		elseif BitwiseAnd(b,224) == 192 then
 			charLength = 2
-		elseif by < 240 then
+		-- 1110xxxx - 3 byte character
+		elseif BitwiseAnd(b,240) == 224 then
 			charLength = 3
-		else
+		-- 11110xxx - 4 byte character
+		elseif BitwiseAnd(b,248) == 240 then
 			charLength = 4
+		else
+		-- invalid
+			charLength = 1
 		end
 		table.insert(chars, string.sub(str, i, i + charLength - 1))
 		i = i + charLength
