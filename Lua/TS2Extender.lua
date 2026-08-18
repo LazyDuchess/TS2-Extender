@@ -63,8 +63,8 @@ function DataWriter.new()
 end
 
 function DataWriter:Write(value)
-	data[index] = value
-	index = index + 1
+	self.data[self.index] = value
+	self.index = self.index + 1
 end
 
 function DataWriter:WriteString(str)
@@ -100,8 +100,8 @@ function DataReader.FromToken(token)
 end
 
 function DataReader:Read()
-	local val = self.data[index]
-	index = index + 1
+	local val = self.data[self.index]
+	self.index = self.index + 1
 	return val
 end
 
