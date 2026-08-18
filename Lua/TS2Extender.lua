@@ -4,6 +4,31 @@ Delegates = {}
 
 Delegates.OnBuildPieMenu = 0
 
+-- Returns an UTF-8 string as a table, with each character as an element in the table. Can be useful for string manipulation or length checks.
+function UTF8StringToTable(str)
+	local chars = {}
+	local i = 1
+	local length = string.len(str)
+
+	while i <= length do
+		local by = string.byte(str, i)
+		local charLength = 0
+		if by < 128 then
+			charLength = 1
+		elseif by < 224 then
+			charLength = 2
+		elseif by < 240 then
+			charLength = 3
+		else
+			charLength = 4
+		end
+		table.insert(chars, string.sub(str, i, i + charLength - 1))
+		i = i + charLength
+	end
+	
+	return chars
+end
+
 function PackString(text)
 	local packed = {}
 	
