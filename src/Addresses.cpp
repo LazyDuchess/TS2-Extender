@@ -769,6 +769,22 @@ namespace Addresses {
 	};
 	static char laaPointerCheckLookupMask[] = "xxxxxxxxxxxxx";
 
+	static char voxModifierModifyEventLookup[] = {
+		0x55,
+		0x83, 0xEC, 0x64,
+		0xB8, 0xAB, 0xFF, 0xFC, 0x00,
+		0xE8, 0xF4, 0x0D, 0x5E, 0x00,
+		0x83, 0xEC, 0x40,
+		0x53,
+		0x56,
+		0x57,
+		0x8B, 0x7D, 0x70,
+		0x89, 0x4D, 0x60,
+		0x8B, 0xCF,
+		0x68, 0xA2, 0xD0, 0xD5, 0xAB
+	};
+	static char voxModifierModifyEventLookupMask[] = "xxxxx????x????xxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -833,6 +849,8 @@ namespace Addresses {
 
 	void* LAAPointerCheck;
 
+	void* cEMVoxModifierModifyEvent;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -879,6 +897,7 @@ namespace Addresses {
 		ADDRESS(AddCheatInteraction, addCheatInteractionLookup);
 		ADDRESS(TSGlobalsCall, tsGlobalsCallLookup);
 		ADDRESS(LAAPointerCheck, laaPointerCheckLookup);
+		ADDRESS(cEMVoxModifierModifyEvent, voxModifierModifyEventLookup);
 
 		DWORD relativeCall = *(DWORD*)TSGlobalsCall;
 

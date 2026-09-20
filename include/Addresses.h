@@ -64,5 +64,7 @@ namespace Addresses {
 
 	extern void* LAAPointerCheck;
 
+	extern void* cEMVoxModifierModifyEvent;
+
 	bool Initialize();
 }
