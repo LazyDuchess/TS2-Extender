@@ -54,6 +54,53 @@ static char separatesPatch[] = { 0x6A, 0x01, 0x90, 0x90 };
 // PUSH 01 with 1 NOP. Tells buy and try on to keep separates visibles in UI.
 static char separatesBuyPatch[] = { 0x6A, 0x01, 0x90 };
 
+static unsigned int modifyVoiceEventObjectId = 0;
+static void* ModifyVoiceEventHook1Return;
+static void* ModifyVoiceEventHook2Return;
+
+// Store the Object ID for cEMVoxModifier::ModifyEvent, contained in ESI.
+static void __declspec(naked) ModifyVoiceEventHook1() {
+	__asm {
+		mov [modifyVoiceEventObjectId], esi
+		mov ecx, eax
+		mov edx, [eax]
+		call dword ptr [edx+0x68]
+		jmp[ModifyVoiceEventHook1Return]
+	}
+}
+
+static void __stdcall ModifyVoiceEventInternalCall(cRZString* str) {
+	Log("%s\n", str->GetString());
+}
+
+// At this point, the built cRZString for the voice filename is in EAX.
+static void __declspec(naked) ModifyVoiceEventHook2() {
+	__asm {
+		push eax
+		push ebx
+		push ecx
+		push edx
+		push esi
+		push edi
+		push ebp
+
+		push eax
+		call ModifyVoiceEventInternalCall
+
+		pop ebp
+		pop edi
+		pop esi
+		pop edx
+		pop ecx
+		pop ebx
+		pop eax
+
+		mov eax, [edi]
+		lea ecx, [ebp - 0x4C]
+		jmp[ModifyVoiceEventHook2Return]
+	}
+}
+
 static void __declspec(naked) ClothingDialogHook1() {
 	__asm {
 		cmp[esi + 0xE8], 0x00000000
@@ -417,6 +464,9 @@ bool Core::Initialize() {
 		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0xE + 0xE, &separatesBuyPatch, 3);
 	}
 
+	ModifyVoiceEventHook1Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x2D + 7);
+	ModifyVoiceEventHook2Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x3B1 + 5);
+	MakeJMP((BYTE*)Addresses::cEMVoxModifierModifyEvent + 0x3B1, (DWORD)ModifyVoiceEventHook2, 5);
 	
 	if (MH_CreateHook(Addresses::TSStringLoad, &DetourTSStringLoad,
 		reinterpret_cast<LPVOID*>(&fpTSStringLoad)) != MH_OK)

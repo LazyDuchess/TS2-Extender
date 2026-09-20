@@ -7,7 +7,8 @@
 #include "ts2/cEdithObjectTestSim.h"
 
 enum class Delegates {
-	OnBuildPieMenu = 0
+	OnBuildPieMenu = 0,
+	OnModifyVoiceEvent = 1
 };
 
 class Core {
