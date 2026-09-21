@@ -20,9 +20,9 @@ namespace LuaExtensions {
 	static REGISTERTSSGCHEATS fpRegisterTSSGCheats = NULL;
 
 	static std::string GetProcessDirectory() {
-		char path[MAX_PATH];
-		if (GetModuleFileName(NULL, path, MAX_PATH)) {
-			std::string dir(path);
+		wchar_t path[MAX_PATH];
+		if (GetModuleFileNameW(NULL, path, MAX_PATH)) {
+			std::string dir = WCharToString(path);
 			size_t pos = dir.find_last_of("\\/");
 			if (pos != std::string::npos) {
 				return dir.substr(0, pos);
