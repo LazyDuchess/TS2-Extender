@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <fstream>
+#include "scan.h"
 
 namespace LuaExtensions {
 	typedef bool(__cdecl* REGISTERPRIMITIVESUPPORTLUACOMMANDS)(TS2::cIGZLua5Thread*);
@@ -39,7 +40,7 @@ namespace LuaExtensions {
 			Log("Lua: SetCASLot FAILED! Lot name must be 7 characters or less.\n");
 			return 0;
 		}
-		strcpy(Addresses::CASLotName, lot);
+		WriteToMemory((DWORD)Addresses::CASLotName, (void*)lot, lotLen + 1);
 		return 0;
 	}
 
@@ -51,7 +52,7 @@ namespace LuaExtensions {
 			Log("Lua: SetYACASLot FAILED! Lot name must be 7 characters or less.\n");
 			return 0;
 		}
-		strcpy(Addresses::YACASLotName, lot);
+		WriteToMemory((DWORD)Addresses::YACASLotName, (void*)lot, lotLen + 1);
 		return 0;
 	}
 
