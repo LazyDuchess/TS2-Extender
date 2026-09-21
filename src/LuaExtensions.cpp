@@ -40,6 +40,7 @@ namespace LuaExtensions {
 			return 0;
 		}
 		strcpy(Addresses::CASLotName, lot);
+		return 0;
 	}
 
 	// SetYACASLot(string lot)
@@ -51,6 +52,7 @@ namespace LuaExtensions {
 			return 0;
 		}
 		strcpy(Addresses::YACASLotName, lot);
+		return 0;
 	}
 
 	// EnsureDirectory(string path)
