@@ -71,5 +71,10 @@ namespace Addresses {
 	
 	extern void* LegacyCalculateUIScale;
 
+	extern void* CASStringLookup;
+
+	extern char* CASLotName;
+	extern char* YACASLotName;
+
 	bool Initialize();
 }

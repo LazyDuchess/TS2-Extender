@@ -31,6 +31,28 @@ namespace LuaExtensions {
 		return "";
 	}
 
+	// SetCASLot(string lot)
+	static int __cdecl LuaSetCASLot(lua_State* luaState) {
+		const char* lot = lua_tostring(luaState, 1);
+		size_t lotLen = std::strlen(lot);
+		if (lotLen > 7) {
+			Log("Lua: SetCASLot FAILED! Lot name must be 7 characters or less.\n");
+			return 0;
+		}
+		strcpy(Addresses::CASLotName, lot);
+	}
+
+	// SetYACASLot(string lot)
+	static int __cdecl LuaSetYACASLot(lua_State* luaState) {
+		const char* lot = lua_tostring(luaState, 1);
+		size_t lotLen = std::strlen(lot);
+		if (lotLen > 7) {
+			Log("Lua: SetYACASLot FAILED! Lot name must be 7 characters or less.\n");
+			return 0;
+		}
+		strcpy(Addresses::YACASLotName, lot);
+	}
+
 	// EnsureDirectory(string path)
 	static int __cdecl LuaEnsureDirectory(lua_State* luaState) {
 		const char* path = lua_tostring(luaState, 1);
@@ -278,6 +300,8 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaReadFile, "ReadFile");
 			luaThread->Register(&LuaWriteFile, "WriteFile");
 			luaThread->Register(&LuaSetLoadUIScriptDebug, "SetLoadUIScriptDebug");
+			luaThread->Register(&LuaSetCASLot, "SetCASLot");
+			luaThread->Register(&LuaSetYACASLot, "SetYACASLot");
 		}
 		return res;
 	}

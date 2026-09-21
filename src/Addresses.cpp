@@ -840,6 +840,25 @@ namespace Addresses {
 	};
 	static char LegacyCalculateUIScaleLookupMask[] = "xxxxxxx????xx????xxxxxxxx????xxxx";
 
+	static char CASStringLookupLookup[] = {
+		0x8B, 0x01,
+		0x56,
+		0x6A, 0xFF,
+		0x68, 0xD0, 0x54, 0x05, 0x01,
+		0xFF, 0x50, 0x24,
+		0x84, 0xC0,
+		0x75, 0x14,
+		0x8B, 0x4D, 0x08,
+		0x56,
+		0x6A, 0xFF,
+		0x68, 0xD8, 0x54, 0x05, 0x01,
+		0x8B, 0x01,
+		0xFF, 0x50, 0x24,
+		0x84, 0xC0,
+		0x74, 0x78
+	};
+	static char CASStringLookupLookupMask[] = "xxxxxx????xxxxxxxxxxxxxx????xxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -911,6 +930,11 @@ namespace Addresses {
 
 	void* LegacyCalculateUIScale;
 
+	void* CASStringLookup;
+
+	char* CASLotName;
+	char* YACASLotName;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -961,6 +985,10 @@ namespace Addresses {
 		ADDRESS(cTSUserToolObjectInit, cTSUserToolObjectInitLookup);
 		ADDRESS(cTSUserToolObjectShutdown, cTSUserToolObjectShutdownLookup);
 		ADDRESS(LegacyCalculateUIScale, LegacyCalculateUIScaleLookup);
+		ADDRESS(CASStringLookup, CASStringLookupLookup);
+
+		CASLotName = *(char**)((DWORD)CASStringLookup + 0x6);
+		YACASLotName = *(char**)((DWORD)CASStringLookup + 0x18);
 
 		DWORD relativeCall = *(DWORD*)TSGlobalsCall;
 
