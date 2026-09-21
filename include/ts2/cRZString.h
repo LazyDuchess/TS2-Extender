@@ -2,7 +2,7 @@
 class cRZString {
 public:
 	void FromChar(const char* str);
-	const char* GetString();
+	char* GetString();
 private:
 	bool IsEmbedded();
 };

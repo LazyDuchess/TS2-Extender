@@ -18,6 +18,7 @@
 #include "ts2/cEdithObjectTestSim.h"
 #include "ts2/cTSPerson.h"
 #include "ts2/cTSInteraction.h"
+#include <cstring>
 #include <string>
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
@@ -73,8 +74,26 @@ static int MakeLuaTableForModifyVoiceEvent(lua_State* luaState, cRZString* str, 
 	lua_newtable(luaState);
 	int tableId = lua_gettop(luaState);
 
+	char* strptr = str->GetString();
+	int underscoreIndex = -1;
+
+	for (int i = std::strlen(strptr) - 1; i >= 0; --i) {
+		if (strptr[i] == '_') {
+			underscoreIndex = i;
+			strptr[i] = '\0';
+			break;
+		}
+	}
+
 	lua_pushstring(luaState, "Vox");
-	lua_pushstring(luaState, str->GetString());
+	lua_pushstring(luaState, strptr);
+	lua_settable(luaState, -3);
+
+	lua_pushstring(luaState, "Suffix");
+	if (underscoreIndex == -1)
+		lua_pushstring(luaState, "");
+	else
+		lua_pushstring(luaState, &strptr[underscoreIndex + 1]);
 	lua_settable(luaState, -3);
 
 	lua_pushstring(luaState, "PersonId");
@@ -103,6 +122,21 @@ static void __stdcall ModifyVoiceEventInternalCall(cRZString* str) {
 	std::string finalStr(lua_tostring(core->m_LuaState, -1));
 
 	lua_pop(core->m_LuaState, 1);
+
+	lua_pushvalue(core->m_LuaState, tableId);
+	lua_pushstring(core->m_LuaState, "Suffix");
+	lua_gettable(core->m_LuaState, -2);
+
+	std::string suffixStr(lua_tostring(core->m_LuaState, -1));
+
+	lua_pop(core->m_LuaState, 1);
+
+	if (!suffixStr.empty()) {
+		finalStr += "_";
+		finalStr += suffixStr;
+	}
+
+	str->FromChar(finalStr.c_str());
 }
 
 // At this point, the built cRZString for the voice filename is in EAX.
