@@ -10,4 +10,6 @@ namespace Config {
 	extern bool FixPinkFlashing;
 	extern bool ExtendedLua;
 	extern bool Separates4All;
+	extern bool UIScale;
+	extern float UIScaleResolution;
 }

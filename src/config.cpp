@@ -13,6 +13,8 @@ namespace Config {
 	bool FixPinkFlashing;
 	bool ExtendedLua;
 	bool Separates4All;
+	bool UIScale;
+	float UIScaleResolution;
 
 	static bool Has(const std::string& section, const std::string& key) {
 		if (!Ini[section].has(key)) return false;
@@ -65,6 +67,8 @@ namespace Config {
 		FixPinkFlashing = GetBool("Fixes", "FixPinkFlashing", true);
 		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
 		Separates4All = GetBool("Enhancements", "Separates4All", false);
+		UIScale = GetBool("Enhancements", "UIScale", false);
+		UIScaleResolution = GetFloat("Enhancements", "UIScaleResolution", 1080.0f);
 
 		if (!iniExisted) {
 			Log("Default config is being written to %s cause it didn't exist.\n", ConfigFilename);

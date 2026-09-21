@@ -530,6 +530,18 @@ bool Core::Initialize() {
 		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0xE + 0xE, &separatesBuyPatch, 3);
 	}
 
+	if (Config::UIScale) {
+		float* pResRef = *(float**)((DWORD)Addresses::LegacyCalculateUIScale + 0x3A);
+		float* pRes1080 = *(float**)((DWORD)Addresses::LegacyCalculateUIScale + 0x105);
+		float* pRes768 = *(float**)((DWORD)Addresses::LegacyCalculateUIScale + 0x11D);
+		float* pRes924 = *(float**)((DWORD)Addresses::LegacyCalculateUIScale + 0x148);
+
+		pResRef[0] = Config::UIScaleResolution;
+		pRes1080[0] = Config::UIScaleResolution;
+		pRes768[0] = Config::UIScaleResolution;
+		pRes924[0] = Config::UIScaleResolution;
+	}
+
 	ModifyVoiceEventHook1Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x2D + 7);
 	ModifyVoiceEventHook2Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x3B1 + 5);
 	MakeJMP((BYTE*)Addresses::cEMVoxModifierModifyEvent + 0x3B1, (DWORD)ModifyVoiceEventHook2, 5);

@@ -68,6 +68,8 @@ namespace Addresses {
 
 	extern void* cTSUserToolObjectInit;
 	extern void* cTSUserToolObjectShutdown;
+	
+	extern void* LegacyCalculateUIScale;
 
 	bool Initialize();
 }

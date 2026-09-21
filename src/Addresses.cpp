@@ -829,6 +829,17 @@ namespace Addresses {
 	};
 	static char cTSUserToolObjectShutdownLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxx";
 
+	static char LegacyCalculateUIScaleLookup[] = {
+		0x83, 0xEC, 0x28,
+		0xF3, 0x0F, 0x10, 0x05, 0x98, 0xC6, 0x10, 0xA0,
+		0xF3, 0x0F, 0x11, 0x44, 0x24, 0x04,
+		0xC7, 0x04, 0x24, 0x00, 0x00, 0x00, 0x00,
+		0xE8, 0x92, 0xAE, 0x88, 0xFF,
+		0x85, 0xC0,
+		0x74, 0x15
+	};
+	static char LegacyCalculateUIScaleLookupMask[] = "xxxxxxx????xx????xxxxxxxx????xxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -898,6 +909,8 @@ namespace Addresses {
 	void* cTSUserToolObjectInit;
 	void* cTSUserToolObjectShutdown;
 
+	void* LegacyCalculateUIScale;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -947,6 +960,7 @@ namespace Addresses {
 		ADDRESS(cEMVoxModifierModifyEvent, voxModifierModifyEventLookup);
 		ADDRESS(cTSUserToolObjectInit, cTSUserToolObjectInitLookup);
 		ADDRESS(cTSUserToolObjectShutdown, cTSUserToolObjectShutdownLookup);
+		ADDRESS(LegacyCalculateUIScale, LegacyCalculateUIScaleLookup);
 
 		DWORD relativeCall = *(DWORD*)TSGlobalsCall;
 
