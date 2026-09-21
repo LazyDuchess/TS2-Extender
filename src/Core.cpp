@@ -69,7 +69,42 @@ static void __declspec(naked) ModifyVoiceEventHook1() {
 	}
 }
 
+static int MakeLuaTableForModifyVoiceEvent(lua_State* luaState, cRZString* str, unsigned int objectId) {
+	lua_newtable(luaState);
+	int tableId = lua_gettop(luaState);
+
+	lua_pushstring(luaState, "Vox");
+	lua_pushstring(luaState, str->GetString());
+	lua_settable(luaState, -3);
+
+	lua_pushstring(luaState, "PersonId");
+	lua_pushnumber(luaState, static_cast<double>(objectId));
+	lua_settable(luaState, -3);
+
+	return tableId;
+}
+
 static void __stdcall ModifyVoiceEventInternalCall(cRZString* str) {
+	Core* core = Core::_instance;
+	int tableId = MakeLuaTableForModifyVoiceEvent(core->m_LuaState, str, modifyVoiceEventObjectId);
+	for (auto& cb : core->m_LuaDelegates[(int)Delegates::OnModifyVoiceEvent].m_Callbacks) {
+		lua_rawgeti(cb.m_luaState, LUA_REGISTRYINDEX, cb.m_LuaCall);
+		lua_pushvalue(cb.m_luaState, tableId);
+		if (lua_pcall(cb.m_luaState, 1, 0, 0) != 0) {
+			Log("Error calling Lua callback: %s\n", lua_tostring(cb.m_luaState, -1));
+			lua_pop(cb.m_luaState, 1);
+		}
+	}
+
+	lua_pushvalue(core->m_LuaState, tableId);
+	lua_pushstring(core->m_LuaState, "Vox");
+	lua_gettable(core->m_LuaState, -2);
+
+	std::string finalStr(lua_tostring(core->m_LuaState, -1));
+
+	lua_pop(core->m_LuaState, 1);
+
+	str->FromChar(finalStr.c_str());
 	Log("%s\n", str->GetString());
 }
 

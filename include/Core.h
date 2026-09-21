@@ -24,7 +24,7 @@ public:
 	lua_State* m_LuaState = nullptr;
 	int m_MakeMoneyStringLuaCall = LUA_NOREF;
 
-	LuaDelegate m_LuaDelegates[1];
+	LuaDelegate m_LuaDelegates[2];
 
 	cEdithObjectTestSim* m_CurrentTestSim = nullptr;
 	bool m_LoadUIScriptDebug = false;
