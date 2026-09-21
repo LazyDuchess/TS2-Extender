@@ -3,5 +3,5 @@
 
 class cTSUserToolObject {
 public:
-	cTSObject* GetHeldObject();
+	void* GetHeldObject();
 };

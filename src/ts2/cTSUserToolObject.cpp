@@ -1,5 +1,6 @@
 #include "ts2/cTSUserToolObject.h"
 
-cTSObject* cTSUserToolObject::GetHeldObject() {
-	return (*(cTSObject**)(this + 0xD0));
+// lowk don't know what it is. not a cTSObject
+void* cTSUserToolObject::GetHeldObject() {
+	return (*(void**)(this + 0xD0));
 }

@@ -66,5 +66,8 @@ namespace Addresses {
 
 	extern void* cEMVoxModifierModifyEvent;
 
+	extern void* cTSUserToolObjectInit;
+	extern void* cTSUserToolObjectShutdown;
+
 	bool Initialize();
 }

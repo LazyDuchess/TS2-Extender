@@ -785,6 +785,50 @@ namespace Addresses {
 	};
 	static char voxModifierModifyEventLookupMask[] = "xxxxx????x????xxxxxxxxxxxxxxxxxxx";
 
+	static char cTSUserToolObjectInitLookup[] = {
+		0x56,
+		0x8B, 0xF1,
+		0x8B, 0x06,
+		0xFF, 0x90, 0x04, 0x01, 0x00, 0x00,
+		0x8B, 0x4C, 0x24, 0x08,
+		0x85, 0xC9,
+		0x74, 0x11,
+		0x8B, 0x01,
+		0xFF, 0x90, 0x38, 0x01, 0x00, 0x00,
+		0x8B, 0xCE,
+		0xFF, 0x30,
+		0xE8, 0xBC, 0x2B, 0x00, 0x00,
+		0x8B, 0x06,
+		0x8B, 0xCE,
+		0xFF, 0x90, 0x08, 0x01, 0x00, 0x00,
+		0xB0, 0x01,
+		0x5E,
+		0xC2, 0x04, 0x00
+	};
+	static char cTSUserToolObjectInitLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxx";
+
+	static char cTSUserToolObjectShutdownLookup[] = {
+		0x53,
+		0x56,
+		0x8B, 0xF1,
+		0x33, 0xDB,
+		0x57,
+		0x39, 0x5E, 0x04,
+		0x74, 0x07,
+		0x8B, 0x06,
+		0x6A, 0x01,
+		0xFF, 0x50, 0x5C,
+		0x53, 
+		0x56, 
+		0x8D, 0x4E, 0x6C,
+		0xE8, 0x37, 0x18, 0xB4, 0xFF,
+		0x8D, 0x7E, 0x64,
+		0x8B, 0x0F,
+		0x85, 0xC9,
+		0x74, 0x14
+	};
+	static char cTSUserToolObjectShutdownLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -851,6 +895,9 @@ namespace Addresses {
 
 	void* cEMVoxModifierModifyEvent;
 
+	void* cTSUserToolObjectInit;
+	void* cTSUserToolObjectShutdown;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -898,6 +945,8 @@ namespace Addresses {
 		ADDRESS(TSGlobalsCall, tsGlobalsCallLookup);
 		ADDRESS(LAAPointerCheck, laaPointerCheckLookup);
 		ADDRESS(cEMVoxModifierModifyEvent, voxModifierModifyEventLookup);
+		ADDRESS(cTSUserToolObjectInit, cTSUserToolObjectInitLookup);
+		ADDRESS(cTSUserToolObjectShutdown, cTSUserToolObjectShutdownLookup);
 
 		DWORD relativeCall = *(DWORD*)TSGlobalsCall;
 
