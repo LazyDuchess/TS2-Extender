@@ -103,9 +103,6 @@ static void __stdcall ModifyVoiceEventInternalCall(cRZString* str) {
 	std::string finalStr(lua_tostring(core->m_LuaState, -1));
 
 	lua_pop(core->m_LuaState, 1);
-
-	str->FromChar(finalStr.c_str());
-	Log("%s\n", str->GetString());
 }
 
 // At this point, the built cRZString for the voice filename is in EAX.
