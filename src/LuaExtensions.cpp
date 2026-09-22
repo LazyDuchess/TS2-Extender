@@ -68,6 +68,18 @@ namespace LuaExtensions {
 		return 1;
 	}
 
+	// GetCASLot()
+	static int __cdecl LuaGetCASLot(lua_State* luaState) {
+		lua_pushstring(luaState, Addresses::CASLotName);
+		return 1;
+	}
+
+	// GetYACASLot()
+	static int __cdecl LuaGetYACASLot(lua_State* luaState) {
+		lua_pushstring(luaState, Addresses::YACASLotName);
+		return 1;
+	}
+
 	// SetCASLot(string lot)
 	static int __cdecl LuaSetCASLot(lua_State* luaState) {
 		const char* lot = lua_tostring(luaState, 1);
@@ -341,6 +353,8 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaSetLoadUIScriptDebug, "SetLoadUIScriptDebug");
 			luaThread->Register(&LuaSetCASLot, "SetCASLot");
 			luaThread->Register(&LuaSetYACASLot, "SetYACASLot");
+			luaThread->Register(&LuaGetCASLot, "GetCASLot");
+			luaThread->Register(&LuaGetYACASLot, "GetYACASLot");
 			luaThread->Register(&LuaGetKeyDown, "KBM_GetKeyDown");
 			luaThread->Register(&LuaGetKeyHeld, "KBM_GetKey");
 			luaThread->Register(&LuaGetKeyUp, "KBM_GetKeyUp");
