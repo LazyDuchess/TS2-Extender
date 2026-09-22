@@ -279,6 +279,7 @@ static void __fastcall DetourOncePerFrameUpdate(void* self, void* _) {
 			lua_pop(cb.m_luaState, 1);
 		}
 	}
+	LuaExtensions::FrameUpdate();
 }
 
 static int __fastcall DetourOverlaysActivate(void* self, void* _) {

@@ -13,12 +13,24 @@
 #include <algorithm>
 #include <fstream>
 #include "scan.h"
+#include <Windows.h>
+#define KEY_COUNT 256
 
 namespace LuaExtensions {
 	typedef bool(__cdecl* REGISTERPRIMITIVESUPPORTLUACOMMANDS)(TS2::cIGZLua5Thread*);
 	static REGISTERPRIMITIVESUPPORTLUACOMMANDS fpRegisterPrimitiveSupportLuaCommands = NULL;
 	typedef void(__stdcall* REGISTERTSSGCHEATS)();
 	static REGISTERTSSGCHEATS fpRegisterTSSGCheats = NULL;
+
+	static SHORT currentInputState[KEY_COUNT]{};
+	static SHORT lastInputState[KEY_COUNT]{};
+
+	void FrameUpdate() {
+		memcpy(lastInputState, currentInputState, sizeof(currentInputState));
+		for (int i = 0; i < KEY_COUNT; i++) {
+			currentInputState[i] = GetAsyncKeyState(i);
+		}
+	}
 
 	static std::string GetProcessDirectory() {
 		wchar_t path[MAX_PATH];
@@ -30,6 +42,30 @@ namespace LuaExtensions {
 			}
 		}
 		return "";
+	}
+
+	// KBM_GetKeyDown(number vk)
+	static int __cdecl LuaGetKeyDown(lua_State* luaState) {
+		int vk = static_cast<int>(lua_tonumber(luaState, 1));
+		bool res = (currentInputState[vk] & 0x8000) && !(lastInputState[vk] & 0x8000);
+		lua_pushboolean(luaState, res ? 1 : 0);
+		return 1;
+	}
+
+	// KBM_GetKey(number vk)
+	static int __cdecl LuaGetKeyHeld(lua_State* luaState) {
+		int vk = static_cast<int>(lua_tonumber(luaState, 1));
+		bool res = (currentInputState[vk] & 0x8000);
+		lua_pushboolean(luaState, res ? 1 : 0);
+		return 1;
+	}
+
+	// KBM_GetKeyUp(number vk)
+	static int __cdecl LuaGetKeyUp(lua_State* luaState) {
+		int vk = static_cast<int>(lua_tonumber(luaState, 1));
+		bool res = !(currentInputState[vk] & 0x8000) && (lastInputState[vk] & 0x8000);
+		lua_pushboolean(luaState, res ? 1 : 0);
+		return 1;
 	}
 
 	// SetCASLot(string lot)
@@ -305,6 +341,9 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaSetLoadUIScriptDebug, "SetLoadUIScriptDebug");
 			luaThread->Register(&LuaSetCASLot, "SetCASLot");
 			luaThread->Register(&LuaSetYACASLot, "SetYACASLot");
+			luaThread->Register(&LuaGetKeyDown, "KBM_GetKeyDown");
+			luaThread->Register(&LuaGetKeyHeld, "KBM_GetKey");
+			luaThread->Register(&LuaGetKeyUp, "KBM_GetKeyUp");
 		}
 		return res;
 	}
