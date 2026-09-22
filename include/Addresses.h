@@ -76,5 +76,8 @@ namespace Addresses {
 	extern char* CASLotName;
 	extern char* YACASLotName;
 
+	extern void* cTSSGSystemOncePerFrameUpdate;
+	extern void* cTSUICASComponentOverlaysOnTick;
+
 	bool Initialize();
 }
