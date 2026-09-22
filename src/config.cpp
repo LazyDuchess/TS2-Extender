@@ -11,6 +11,7 @@ namespace Config {
 	bool FixRNG;
 	bool FixOFBUniform;
 	bool FixPinkFlashing;
+	bool FixMakeupLag;
 	bool ExtendedLua;
 	bool Separates4All;
 	bool UIScale;
@@ -65,6 +66,7 @@ namespace Config {
 		FixRNG = GetBool("Fixes", "FixRNG", true);
 		FixOFBUniform = GetBool("Fixes", "FixOFBUniform", true);
 		FixPinkFlashing = GetBool("Fixes", "FixPinkFlashing", true);
+		FixMakeupLag = GetBool("Fixes", "FixMakeupLag", true);
 		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
 		Separates4All = GetBool("Enhancements", "Separates4All", false);
 		UIScale = GetBool("Enhancements", "UIScale", false);

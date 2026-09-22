@@ -8,6 +8,7 @@ namespace Config {
 	extern bool FixRNG;
 	extern bool FixOFBUniform;
 	extern bool FixPinkFlashing;
+	extern bool FixMakeupLag;
 	extern bool ExtendedLua;
 	extern bool Separates4All;
 	extern bool UIScale;

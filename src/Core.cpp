@@ -20,6 +20,7 @@
 #include "ts2/cTSInteraction.h"
 #include <cstring>
 #include <string>
+#include "ts2/cGZMessage.h"
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
 typedef UINT(__thiscall* LUA5OPEN)(void*, UINT);
@@ -33,6 +34,14 @@ typedef bool(__cdecl* LOADUISCRIPT)(uint32_t instance, void* unk1, void* unk2, v
 typedef cRZString* (__cdecl* MAKEMONEYSTRING)(int money);
 typedef void(__thiscall* APPENDINTERACTIONSFORMENU)(cEdithObjectTestSim* testSim, std::vector<cTSInteraction*>* interactions, bool debug);
 
+typedef int(__thiscall* OVERLAYSONTICK)(void* self, int unk);
+typedef int(__thiscall* OVERLAYSDOMESSAGE)(void* self, cGZMessage* msg);
+
+typedef void(__thiscall* ONCEPERFRAMEUPDATE)(void* self);
+
+static ONCEPERFRAMEUPDATE fpOncePerFrameUpdate = NULL;
+static OVERLAYSDOMESSAGE fpOverlaysDoMessage = NULL;
+static OVERLAYSONTICK fpOverlaysOnTick = NULL;
 static APPENDINTERACTIONSFORMENU fpAppendInteractionsForMenu = NULL;
 static MAKEMONEYSTRING fpMakeMoneyString = NULL;
 static LOADUISCRIPT fpLoadUiScript = NULL;
@@ -253,6 +262,26 @@ static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTS
 	lua_settable(luaState, -3);
 
 	return tableId;
+}
+
+static bool shouldTickOverlays = false;
+
+static void __fastcall DetourOncePerFrameUpdate(void* self, void* _) {
+	fpOncePerFrameUpdate(self);
+	shouldTickOverlays = false;
+}
+
+static int __fastcall DetourOverlaysDoMessage(void* self, void* _, cGZMessage* msg) {
+	if ((msg->MessageID == 0x3) && (msg->Unknown == 0x287259f6 || msg->Unknown == 0x28759f7 || msg->Unknown == 0x28759f8))
+		shouldTickOverlays = true;
+	return fpOverlaysDoMessage(self, msg);
+}
+
+static int __fastcall DetourOverlaysOnTick(void* self, void* _, int unk) {
+	if (shouldTickOverlays) {
+		return fpOverlaysOnTick(self, unk);
+	}
+	return 1;
 }
 
 // Callback(vec Interactions, number SimId, number ObjectId, bool clicked, bool debug)
@@ -516,6 +545,38 @@ bool Core::Initialize() {
 		ClothingDialogHook2Return = (void*)((DWORD)Addresses::ClothingDialogHack2 + 7);
 		MakeJMP((BYTE*)Addresses::ClothingDialogHack1, (DWORD)ClothingDialogHook1, 6);
 		MakeJMP((BYTE*)Addresses::ClothingDialogHack2, (DWORD)ClothingDialogHook2, 7);
+	}
+
+	if (Config::FixMakeupLag) {
+		if (MH_CreateHook(Addresses::cTSUICASComponentOverlaysOnTick, &DetourOverlaysOnTick,
+			reinterpret_cast<LPVOID*>(&fpOverlaysOnTick)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::cTSUICASComponentOverlaysOnTick) != MH_OK)
+		{
+			return false;
+		}
+
+		if (MH_CreateHook(Addresses::cTSUICASComponentOverlaysDoMessage, &DetourOverlaysDoMessage,
+			reinterpret_cast<LPVOID*>(&fpOverlaysDoMessage)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::cTSUICASComponentOverlaysDoMessage) != MH_OK)
+		{
+			return false;
+		}
+	}
+
+	if (MH_CreateHook(Addresses::cTSSGSystemOncePerFrameUpdate, &DetourOncePerFrameUpdate,
+		reinterpret_cast<LPVOID*>(&fpOncePerFrameUpdate)) != MH_OK)
+	{
+		return false;
+	}
+	if (MH_EnableHook(Addresses::cTSSGSystemOncePerFrameUpdate) != MH_OK)
+	{
+		return false;
 	}
 
 	if (Config::Separates4All) {

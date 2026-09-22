@@ -78,6 +78,7 @@ namespace Addresses {
 
 	extern void* cTSSGSystemOncePerFrameUpdate;
 	extern void* cTSUICASComponentOverlaysOnTick;
+	extern void* cTSUICASComponentOverlaysDoMessage;
 
 	bool Initialize();
 }

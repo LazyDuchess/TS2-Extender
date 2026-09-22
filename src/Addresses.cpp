@@ -891,7 +891,26 @@ namespace Addresses {
 		0xC2, 0x04, 0x00
 	};
 	static char cTSUICASComponentOverlaysOnTickLookupMask[] = "xxxxxxxx????xxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxx";
-		;
+
+	static char cTSUICASComponentOverlaysDoMessageLookup[] = {
+		0x55,
+		0x8B, 0xEC,
+		0x8B, 0x45, 0x08,
+		0x83, 0xEC, 0x10,
+		0x81, 0x38, 0xC7, 0xDC, 0x42, 0x4B,
+		0x57,
+		0x8B, 0xF9,
+		0x75, 0x4D,
+		0x81, 0x78, 0x08, 0x18, 0x6B, 0xAE, 0xD1,
+		0x75, 0x44,
+		0x83, 0xBF, 0xE4, 0x02, 0x00, 0x00, 0x00,
+		0x74, 0x37,
+		0x56,
+		0x8B, 0x70, 0x0C,
+		0x8B, 0x07
+	};
+	static char cTSUICASComponentOverlaysDoMessageLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -970,6 +989,7 @@ namespace Addresses {
 
 	void* cTSSGSystemOncePerFrameUpdate;
 	void* cTSUICASComponentOverlaysOnTick;
+	void* cTSUICASComponentOverlaysDoMessage;
 
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
@@ -1024,6 +1044,7 @@ namespace Addresses {
 		ADDRESS(CASStringLookup, CASStringLookupLookup);
 		ADDRESS(cTSSGSystemOncePerFrameUpdate, cTSSGSystemOncePerFrameUpdateLookup);
 		ADDRESS(cTSUICASComponentOverlaysOnTick, cTSUICASComponentOverlaysOnTickLookup);
+		ADDRESS(cTSUICASComponentOverlaysDoMessage, cTSUICASComponentOverlaysDoMessageLookup);
 
 		CASLotName = *(char**)((DWORD)CASStringLookup + 0x6);
 		YACASLotName = *(char**)((DWORD)CASStringLookup + 0x18);
