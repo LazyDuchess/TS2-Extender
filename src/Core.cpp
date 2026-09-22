@@ -36,10 +36,12 @@ typedef void(__thiscall* APPENDINTERACTIONSFORMENU)(cEdithObjectTestSim* testSim
 
 typedef int(__thiscall* OVERLAYSONTICK)(void* self, int unk);
 typedef int(__thiscall* OVERLAYSDOMESSAGE)(void* self, cGZMessage* msg);
+typedef int(__thiscall* OVERLAYSACTIVATE)(void* self);
 
 typedef void(__thiscall* ONCEPERFRAMEUPDATE)(void* self);
 
 static ONCEPERFRAMEUPDATE fpOncePerFrameUpdate = NULL;
+static OVERLAYSACTIVATE fpOverlaysActivate = NULL;
 static OVERLAYSDOMESSAGE fpOverlaysDoMessage = NULL;
 static OVERLAYSONTICK fpOverlaysOnTick = NULL;
 static APPENDINTERACTIONSFORMENU fpAppendInteractionsForMenu = NULL;
@@ -271,10 +273,36 @@ static void __fastcall DetourOncePerFrameUpdate(void* self, void* _) {
 	shouldTickOverlays = false;
 }
 
+static int __fastcall DetourOverlaysActivate(void* self, void* _) {
+	shouldTickOverlays = true;
+	return fpOverlaysActivate(self);
+}
+
 static int __fastcall DetourOverlaysDoMessage(void* self, void* _, cGZMessage* msg) {
 	if ((msg->MessageID == 0x3) && (msg->Unknown == 0x287259f6 || msg->Unknown == 0x28759f7 || msg->Unknown == 0x28759f8))
 		shouldTickOverlays = true;
 	return fpOverlaysDoMessage(self, msg);
+}
+
+static void* UITabChangeHookReturn;
+
+static void __declspec(naked) UITabChangeHook() {
+	__asm {
+		mov[shouldTickOverlays], 0x1
+		mov eax,[edi+0x08]
+		mov [ebp+0x0C], eax
+		jmp [UITabChangeHookReturn]
+	}
+}
+
+static void* UIMirrorTabChangeHookReturn;
+
+static void __declspec(naked) UIMirrorTabChangeHook() {
+	__asm {
+		mov[shouldTickOverlays], 0x1
+		call dword ptr [edx+0x00000154]
+		jmp[UIMirrorTabChangeHookReturn]
+	}
 }
 
 static int __fastcall DetourOverlaysOnTick(void* self, void* _, int unk) {
@@ -567,6 +595,24 @@ bool Core::Initialize() {
 		{
 			return false;
 		}
+
+		if (MH_CreateHook(Addresses::cTSUICASComponentOverlaysActivate, &DetourOverlaysActivate,
+			reinterpret_cast<LPVOID*>(&fpOverlaysActivate)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::cTSUICASComponentOverlaysActivate) != MH_OK)
+		{
+			return false;
+		}
+
+		// TODO: One or both of these might not be needed now that we are also hooking cTSUICASComponentOverlays::Activate?
+
+		UITabChangeHookReturn = (void*)((DWORD)Addresses::UnknownUITabChange + 6);
+		MakeJMP((BYTE*)Addresses::UnknownUITabChange, (DWORD)UITabChangeHook, 6);
+
+		UIMirrorTabChangeHookReturn = (void*)((DWORD)Addresses::UnknownMirrorUITabChange + 6);
+		MakeJMP((BYTE*)Addresses::UnknownMirrorUITabChange, (DWORD)UIMirrorTabChangeHook, 6);
 	}
 
 	if (MH_CreateHook(Addresses::cTSSGSystemOncePerFrameUpdate, &DetourOncePerFrameUpdate,

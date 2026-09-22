@@ -911,6 +911,57 @@ namespace Addresses {
 	};
 	static char cTSUICASComponentOverlaysDoMessageLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char UnknownUITabChangeLookup[] = {
+		0x8B, 0x47, 0x08,
+		0x89, 0x45, 0x0C,
+		0x89, 0x5F, 0x08,
+		0x3B, 0xC3,
+		0x74, 0x77,
+		0x8D, 0x45, 0x0C,
+		0x50,
+		0x8D, 0x45, 0xEC,
+		0x50,
+		0x8D, 0x4F, 0x50,
+		0xE8, 0x1E, 0xC1, 0x9F, 0xFF,
+		0x8B, 0x00,
+		0x3B, 0x47, 0x54,
+		0x74, 0x60,
+		0x8D, 0x45, 0x0C,
+		0x50
+	};
+	static char UnknownUITabChangeLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxx";
+
+	static char UnknownMirrorUITabChangeLookup[] = {
+		0xFF, 0x92, 0x54, 0x01, 0x00, 0x00,
+		0xC6, 0x45, 0xF3, 0x01,
+		0x83, 0x63, 0x3C, 0x00,
+		0x8B, 0x4D, 0xEC,
+		0xC7, 0x45, 0xFC, 0x01, 0x00, 0x00, 0x00,
+		0x5F,
+		0x5E,
+		0x5B,
+		0x85, 0xC9,
+		0x74, 0x05
+	};
+	static char UnknownMirrorUITabChangeLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+	static char cTSUICASComponentOverlaysActivateLookup[] = {
+		0x55,
+		0x83, 0xEC, 0x68,
+		0xB8, 0x7F, 0xB5, 0xFF, 0x00,
+		0xE8, 0xD0, 0x96, 0x22, 0x00,
+		0x81, 0xEC, 0x10, 0x01, 0x00, 0x00,
+		0x53,
+		0x8B, 0xD9,
+		0x89, 0x5D, 0x44,
+		0x83, 0xA3, 0x30, 0x01, 0x00, 0x00, 0x00,
+		0x8B, 0x8B, 0x68, 0x01, 0x00, 0x00,
+		0xC6, 0x83, 0x2C, 0x01, 0x00, 0x00, 0x00,
+		0x85, 0xC9,
+		0x75, 0x07
+	};
+	static char cTSUICASComponentOverlaysActivateLookupMask[] = "xxxxx????x????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -990,6 +1041,10 @@ namespace Addresses {
 	void* cTSSGSystemOncePerFrameUpdate;
 	void* cTSUICASComponentOverlaysOnTick;
 	void* cTSUICASComponentOverlaysDoMessage;
+	void* cTSUICASComponentOverlaysActivate;
+
+	void* UnknownUITabChange;
+	void* UnknownMirrorUITabChange;
 
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
@@ -1045,6 +1100,9 @@ namespace Addresses {
 		ADDRESS(cTSSGSystemOncePerFrameUpdate, cTSSGSystemOncePerFrameUpdateLookup);
 		ADDRESS(cTSUICASComponentOverlaysOnTick, cTSUICASComponentOverlaysOnTickLookup);
 		ADDRESS(cTSUICASComponentOverlaysDoMessage, cTSUICASComponentOverlaysDoMessageLookup);
+		ADDRESS(cTSUICASComponentOverlaysActivate, cTSUICASComponentOverlaysActivateLookup);
+		ADDRESS(UnknownUITabChange, UnknownUITabChangeLookup);
+		ADDRESS(UnknownMirrorUITabChange, UnknownMirrorUITabChangeLookup);
 
 		CASLotName = *(char**)((DWORD)CASStringLookup + 0x6);
 		YACASLotName = *(char**)((DWORD)CASStringLookup + 0x18);

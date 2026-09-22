@@ -79,6 +79,11 @@ namespace Addresses {
 	extern void* cTSSGSystemOncePerFrameUpdate;
 	extern void* cTSUICASComponentOverlaysOnTick;
 	extern void* cTSUICASComponentOverlaysDoMessage;
+	extern void* cTSUICASComponentOverlaysActivate;
+	// no clue but triggers when switching tabs in CAS UI
+	extern void* UnknownUITabChange;
+	// triggers when switching tabs in mirror UI
+	extern void* UnknownMirrorUITabChange;
 
 	bool Initialize();
 }
