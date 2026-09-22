@@ -40,6 +40,9 @@ typedef int(__thiscall* OVERLAYSACTIVATE)(void* self);
 
 typedef void(__thiscall* ONCEPERFRAMEUPDATE)(void* self);
 
+typedef int(__thiscall* ADDGAMEVERSION)(void* self);
+
+static ADDGAMEVERSION fpAddGameVersion = NULL;
 static ONCEPERFRAMEUPDATE fpOncePerFrameUpdate = NULL;
 static OVERLAYSACTIVATE fpOverlaysActivate = NULL;
 static OVERLAYSDOMESSAGE fpOverlaysDoMessage = NULL;
@@ -264,6 +267,10 @@ static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTS
 	lua_settable(luaState, -3);
 
 	return tableId;
+}
+
+static int __fastcall DetourAddGameVersion(void* self, void* _) {
+	return 0;
 }
 
 static bool shouldTickOverlays = false;
@@ -698,6 +705,16 @@ bool Core::Initialize() {
 		return false;
 	}
 	if (MH_EnableHook(Addresses::AppendInteractionsForMenu) != MH_OK)
+	{
+		return false;
+	}
+
+	if (MH_CreateHook(Addresses::ScenegraphAddGameVersion, &DetourAddGameVersion,
+		reinterpret_cast<LPVOID*>(&fpAddGameVersion)) != MH_OK)
+	{
+		return false;
+	}
+	if (MH_EnableHook(Addresses::ScenegraphAddGameVersion) != MH_OK)
 	{
 		return false;
 	}

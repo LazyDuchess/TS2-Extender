@@ -85,5 +85,7 @@ namespace Addresses {
 	// triggers when switching tabs in mirror UI
 	extern void* UnknownMirrorUITabChange;
 
+	extern void* ScenegraphAddGameVersion;
+
 	bool Initialize();
 }

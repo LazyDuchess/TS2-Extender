@@ -962,6 +962,25 @@ namespace Addresses {
 	};
 	static char cTSUICASComponentOverlaysActivateLookupMask[] = "xxxxx????x????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+	static char ScenegraphAddGameVersionLookup[] = {
+		0xB8, 0x3F, 0x7C, 0xFF, 0x00,
+		0xE8, 0x4E, 0x54, 0x26, 0x00,
+		0x83, 0xEC, 0x78,
+		0x53,
+		0x56,
+		0x8B, 0xF1,
+		0x57,
+		0x89, 0x75, 0xEC,
+		0x83, 0x7E, 0x18, 0x00,
+		0x0F, 0x84, 0x74, 0x01, 0x00, 0x00,
+		0xE8, 0x9D, 0x0B, 0xC5, 0xFF,
+		0x85, 0xC0,
+		0x74, 0x15,
+		0xE8, 0x94, 0x0B, 0xC5, 0xFF,
+		0x8B, 0xC8
+	};
+	static char ScenegraphAddGameVersionLookupMask[] = "x????x????xxxxxxxxxxxxxxxx?????x????xxxxx????xx";
+
 	void* RandomUint32Uniform;
 	void* EALogoPush;
 	void* IntroPush;
@@ -1046,6 +1065,8 @@ namespace Addresses {
 	void* UnknownUITabChange;
 	void* UnknownMirrorUITabChange;
 
+	void* ScenegraphAddGameVersion;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -1103,7 +1124,7 @@ namespace Addresses {
 		ADDRESS(cTSUICASComponentOverlaysActivate, cTSUICASComponentOverlaysActivateLookup);
 		ADDRESS(UnknownUITabChange, UnknownUITabChangeLookup);
 		ADDRESS(UnknownMirrorUITabChange, UnknownMirrorUITabChangeLookup);
-
+		ADDRESS(ScenegraphAddGameVersion, ScenegraphAddGameVersionLookup);
 		CASLotName = *(char**)((DWORD)CASStringLookup + 0x6);
 		YACASLotName = *(char**)((DWORD)CASStringLookup + 0x18);
 
