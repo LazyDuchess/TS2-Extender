@@ -271,6 +271,14 @@ static bool shouldTickOverlays = false;
 static void __fastcall DetourOncePerFrameUpdate(void* self, void* _) {
 	fpOncePerFrameUpdate(self);
 	shouldTickOverlays = false;
+	Core* core = Core::_instance;
+	for (auto& cb : core->m_LuaDelegates[(int)Delegates::OnFrameUpdate].m_Callbacks) {
+		lua_rawgeti(cb.m_luaState, LUA_REGISTRYINDEX, cb.m_LuaCall);
+		if (lua_pcall(cb.m_luaState, 0, 0, 0) != 0) {
+			Log("Error calling Lua callback: %s\n", lua_tostring(cb.m_luaState, -1));
+			lua_pop(cb.m_luaState, 1);
+		}
+	}
 }
 
 static int __fastcall DetourOverlaysActivate(void* self, void* _) {
