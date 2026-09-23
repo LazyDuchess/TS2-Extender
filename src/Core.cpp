@@ -21,6 +21,7 @@
 #include <cstring>
 #include <string>
 #include "ts2/cGZMessage.h"
+#include "Utils.h"
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
 typedef UINT(__thiscall* LUA5OPEN)(void*, UINT);
@@ -443,6 +444,7 @@ void Core::DoDefaultUserData() {
 bool Core::CacheUserData() {
 	HKEY nameKey;
 
+#if TS2_LC
 	LSTATUS keyStatus = RegOpenKeyExW(
 		HKEY_CURRENT_USER,
 		L"SOFTWARE\\Electronic Arts\\The Sims 2 Ultimate Collection 25",
@@ -450,11 +452,24 @@ bool Core::CacheUserData() {
 		KEY_READ | KEY_WOW64_32KEY,
 		&nameKey
 	);
+#else
+	LSTATUS keyStatus = RegOpenKeyExW(
+		HKEY_CURRENT_USER,
+		L"SOFTWARE\\EA GAMES\\The Sims 2",
+		0,
+		KEY_READ | KEY_WOW64_32KEY,
+		&nameKey
+	);
+#endif
 
 	if (keyStatus != ERROR_SUCCESS) return false;
 
 	DWORD finalSize = 0;
+#if TS2_LC
 	const wchar_t keyName[] = L"displayname";
+#else
+	const wchar_t keyName[] = L"Name";
+#endif
 
 	LSTATUS valueStatus = RegGetValueW(
 		nameKey,
@@ -486,6 +501,7 @@ bool Core::CacheUserData() {
 	if (SUCCEEDED(hr)) {
 		m_UserDataPath = std::wstring(path_pwstr) + L"\\EA Games\\" + m_GameDisplayName;
 		CoTaskMemFree(path_pwstr);
+		Log("Found registry for game user folder: %s\n", WCharToString(m_UserDataPath.c_str()).c_str());
 		return true;
 	}
 	return false;
