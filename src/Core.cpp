@@ -525,7 +525,7 @@ bool Core::Initialize() {
 	if (MH_Initialize() != MH_OK)
 		return false;
 
-	if (Config::FixRNG) {
+	if (Config::FixRNG && ADDRESS_VALID(Addresses::RandomUint32Uniform)) {
 		if (MH_CreateHook(Addresses::RandomUint32Uniform, &DetourRandomUint32Uniform,
 			reinterpret_cast<LPVOID*>(&fpRandomUint32Uniform)) != MH_OK)
 		{

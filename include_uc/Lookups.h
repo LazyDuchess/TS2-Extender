@@ -1,5 +1,14 @@
-static char randomUint32Lookup[] = { 0x8B, 0x01, 0xBA, 0x6D, 0x4E, 0xC6, 0x41, 0xF7, 0xE2, 0x05, 0x39, 0x30, 0x00, 0x00 };
-static char randomUint32LookupMask[] = "xxxxxxxxxxxxxx";
+// Pattern scans for Retail/Ultimate Collection
+
+// GHIDRA: 00417fa0
+// cRZRandom::RandomUint32Uniform(cRZRandom *this)
+static char randomUint32Lookup[] = {
+	0x8B, 0x01,
+	0xE9, 0x6A, 0xAF, 0x00, 0x00,
+	0xF7, 0xE2,
+	0x05, 0x39, 0x30, 0x00, 0x00
+};
+static char randomUint32LookupMask[] = "xxx????xxxxxxx";
 
 // first 4 bytes are a pointer to ealogo_audio.movie
 static char eaLogoPushLookup[] = {

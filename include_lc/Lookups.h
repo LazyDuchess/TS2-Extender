@@ -1,6 +1,18 @@
-static char randomUint32Lookup[] = { 0x8B, 0x01, 0xBA, 0x6D, 0x4E, 0xC6, 0x41, 0xF7, 0xE2, 0x05, 0x39, 0x30, 0x00, 0x00 };
+// Pattern scans for Legacy Collection
+
+// GHIDRA: 00478cb5 (1.18.0.98)
+// CE: "Sims2EP9.exe"+1B8D75 (1.18.0.187)
+// MAC: 0052d278
+// cRZRandom::RandomUint32Uniform(cRZRandom *this)
+static char randomUint32Lookup[] = { 
+	0x8B, 0x01, 
+	0xBA, 0x6D, 0x4E, 0xC6, 0x41, 
+	0xF7, 0xE2, 
+	0x05, 0x39, 0x30, 0x00, 0x00 
+};
 static char randomUint32LookupMask[] = "xxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+1B8D75 (1.18.0.187)
 // first 4 bytes are a pointer to ealogo_audio.movie
 static char eaLogoPushLookup[] = {
 	0xE8, 0x2B, 0xBF, 0x01,
@@ -14,6 +26,7 @@ static char eaLogoPushLookup[] = {
 };
 static char eaLogoPushLookupMask[] = "????xxxx????xxxxx????xxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+5C1216 (1.18.0.187)
 // first 4 bytes are a pointer to intro_eng_audio.movie
 static char introEngPushLookup[] = {
 	0xFC, 0x2B, 0xBF, 0x01,
@@ -28,6 +41,7 @@ static char introEngPushLookup[] = {
 };
 static char introEngPushLookupMask[] = "????xxxx????xxxxx????xxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+B64460 (1.18.0.187)
 static char luaUnregisterLookup[] = {
 	0x56,
 	0x8B, 0x74, 0x24, 0x08,
@@ -40,6 +54,7 @@ static char luaUnregisterLookup[] = {
 };
 static char luaUnregisterLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+56E295 (1.18.0.187)
 static char luaPrintStubLookup[] = {
 	0xFF, 0x50, 0x10,
 	0x8B, 0xF8,
@@ -54,6 +69,7 @@ static char luaPrintStubLookup[] = {
 };
 static char luaPrintStubLookupMask[] = "xxxxxxxxxx????x????xxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C78B10 (1.18.0.187)
 static char lua5OpenLookup[] = {
 	0x53,
 	0x55,
@@ -70,6 +86,7 @@ static char lua5OpenLookup[] = {
 };
 static char lua5OpenLookupMask[] = "xxxxxxx????xxxxxxxxx????xxx";
 
+// CE: "Sims2EP9.exe"+56F980 (1.18.0.187)
 static char registerLuaCommandsLookup[] = {
 	0x56,
 	0x8B, 0x74, 0x24, 0x08,
@@ -84,6 +101,7 @@ static char registerLuaCommandsLookup[] = {
 };
 static char registerLuaCommandsLookupMask[] = "xxxxxxxxxx?????xxxxx????x????xxxxxx";
 
+// CE: "Sims2EP9.exe"+C7E590 (1.18.0.187)
 static char luaPushStringLookup[] = {
 	0x55,
 	0x8B, 0x6C, 0x24, 0x0C,
@@ -98,6 +116,7 @@ static char luaPushStringLookup[] = {
 };
 static char luaPushStringLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+1D0B4A (1.18.0.187)
 static char cheatQueryInterfaceLookup[] = {
 	0x8B, 0x44, 0x24, 0x08,
 	0x85, 0xC0,
@@ -110,6 +129,7 @@ static char cheatQueryInterfaceLookup[] = {
 };
 static char cheatQueryInterfaceLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+1D0BE0 (1.18.0.187)
 static char cheatReleaseLookup[] = {
 	0x8B, 0x41, 0x08,
 	0x83, 0xE8, 0x01,
@@ -123,6 +143,7 @@ static char cheatReleaseLookup[] = {
 };
 static char cheatReleaseLookupMask[] = "xxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+14C620 (1.18.0.187)
 static char cheatDestructorLookup[] = {
 	0xF6, 0x44, 0x24, 0x04, 0x01,
 	0x56,
@@ -134,6 +155,7 @@ static char cheatDestructorLookup[] = {
 };
 static char cheatDestructorLookupMask[] = "xxxxxxxxxx????xxxxx";
 
+// CE: "Sims2EP9.exe"+14F330 (1.18.0.187)
 static char getCheatSystemLookup[] = {
 	0x51,
 	0xA1, 0x00, 0x4B, 0x3A, 0x01,
@@ -147,6 +169,7 @@ static char getCheatSystemLookup[] = {
 };
 static char getCheatSystemLookupMask[] = "xx????xxxxxxxx????xxxxxx";
 
+// CE: "Sims2EP9.exe"+B39640 (1.18.0.187)
 static char registerTestingCheatLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -163,6 +186,7 @@ static char registerTestingCheatLookup[] = {
 };
 static char registerTestingCheatLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+3A18B0 (1.18.0.187)
 static char registerTSSGCheatsLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -178,6 +202,7 @@ static char registerTSSGCheatsLookup[] = {
 };
 static char registerTSSGCheatsLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxx????xx";
 
+// CE: "Sims2EP9.exe"+C7E750 (1.18.0.187)
 static char luaRawGetILookup[] = {
 	0x8B, 0x4C, 0x24, 0x08,
 	0x56,
@@ -199,6 +224,7 @@ static char luaRawGetILookup[] = {
 };
 static char luaRawGetILookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7EA30 (1.18.0.187)
 static char luaSetTopLookup[] = {
 	0x8B, 0x44, 0x24, 0x08,
 	0x8B, 0x4C, 0x24, 0x04,
@@ -216,6 +242,7 @@ static char luaSetTopLookup[] = {
 };
 static char luaSetTopLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7E3A0 (1.18.0.187)
 static char luaPCallLookup[] = {
 	0x8B, 0x4C, 0x24, 0x10,
 	0x83, 0xEC, 0x08,
@@ -235,6 +262,7 @@ static char luaPCallLookup[] = {
 };
 static char luaPCallLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7E600 (1.18.0.187)
 static char luaPushValueLookup[] = {
 	0x8B, 0x4C, 0x24, 0x08,
 	0x56,
@@ -257,6 +285,7 @@ static char luaPushValueLookup[] = {
 };
 static char luaPushValueLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7ECE0 (1.18.0.187)
 static char luaToStringLookup[] = {
 	0x8B, 0x4C, 0x24, 0x08,
 	0x56,
@@ -275,6 +304,7 @@ static char luaToStringLookup[] = {
 };
 static char luaToStringLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C86D90 (1.18.0.187)
 static char luaLRefLookup[] = {
 	0x83, 0xEC, 0x08,
 	0x53,
@@ -288,6 +318,7 @@ static char luaLRefLookup[] = {
 };
 static char luaLRefLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7EBC0 (1.18.0.187)
 static char luaToNumberLookup[] = {
 	0x8B, 0x54, 0x24, 0x08,
 	0x83, 0xEC, 0x10,
@@ -306,6 +337,7 @@ static char luaToNumberLookup[] = {
 };
 static char luaToNumberLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7E570 (1.18.0.187)
 static char luaPushNumberLookup[] = {
 	0x8B, 0x4C, 0x24, 0x04,
 	0xF2, 0x0F, 0x10, 0x44, 0x24, 0x08,
@@ -317,6 +349,7 @@ static char luaPushNumberLookup[] = {
 };
 static char luaPushNumberLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7E290 (1.18.0.187)
 static char luaNewTableLookup[] = {
 	0x56,
 	0x57,
@@ -336,6 +369,7 @@ static char luaNewTableLookup[] = {
 };
 static char luaNewTableLookupMask[] = "xxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7E430 (1.18.0.187)
 static char luaPushCClosureLookup[] = {
 	0x55,
 	0x56,
@@ -354,6 +388,7 @@ static char luaPushCClosureLookup[] = {
 };
 static char luaPushCClosureLookupMask[] = "xxxxxxxxxxxxxxxxxxxx????xxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7DFA0 (1.18.0.187)
 static char luaGetTopLookup[] = {
 	0x8B, 0x4C, 0x24, 0x04,
 	0x8B, 0x41, 0x08,
@@ -365,6 +400,7 @@ static char luaGetTopLookup[] = {
 };
 static char luaGetTopLookupMask[] = "xxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7DF50 (1.18.0.187)
 static char luaGetTableLookup[] = {
 	0x8B, 0x4C, 0x24, 0x08,
 	0x56,
@@ -389,6 +425,7 @@ static char luaGetTableLookup[] = {
 };
 static char luaGetTableLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7E9F0 (1.18.0.187)
 static char luaSetTableLookup[] = {
 	0x8B, 0x4C, 0x24, 0x08,
 	0x56,
@@ -414,6 +451,7 @@ static char luaSetTableLookup[] = {
 };
 static char luaSetTableLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C87190 (1.18.0.187)
 static char luaLUnrefLookup[] = {
 	0x53,
 	0x8B, 0x5C, 0x24, 0x10,
@@ -430,6 +468,7 @@ static char luaLUnrefLookup[] = {
 };
 static char luaLUnrefLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7EB20 (1.18.0.187)
 static char luaToBooleanLookup[] = {
 	0x8B, 0x54, 0x24, 0x08,
 	0x85, 0xD2,
@@ -461,6 +500,7 @@ static char luaToBooleanLookup[] = {
 };
 static char luaToBooleanLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+6CDD5A (1.18.0.187)
 static char clothingDialogOnCancelLookup[] = {
 	0x56,
 	0x8B, 0xF1,
@@ -475,6 +515,7 @@ static char clothingDialogOnCancelLookup[] = {
 };
 static char clothingDialogOnCancelLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+6CF346 (1.18.0.187)
 static char clothingDialogOnAttachLookup[] = {
 	0xB8, 0xFD, 0xCB, 0xFC, 0x00,
 	0xE8, 0x9A, 0x3C, 0x15, 0x00,
@@ -489,6 +530,7 @@ static char clothingDialogOnAttachLookup[] = {
 };
 static char clothingDialogOnAttachLookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxx????";
 
+// CE: "Sims2EP9.exe"+6CF20A (1.18.0.187)
 static char clothingDialogSetStateLookup[] = {
 	0xC7, 0x86, 0x90, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
 	0x8B, 0x13,
@@ -504,6 +546,7 @@ static char clothingDialogSetStateLookup[] = {
 };
 static char clothingDialogSetStateLookupMask[] = "xxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+6EFF84 (1.18.0.187)
 static char dressEmployeeDialogOnAttachLookup[]{
 	0x56,
 	0xFF, 0x74, 0x24, 0x0C,
@@ -519,6 +562,7 @@ static char dressEmployeeDialogOnAttachLookup[]{
 };
 static char dressEmployeeDialogOnAttachLookupMask[] = "xxxxxxxxxxxx????xxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+932CAB (1.18.0.187)
 static char clothingDialogHack1Lookup[]{
 	0x89, 0x8E, 0xE8, 0x00, 0x00, 0x00,
 	0x3B, 0xCA,
@@ -533,6 +577,7 @@ static char clothingDialogHack1Lookup[]{
 };
 static char clothingDialogHack1LookupMask[] = "xxxxxxxxxxxxx????xxxxxx????xxxxx????";
 
+// CE: "Sims2EP9.exe"+932E73 (1.18.0.187)
 static char clothingDialogHack2Lookup[]{
 	0x83, 0x8E, 0xE8, 0x00, 0x00, 0x00, 0x01,
 	0x8B, 0x01,
@@ -544,6 +589,7 @@ static char clothingDialogHack2Lookup[]{
 };
 static char clothingDialogHack2LookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+B38F10 (1.18.0.187)
 static char cheatSystemLookup[]{
 	0x51,
 	0xA1, 0x00, 0x4B, 0x3A, 0x01,
@@ -564,6 +610,7 @@ static char cheatSystemLookup[]{
 };
 static char cheatSystemLookupMask[] = "xx????xxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+745E61 (1.18.0.187)
 static char calculateOutfitPartVisibilityLookup[] = {
 	0xFF, 0x74, 0x24, 0x0C,
 	0x8B, 0xC8,
@@ -579,6 +626,7 @@ static char calculateOutfitPartVisibilityLookup[] = {
 };
 static char calculateOutfitPartVisibilityLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+6D292C (1.18.0.187)
 static char calculateBuyPartVisibilityLookup[] = {
 	0xFF, 0x75, 0xEF,
 	0x56,
@@ -596,6 +644,7 @@ static char calculateBuyPartVisibilityLookup[] = {
 };
 static char calculateBuyPartVisibilityLookupMask[] = "xxxxxxxx????xxxxxxxxxx????xxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+6D55F6 (1.18.0.187)
 static char calculateTryOnPartVisibilityLookup[] = {
 	0xFF, 0x75, 0xEC,
 	0x56,
@@ -613,6 +662,7 @@ static char calculateTryOnPartVisibilityLookup[] = {
 };
 static char calculateTryOnPartVisibilityLookupMask[] = "xxxxxxxx????xxxxxxxxxx????xxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+20DF74 (1.18.0.187)
 static char getNodeTextInputFieldLookup[] = {
 	0xFF, 0xFF, 0xFF, 0xFF,
 	0x85, 0xC0,
@@ -622,6 +672,7 @@ static char getNodeTextInputFieldLookup[] = {
 };
 static char getNodeTextInputFieldLookupMask[] = "????xxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+1D10D0 (1.18.0.187)
 static char tsStringLoadLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -638,6 +689,7 @@ static char tsStringLoadLookup[] = {
 };
 static char tsStringLoadLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+B41B50 (1.18.0.187)
 static char loadUiScriptLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -651,6 +703,7 @@ static char loadUiScriptLookup[] = {
 };
 static char loadUiScriptLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+1ACF84 (1.18.0.187)
 static char crzstringFromCharLookup[] = {
 	0x83, 0xC1, 0x04,
 	0x83, 0x7C, 0x24, 0x04, 0x00,
@@ -666,6 +719,7 @@ static char crzstringFromCharLookup[] = {
 };
 static char crzstringFromCharLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+743C47 (1.18.0.187)
 static char uiMakeMoneyStringLookup[] = {
 	0xB8, 0xFF, 0xFF, 0xFF, 0xFF,
 	0xE8, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -680,6 +734,7 @@ static char uiMakeMoneyStringLookup[] = {
 };
 static char uiMakeMoneyStringLookupMask[] = "x????x????xxxxxxxxx????xxxxxxx????";
 
+// CE: "Sims2EP9.exe"+44FF80 (1.18.0.187)
 static char appendInteractionsForMenuLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -695,6 +750,7 @@ static char appendInteractionsForMenuLookup[] = {
 };
 static char appendInteractionsForMenuLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+44F760 (1.18.0.187)
 static char addCheatInteractionLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -710,6 +766,7 @@ static char addCheatInteractionLookup[] = {
 };
 static char addCheatInteractionLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+1EE803 (1.18.0.187)
 static char tsGlobalsCallLookup[] = {
 	0xFF, 0xFF, 0xFF, 0xFF,
 	0x8B, 0xC8,
@@ -725,6 +782,7 @@ static char tsGlobalsCallLookup[] = {
 };
 static char tsGlobalsCallLookupMask[] = "????xxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+C7E410 (1.18.0.187)
 static char luaPushBooleanLookup[] = {
 	0x8B, 0x54, 0x24, 0x04,
 	0x33, 0xC0,
@@ -738,6 +796,7 @@ static char luaPushBooleanLookup[] = {
 };
 static char luaPushBooleanLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+5F79E (1.18.0.187)
 static char laaPointerCheckLookup[] = {
 	0x85, 0xC9,
 	0x7D, 0x04,
@@ -749,6 +808,7 @@ static char laaPointerCheckLookup[] = {
 };
 static char laaPointerCheckLookupMask[] = "xxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+2418E6 (1.18.0.187)
 static char voxModifierModifyEventLookup[] = {
 	0x55,
 	0x83, 0xEC, 0x64,
@@ -765,6 +825,7 @@ static char voxModifierModifyEventLookup[] = {
 };
 static char voxModifierModifyEventLookupMask[] = "xxxxx????x????xxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+67BF1D (1.18.0.187)
 static char cTSUserToolObjectInitLookup[] = {
 	0x56,
 	0x8B, 0xF1,
@@ -787,6 +848,7 @@ static char cTSUserToolObjectInitLookup[] = {
 };
 static char cTSUserToolObjectInitLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+67F38A (1.18.0.187)
 static char cTSUserToolObjectShutdownLookup[] = {
 	0x53,
 	0x56,
@@ -809,6 +871,7 @@ static char cTSUserToolObjectShutdownLookup[] = {
 };
 static char cTSUserToolObjectShutdownLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+8B8390 (1.18.0.187)
 static char LegacyCalculateUIScaleLookup[] = {
 	0x83, 0xEC, 0x28,
 	0xF3, 0x0F, 0x10, 0x05, 0x98, 0xC6, 0x10, 0xA0,
@@ -820,6 +883,7 @@ static char LegacyCalculateUIScaleLookup[] = {
 };
 static char LegacyCalculateUIScaleLookupMask[] = "xxxxxxx????xx????xxxxxxxx????xxxx";
 
+// CE: "Sims2EP9.exe"+21676B (1.18.0.187)
 static char CASStringLookupLookup[] = {
 	0x8B, 0x01,
 	0x56,
@@ -839,6 +903,7 @@ static char CASStringLookupLookup[] = {
 };
 static char CASStringLookupLookupMask[] = "xxxxxx????xxxxxxxxxxxxxx????xxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+24FB30 (1.18.0.187)
 static char cTSSGSystemOncePerFrameUpdateLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -855,6 +920,7 @@ static char cTSSGSystemOncePerFrameUpdateLookup[] = {
 };
 static char cTSSGSystemOncePerFrameUpdateLookupMask[] = "xxxxxxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxx????";
 
+// CE: "Sims2EP9.exe"+5FB453 (1.18.0.187)
 static char cTSUICASComponentOverlaysOnTickLookup[] = {
 	0x56,
 	0xFF, 0x74, 0x24, 0x08,
@@ -872,6 +938,7 @@ static char cTSUICASComponentOverlaysOnTickLookup[] = {
 };
 static char cTSUICASComponentOverlaysOnTickLookupMask[] = "xxxxxxxx????xxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+5FA6E6 (1.18.0.187)
 static char cTSUICASComponentOverlaysDoMessageLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -891,6 +958,7 @@ static char cTSUICASComponentOverlaysDoMessageLookup[] = {
 };
 static char cTSUICASComponentOverlaysDoMessageLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+745ADA (1.18.0.187)
 static char UnknownUITabChangeLookup[] = {
 	0x8B, 0x47, 0x08,
 	0x89, 0x45, 0x0C,
@@ -911,6 +979,7 @@ static char UnknownUITabChangeLookup[] = {
 };
 static char UnknownUITabChangeLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+6D6933 (1.18.0.187)
 static char UnknownMirrorUITabChangeLookup[] = {
 	0xFF, 0x92, 0x54, 0x01, 0x00, 0x00,
 	0xC6, 0x45, 0xF3, 0x01,
@@ -925,6 +994,7 @@ static char UnknownMirrorUITabChangeLookup[] = {
 };
 static char UnknownMirrorUITabChangeLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+5F982C (1.18.0.187)
 static char cTSUICASComponentOverlaysActivateLookup[] = {
 	0x55,
 	0x83, 0xEC, 0x68,
@@ -942,6 +1012,7 @@ static char cTSUICASComponentOverlaysActivateLookup[] = {
 };
 static char cTSUICASComponentOverlaysActivateLookupMask[] = "xxxxx????x????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+5BDA91 (1.18.0.187)
 static char ScenegraphAddGameVersionLookup[] = {
 	0xB8, 0x3F, 0x7C, 0xFF, 0x00,
 	0xE8, 0x4E, 0x54, 0x26, 0x00,
@@ -961,6 +1032,7 @@ static char ScenegraphAddGameVersionLookup[] = {
 };
 static char ScenegraphAddGameVersionLookupMask[] = "x????x????xxxxxxxxxxxxxxxx?????x????xxxxx????xx";
 
+// CE: "Sims2EP9.exe"+5E7D45 (1.18.0.187)
 static char SetupUIForSimCreationLookup[] = {
 	0xB8, 0x23, 0xA4, 0xFF, 0x00,
 	0xE8, 0xB2, 0xB1, 0x23, 0x00,
@@ -976,6 +1048,7 @@ static char SetupUIForSimCreationLookup[] = {
 };
 static char SetupUIForSimCreationLookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+5E92D7 (1.18.0.187)
 static char SimEditorUpdateUILookup[] = {
 	0xB8, 0x38, 0xA5, 0xFF, 0x00,
 	0xE8, 0x26, 0x9C, 0x23, 0x00,
@@ -991,6 +1064,7 @@ static char SimEditorUpdateUILookup[] = {
 };
 static char SimEditorUpdateUILookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+5EEA4E (1.18.0.187)
 static char CalcZodiacAddressLookup[] = {
 	0x74, 0x1A,
 	0x8B, 0x8D, 0x84, 0x01, 0x00, 0x00,
@@ -1010,6 +1084,7 @@ static char CalcZodiacAddressLookup[] = {
 };
 static char CalcZodiacAddressLookupMask[] = "xxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+5E2BB5 (1.18.0.187)
 static char SimEditorLoadCASComponentLookup[] = {
 	0xB8, 0x7B, 0x9F, 0xFF, 0x00,
 	0xE8, 0x39, 0x03, 0x24, 0x00,
@@ -1027,6 +1102,7 @@ static char SimEditorLoadCASComponentLookup[] = {
 };
 static char SimEditorLoadCASComponentLookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxxx????xxxxx";
 
+// CE: "Sims2EP9.exe"+5E9EF7 (1.18.0.187)
 static char SimEditorValidateSimLookup[] = {
 	0x55,
 	0x83, 0xEC, 0x5C,
@@ -1044,6 +1120,7 @@ static char SimEditorValidateSimLookup[] = {
 };
 static char SimEditorValidateSimLookupMask[] = "xxxxx????x????xxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+5DF041 (1.18.0.187)
 static char SimEditorDoMessageLookup[] = {
 	0xB8, 0xB1, 0x9C, 0xFF, 0x00,
 	0xE8, 0xAD, 0x3E, 0x54, 0x00,
@@ -1061,6 +1138,7 @@ static char SimEditorDoMessageLookup[] = {
 };
 static char SimEditorDoMessageLookupMask[] = "x????x????xxxxxxxx????xxxxxxxxxxxxxxxxx";
 
+// CE: "Sims2EP9.exe"+5E1DA2 (1.18.0.187)
 static char SimEditorHandleTabWizardLookup[] = {
 	0xB8, 0xE8, 0x9E, 0xFF, 0x00,
 	0xE8, 0x4C, 0x11, 0x24, 0x00,

@@ -4,12 +4,24 @@
 #include "scan.h"
 #include "Logging.h"
 #include "ts2/cUserInput.h"
+
+#define ADDRESS_REQUIRE(name, lookup) \
+Log("Scanning for %s...\n", #name);\
+name = ScanInternal(lookup, lookup##Mask, modBase, size);\
+if (name == nullptr) {\
+	Log("FATAL: Failed to find address for %s!\n", #name);\
+	return false;\
+}\
+else\
+{\
+	Log("Found %s at %p\n", #name, name);\
+}\
+
 #define ADDRESS(name, lookup) \
 Log("Scanning for %s...\n", #name);\
 name = ScanInternal(lookup, lookup##Mask, modBase, size);\
 if (name == nullptr) {\
 	Log("Failed to find address for %s!\n", #name);\
-	return false;\
 }\
 else\
 {\

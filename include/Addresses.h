@@ -101,3 +101,5 @@ namespace Addresses {
 
 	bool Initialize();
 }
+
+#define ADDRESS_VALID(name) name != nullptr
