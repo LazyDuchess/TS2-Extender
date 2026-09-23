@@ -15,14 +15,24 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(MinHook)
 
-file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*/*.cpp")
-file(GLOB_RECURSE HEADERS "include/*.h" "include/*/*.h")
+file(GLOB_RECURSE SOURCES_SHARED CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB_RECURSE HEADERS_SHARED CONFIGURE_DEPENDS "include/*.h")
 
-function(setup_ts2extender_target target_name compile_defs)
-    add_library(${target_name} SHARED ${SOURCES} ${HEADERS})
+file(GLOB_RECURSE SOURCES_LC CONFIGURE_DEPENDS "src_lc/*.cpp")
+file(GLOB_RECURSE SOURCES_UC CONFIGURE_DEPENDS "src_uc/*.cpp")
 
-    target_include_directories(${target_name} PRIVATE include minhook/include)
-    target_include_directories(${target_name} PRIVATE include thirdparty/mINI/src/mini)
+file(GLOB_RECURSE HEADERS_LC CONFIGURE_DEPENDS "include_lc/*.h")
+file(GLOB_RECURSE HEADERS_UC CONFIGURE_DEPENDS "include_uc/*.h")
+
+function(setup_ts2extender_target target_name compile_defs sources headers include_dir)
+    add_library(${target_name} SHARED ${SOURCES_SHARED} ${sources} ${HEADERS_SHARED} ${headers})
+
+    target_include_directories(${target_name} PRIVATE 
+	include
+	"${include_dir}"
+	minhook/include
+	thirdparty/mINI/src/mini
+    )
 
     target_link_libraries(${target_name} PRIVATE minhook)
 
@@ -36,7 +46,7 @@ function(setup_ts2extender_target target_name compile_defs)
 endfunction()
 
 # Legacy Collection build (Standard)
-setup_ts2extender_target(TS2Extender "TS2_LC")
+setup_ts2extender_target(TS2Extender "TS2_LC" "${SOURCES_LC}" "${HEADERS_LC}" include_lc)
 
 # Ultimate Collection build
-setup_ts2extender_target(TS2ExtenderUC "TS2_UC")
+setup_ts2extender_target(TS2ExtenderUC "TS2_UC" "${SOURCES_UC}" "${HEADERS_UC}" include_uc)

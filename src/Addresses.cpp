@@ -17,11 +17,8 @@ else\
 }\
 
 namespace Addresses {
-#if TS2_LC
-#include "lc/Lookups.h"
-#else
-#include "uc/Lookups.h"
-#endif
+
+	#include "Lookups.h"
 
 	void* RandomUint32Uniform;
 	void* EALogoPush;
