@@ -5,6 +5,9 @@
 #include <iostream>
 
 static bool IsGame() {
+#if TS2_UC
+    return true;
+#else
     char path[MAX_PATH];
     if (GetModuleFileName(NULL, path, MAX_PATH)) {
         std::string filename(path);
@@ -17,6 +20,7 @@ static bool IsGame() {
         return true;
     }
     return false;
+#endif
 }
 
 BOOL WINAPI DllMain(HMODULE hModule,

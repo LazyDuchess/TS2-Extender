@@ -20,6 +20,9 @@ char* ScanBasic(char* pattern, char* mask, char* begin, int size)
 {
     int patternLen = strlen(mask);
 
+    if (patternLen > size)
+        return nullptr;
+
     for (int i = 0; i < size; i++)
     {
         bool found = true;
@@ -41,21 +44,40 @@ char* ScanBasic(char* pattern, char* mask, char* begin, int size)
 
 char* ScanInternal(char* pattern, char* mask, char* begin, int size)
 {
-    char* match{ nullptr };
-    MEMORY_BASIC_INFORMATION mbi{};
+    char* end = begin + size;
+    char* curr = begin;
 
-    for (char* curr = begin; curr < begin + size; curr += mbi.RegionSize)
+    while (curr < end)
     {
-        if (!VirtualQuery(curr, &mbi, sizeof(mbi)) || mbi.State != MEM_COMMIT || mbi.Protect == PAGE_NOACCESS) continue;
+        MEMORY_BASIC_INFORMATION mbi{};
 
-        match = ScanBasic(pattern, mask, curr, mbi.RegionSize);
-
-        if (match != nullptr)
-        {
+        if (!VirtualQuery(curr, &mbi, sizeof(mbi)))
             break;
+
+        char* regionBase = static_cast<char*>(mbi.BaseAddress);
+        char* regionEnd = regionBase + mbi.RegionSize;
+
+        char* scanBegin = max(curr, regionBase);
+        char* scanEnd = min(end, regionEnd);
+
+        if (mbi.State == MEM_COMMIT &&
+            !(mbi.Protect & PAGE_NOACCESS))
+        {
+            char* match = ScanBasic(
+                pattern,
+                mask,
+                scanBegin,
+                scanEnd - scanBegin
+            );
+
+            if (match)
+                return match;
         }
+
+        curr = regionEnd;
     }
-    return match;
+
+    return nullptr;
 }
 
 void Nop(BYTE* pAddress, DWORD dwLen)

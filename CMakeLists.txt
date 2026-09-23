@@ -35,6 +35,8 @@ function(setup_ts2extender_target target_name compile_defs)
     target_compile_definitions(${target_name} PRIVATE ${compile_defs})
 endfunction()
 
-setup_ts2extender_target(TS2Extender "TS2EXTENDER_EXPORTS")
+# Legacy Collection build (Standard)
+setup_ts2extender_target(TS2Extender "TS2_LC")
 
-setup_ts2extender_target(TS2ExtenderConsole "TS2EXTENDER_EXPORTS;FORCE_CONSOLE")
+# Ultimate Collection build
+setup_ts2extender_target(TS2ExtenderUC "TS2_UC")
