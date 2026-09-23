@@ -10,6 +10,7 @@ Tested to work with the Steam version.
 * Adds completely new Lua functionality for modders, and a text Lua script loader for easier modding.
 * Allows use of separate top/bottoms for all clothing categories if you have appropriate CC.
 * Configurable UI scaling.
+* Allows editing personality in Create-A-Sim without refreshing their zodiac sign.
 
 ## Fixes
 
