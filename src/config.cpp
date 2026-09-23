@@ -14,6 +14,7 @@ namespace Config {
 	bool FixMakeupLag;
 	bool ExtendedLua;
 	bool Separates4All;
+	bool FreeZodiac;
 	bool UIScale;
 	float UIScaleResolution;
 
@@ -69,6 +70,7 @@ namespace Config {
 		FixMakeupLag = GetBool("Fixes", "FixMakeupLag", true);
 		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
 		Separates4All = GetBool("Enhancements", "Separates4All", false);
+		FreeZodiac = GetBool("Enhancements", "FreeZodiac", false);
 		UIScale = GetBool("Enhancements", "UIScale", false);
 		UIScaleResolution = GetFloat("Enhancements", "UIScaleResolution", 1080.0f);
 

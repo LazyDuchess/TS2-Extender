@@ -87,5 +87,11 @@ namespace Addresses {
 
 	extern void* ScenegraphAddGameVersion;
 
+	extern void* SetupUIForSimCreation;
+	extern void* SimEditorUpdateUI;
+
+	// no clue but walking back from cTSUISimEditorBase::SetPersonData got me here, where the zodiac is recalculated after editing personality.
+	extern void* CalcZodiacAddress;
+
 	bool Initialize();
 }

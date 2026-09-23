@@ -665,6 +665,11 @@ bool Core::Initialize() {
 		pRes924[0] = Config::UIScaleResolution;
 	}
 
+	if (Config::FreeZodiac) {
+		static const char jmpChar = 0xEB;
+		WriteToMemory((DWORD)Addresses::CalcZodiacAddress, (void*)(&jmpChar), 1);
+	}
+
 	ModifyVoiceEventHook1Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x2D + 7);
 	ModifyVoiceEventHook2Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x3B1 + 5);
 	MakeJMP((BYTE*)Addresses::cEMVoxModifierModifyEvent + 0x3B1, (DWORD)ModifyVoiceEventHook2, 5);
