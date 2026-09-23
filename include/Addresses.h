@@ -93,5 +93,11 @@ namespace Addresses {
 	// no clue but walking back from cTSUISimEditorBase::SetPersonData got me here, where the zodiac is recalculated after editing personality.
 	extern void* CalcZodiacAddress;
 
+	extern void* SimEditorLoadCASComponent;
+
+	extern void* SimEditorValidateSim;
+	extern void* SimEditorDoMessage;
+	extern void* SimEditorHandleTabWizard;
+
 	bool Initialize();
 }
