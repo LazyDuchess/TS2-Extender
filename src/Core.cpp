@@ -523,16 +523,21 @@ bool Core::Initialize() {
 
 	// Initialize MinHook.
 	if (MH_Initialize() != MH_OK)
+	{
+		Log("Failed to initialize MinHook\n");
 		return false;
+	}
 
 	if (Config::FixRNG && ADDRESS_VALID(Addresses::RandomUint32Uniform)) {
 		if (MH_CreateHook(Addresses::RandomUint32Uniform, &DetourRandomUint32Uniform,
 			reinterpret_cast<LPVOID*>(&fpRandomUint32Uniform)) != MH_OK)
 		{
+			Log("FixRNG Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::RandomUint32Uniform) != MH_OK)
 		{
+			Log("FixRNG Patch Failed!\n");
 			return false;
 		}
 	}
@@ -553,10 +558,12 @@ bool Core::Initialize() {
 		if (MH_CreateHook(Addresses::GZLua5Open, &DetourLua5Open,
 			reinterpret_cast<LPVOID*>(&fpLua5Open)) != MH_OK)
 		{
+			Log("ExtendedLua Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::GZLua5Open) != MH_OK)
 		{
+			Log("ExtendedLua Patch Failed!\n");
 			return false;
 		}
 		if (!LuaExtensions::Initialize()) return false;
@@ -570,20 +577,24 @@ bool Core::Initialize() {
 		if (MH_CreateHook(Addresses::ClothingDialogOnAttach, &DetourClothingDialogOnAttach,
 			reinterpret_cast<LPVOID*>(&fpClothingDialogOnAttach)) != MH_OK)
 		{
+			Log("FixOFBUniform Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::ClothingDialogOnAttach) != MH_OK)
 		{
+			Log("FixOFBUniform Patch Failed!\n");
 			return false;
 		}
 
 		if (MH_CreateHook(Addresses::DressEmployeeDialogOnAttach, &DetourDressEmployeeDialogOnAttach,
 			reinterpret_cast<LPVOID*>(&fpDressEmployeeDialogOnAttach)) != MH_OK)
 		{
+			Log("FixOFBUniform Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::DressEmployeeDialogOnAttach) != MH_OK)
 		{
+			Log("FixOFBUniform Patch Failed!\n");
 			return false;
 		}
 
@@ -599,30 +610,36 @@ bool Core::Initialize() {
 		if (MH_CreateHook(Addresses::cTSUICASComponentOverlaysOnTick, &DetourOverlaysOnTick,
 			reinterpret_cast<LPVOID*>(&fpOverlaysOnTick)) != MH_OK)
 		{
+			Log("FixMakeupLag Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::cTSUICASComponentOverlaysOnTick) != MH_OK)
 		{
+			Log("FixMakeupLag Patch Failed!\n");
 			return false;
 		}
 
 		if (MH_CreateHook(Addresses::cTSUICASComponentOverlaysDoMessage, &DetourOverlaysDoMessage,
 			reinterpret_cast<LPVOID*>(&fpOverlaysDoMessage)) != MH_OK)
 		{
+			Log("FixMakeupLag Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::cTSUICASComponentOverlaysDoMessage) != MH_OK)
 		{
+			Log("FixMakeupLag Patch Failed!\n");
 			return false;
 		}
 
 		if (MH_CreateHook(Addresses::cTSUICASComponentOverlaysActivate, &DetourOverlaysActivate,
 			reinterpret_cast<LPVOID*>(&fpOverlaysActivate)) != MH_OK)
 		{
+			Log("FixMakeupLag Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::cTSUICASComponentOverlaysActivate) != MH_OK)
 		{
+			Log("FixMakeupLag Patch Failed!\n");
 			return false;
 		}
 
@@ -635,14 +652,18 @@ bool Core::Initialize() {
 		MakeJMP((BYTE*)Addresses::UnknownMirrorUITabChange, (DWORD)UIMirrorTabChangeHook, 6);
 	}
 
-	if (MH_CreateHook(Addresses::cTSSGSystemOncePerFrameUpdate, &DetourOncePerFrameUpdate,
-		reinterpret_cast<LPVOID*>(&fpOncePerFrameUpdate)) != MH_OK)
-	{
-		return false;
-	}
-	if (MH_EnableHook(Addresses::cTSSGSystemOncePerFrameUpdate) != MH_OK)
-	{
-		return false;
+	if (ADDRESS_VALID(Addresses::cTSSGSystemOncePerFrameUpdate)) {
+		if (MH_CreateHook(Addresses::cTSSGSystemOncePerFrameUpdate, &DetourOncePerFrameUpdate,
+			reinterpret_cast<LPVOID*>(&fpOncePerFrameUpdate)) != MH_OK)
+		{
+			Log("cTSSGSystemOncePerFrameUpdate Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::cTSSGSystemOncePerFrameUpdate) != MH_OK)
+		{
+			Log("cTSSGSystemOncePerFrameUpdate Patch Failed!\n");
+			return false;
+		}
 	}
 
 	if (Config::Separates4All && ADDRESS_VALID(Addresses::CalculateOutfitPartVisibility)) {
@@ -684,10 +705,12 @@ bool Core::Initialize() {
 		if (MH_CreateHook(Addresses::TSStringLoad, &DetourTSStringLoad,
 			reinterpret_cast<LPVOID*>(&fpTSStringLoad)) != MH_OK)
 		{
+			Log("TSStringLoad Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::TSStringLoad) != MH_OK)
 		{
+			Log("TSStringLoad Patch Failed!\n");
 			return false;
 		}
 	}
@@ -696,10 +719,12 @@ bool Core::Initialize() {
 		if (MH_CreateHook(Addresses::LoadUIScript, &DetourLoadUIScript,
 			reinterpret_cast<LPVOID*>(&fpLoadUiScript)) != MH_OK)
 		{
+			Log("LoadUIScript Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::LoadUIScript) != MH_OK)
 		{
+			Log("LoadUIScript Patch Failed!\n");
 			return false;
 		}
 	}
@@ -708,10 +733,12 @@ bool Core::Initialize() {
 		if (MH_CreateHook(Addresses::UIMakeMoneyString, &DetourMakeMoneyString,
 			reinterpret_cast<LPVOID*>(&fpMakeMoneyString)) != MH_OK)
 		{
+			Log("UIMakeMoneyString Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::UIMakeMoneyString) != MH_OK)
 		{
+			Log("UIMakeMoneyString Patch Failed!\n");
 			return false;
 		}
 	}
@@ -720,10 +747,12 @@ bool Core::Initialize() {
 		if (MH_CreateHook(Addresses::AppendInteractionsForMenu, &DetourAppendInteractionsForMenu,
 			reinterpret_cast<LPVOID*>(&fpAppendInteractionsForMenu)) != MH_OK)
 		{
+			Log("AppendInteractionsForMenu Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::AppendInteractionsForMenu) != MH_OK)
 		{
+			Log("AppendInteractionsForMenu Patch Failed!\n");
 			return false;
 		}
 	}
@@ -732,10 +761,12 @@ bool Core::Initialize() {
 		if (MH_CreateHook(Addresses::ScenegraphAddGameVersion, &DetourAddGameVersion,
 			reinterpret_cast<LPVOID*>(&fpAddGameVersion)) != MH_OK)
 		{
+			Log("ScenegraphAddGameVersion Patch Failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::ScenegraphAddGameVersion) != MH_OK)
 		{
+			Log("ScenegraphAddGameVersion Patch Failed!\n");
 			return false;
 		}
 	}
