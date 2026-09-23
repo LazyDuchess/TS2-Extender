@@ -135,7 +135,8 @@ namespace Addresses {
 		ADDRESS(IntroPush, introEngPushLookup);
 		ADDRESS(LuaUnregister, luaUnregisterLookup);
 		ADDRESS(LuaPrintStub, luaPrintStubLookup);
-		LuaPrintStub = (void*)((DWORD)LuaPrintStub + 9);
+		if (ADDRESS_VALID(LuaPrintStub))
+			LuaPrintStub = (void*)((DWORD)LuaPrintStub + 9);
 		ADDRESS(GZLua5Open, lua5OpenLookup);
 		ADDRESS(RegisterLuaCommands, registerLuaCommandsLookup);
 		ADDRESS(LuaPushString, luaPushStringLookup);
@@ -166,7 +167,8 @@ namespace Addresses {
 		ADDRESS(CalculateBuyPartVisibility, calculateBuyPartVisibilityLookup);
 		ADDRESS(CalculateTryOnPartVisibility, calculateTryOnPartVisibilityLookup);
 		ADDRESS(GetNodeTextInputField, getNodeTextInputFieldLookup);
-		cUserInput::m_GlobalUserInputPtr = (cUserInput**)*((cUserInput***)GetNodeTextInputField);
+		if (ADDRESS_VALID(GetNodeTextInputField))
+			cUserInput::m_GlobalUserInputPtr = (cUserInput**)*((cUserInput***)GetNodeTextInputField);
 		ADDRESS(TSStringLoad, tsStringLoadLookup);
 		ADDRESS(LoadUIScript, loadUiScriptLookup);
 		ADDRESS(CRZStringFromChar, crzstringFromCharLookup);
@@ -174,6 +176,10 @@ namespace Addresses {
 		ADDRESS(AppendInteractionsForMenu, appendInteractionsForMenuLookup);
 		ADDRESS(AddCheatInteraction, addCheatInteractionLookup);
 		ADDRESS(TSGlobalsCall, tsGlobalsCallLookup);
+		if (ADDRESS_VALID(TSGlobalsCall)) {
+			DWORD relativeCall = *(DWORD*)TSGlobalsCall;
+			TSGlobals = (void*)((DWORD)TSGlobalsCall + relativeCall + 4);
+		}
 		ADDRESS(LAAPointerCheck, laaPointerCheckLookup);
 		ADDRESS(cEMVoxModifierModifyEvent, voxModifierModifyEventLookup);
 		ADDRESS(cTSUserToolObjectInit, cTSUserToolObjectInitLookup);
@@ -195,12 +201,10 @@ namespace Addresses {
 		ADDRESS(SimEditorDoMessage, SimEditorDoMessageLookup);
 		ADDRESS(SimEditorHandleTabWizard, SimEditorHandleTabWizardLookup);
 
-		CASLotName = *(char**)((DWORD)CASStringLookup + 0x6);
-		YACASLotName = *(char**)((DWORD)CASStringLookup + 0x18);
-
-		DWORD relativeCall = *(DWORD*)TSGlobalsCall;
-
-		TSGlobals = (void*)((DWORD)TSGlobalsCall + relativeCall + 4);
+		if (ADDRESS_VALID(CASStringLookup)) {
+			CASLotName = *(char**)((DWORD)CASStringLookup + 0x6);
+			YACASLotName = *(char**)((DWORD)CASStringLookup + 0x18);
+		}
 		return true;
 	}
 

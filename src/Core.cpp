@@ -537,13 +537,17 @@ bool Core::Initialize() {
 		}
 	}
 
-	if (Config::SkipIntro) {
+	if (Config::SkipIntro && ADDRESS_VALID(Addresses::EALogoPush) && ADDRESS_VALID(Addresses::IntroPush)) {
 		void* addrToMovie = placeholderMoviePath;
 		WriteToMemory((DWORD)Addresses::EALogoPush, &addrToMovie, 4);
 		WriteToMemory((DWORD)Addresses::IntroPush, &addrToMovie, 4);
 	}
 
-	if (Config::ExtendedLua) {
+	// TODO: Improve checks for those that rely on multiple addresses
+
+	bool luaValid = ADDRESS_VALID(Addresses::GZLua5Open) && ADDRESS_VALID(Addresses::LuaUnregister);
+
+	if (Config::ExtendedLua && luaValid) {
 		WriteToMemory((DWORD)Addresses::LuaUnregister, retOverride, 1);
 		Nop((BYTE*)Addresses::LuaPrintStub, 16);
 		if (MH_CreateHook(Addresses::GZLua5Open, &DetourLua5Open,
@@ -558,11 +562,11 @@ bool Core::Initialize() {
 		if (!LuaExtensions::Initialize()) return false;
 	}
 
-	if (Config::FixPinkFlashing) {
+	if (Config::FixPinkFlashing && ADDRESS_VALID(Addresses::LAAPointerCheck)) {
 		Nop((BYTE*)Addresses::LAAPointerCheck, 4);
 	}
 
-	if (Config::FixOFBUniform) {
+	if (Config::FixOFBUniform && ADDRESS_VALID(Addresses::ClothingDialogOnAttach)) {
 		if (MH_CreateHook(Addresses::ClothingDialogOnAttach, &DetourClothingDialogOnAttach,
 			reinterpret_cast<LPVOID*>(&fpClothingDialogOnAttach)) != MH_OK)
 		{
@@ -591,7 +595,7 @@ bool Core::Initialize() {
 		MakeJMP((BYTE*)Addresses::ClothingDialogHack2, (DWORD)ClothingDialogHook2, 7);
 	}
 
-	if (Config::FixMakeupLag) {
+	if (Config::FixMakeupLag && ADDRESS_VALID(Addresses::cTSUICASComponentOverlaysOnTick)) {
 		if (MH_CreateHook(Addresses::cTSUICASComponentOverlaysOnTick, &DetourOverlaysOnTick,
 			reinterpret_cast<LPVOID*>(&fpOverlaysOnTick)) != MH_OK)
 		{
@@ -641,7 +645,7 @@ bool Core::Initialize() {
 		return false;
 	}
 
-	if (Config::Separates4All) {
+	if (Config::Separates4All && ADDRESS_VALID(Addresses::CalculateOutfitPartVisibility)) {
 		WriteToMemory((DWORD)Addresses::CalculateOutfitPartVisibility, &separatesPatch, 4);
 
 		WriteToMemory((DWORD)Addresses::CalculateBuyPartVisibility, &separatesBuyPatch, 3);
@@ -653,7 +657,7 @@ bool Core::Initialize() {
 		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0xE + 0xE, &separatesBuyPatch, 3);
 	}
 
-	if (Config::UIScale) {
+	if (Config::UIScale && ADDRESS_VALID(Addresses::LegacyCalculateUIScale)) {
 		float* pResRef = *(float**)((DWORD)Addresses::LegacyCalculateUIScale + 0x3A);
 		float* pRes1080 = *(float**)((DWORD)Addresses::LegacyCalculateUIScale + 0x105);
 		float* pRes768 = *(float**)((DWORD)Addresses::LegacyCalculateUIScale + 0x11D);
@@ -665,63 +669,75 @@ bool Core::Initialize() {
 		pRes924[0] = Config::UIScaleResolution;
 	}
 
-	if (Config::FreeZodiac) {
+	if (Config::FreeZodiac && ADDRESS_VALID(Addresses::CalcZodiacAddress)) {
 		static const char jmpChar = 0xEB;
 		WriteToMemory((DWORD)Addresses::CalcZodiacAddress, (void*)(&jmpChar), 1);
 	}
 
-	ModifyVoiceEventHook1Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x2D + 7);
-	ModifyVoiceEventHook2Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x3B1 + 5);
-	MakeJMP((BYTE*)Addresses::cEMVoxModifierModifyEvent + 0x3B1, (DWORD)ModifyVoiceEventHook2, 5);
+	if (ADDRESS_VALID(Addresses::cEMVoxModifierModifyEvent)) {
+		ModifyVoiceEventHook1Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x2D + 7);
+		ModifyVoiceEventHook2Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x3B1 + 5);
+		MakeJMP((BYTE*)Addresses::cEMVoxModifierModifyEvent + 0x3B1, (DWORD)ModifyVoiceEventHook2, 5);
+	}
 	
-	if (MH_CreateHook(Addresses::TSStringLoad, &DetourTSStringLoad,
-		reinterpret_cast<LPVOID*>(&fpTSStringLoad)) != MH_OK)
-	{
-		return false;
-	}
-	if (MH_EnableHook(Addresses::TSStringLoad) != MH_OK)
-	{
-		return false;
-	}
-
-	if (MH_CreateHook(Addresses::LoadUIScript, &DetourLoadUIScript,
-		reinterpret_cast<LPVOID*>(&fpLoadUiScript)) != MH_OK)
-	{
-		return false;
-	}
-	if (MH_EnableHook(Addresses::LoadUIScript) != MH_OK)
-	{
-		return false;
+	if (ADDRESS_VALID(Addresses::TSStringLoad)) {
+		if (MH_CreateHook(Addresses::TSStringLoad, &DetourTSStringLoad,
+			reinterpret_cast<LPVOID*>(&fpTSStringLoad)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::TSStringLoad) != MH_OK)
+		{
+			return false;
+		}
 	}
 
-	if (MH_CreateHook(Addresses::UIMakeMoneyString, &DetourMakeMoneyString,
-		reinterpret_cast<LPVOID*>(&fpMakeMoneyString)) != MH_OK)
-	{
-		return false;
-	}
-	if (MH_EnableHook(Addresses::UIMakeMoneyString) != MH_OK)
-	{
-		return false;
-	}
-
-	if (MH_CreateHook(Addresses::AppendInteractionsForMenu, &DetourAppendInteractionsForMenu,
-		reinterpret_cast<LPVOID*>(&fpAppendInteractionsForMenu)) != MH_OK)
-	{
-		return false;
-	}
-	if (MH_EnableHook(Addresses::AppendInteractionsForMenu) != MH_OK)
-	{
-		return false;
+	if (ADDRESS_VALID(Addresses::LoadUIScript)) {
+		if (MH_CreateHook(Addresses::LoadUIScript, &DetourLoadUIScript,
+			reinterpret_cast<LPVOID*>(&fpLoadUiScript)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::LoadUIScript) != MH_OK)
+		{
+			return false;
+		}
 	}
 
-	if (MH_CreateHook(Addresses::ScenegraphAddGameVersion, &DetourAddGameVersion,
-		reinterpret_cast<LPVOID*>(&fpAddGameVersion)) != MH_OK)
-	{
-		return false;
+	if (ADDRESS_VALID(Addresses::UIMakeMoneyString)) {
+		if (MH_CreateHook(Addresses::UIMakeMoneyString, &DetourMakeMoneyString,
+			reinterpret_cast<LPVOID*>(&fpMakeMoneyString)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::UIMakeMoneyString) != MH_OK)
+		{
+			return false;
+		}
 	}
-	if (MH_EnableHook(Addresses::ScenegraphAddGameVersion) != MH_OK)
-	{
-		return false;
+
+	if (ADDRESS_VALID(Addresses::AppendInteractionsForMenu)) {
+		if (MH_CreateHook(Addresses::AppendInteractionsForMenu, &DetourAppendInteractionsForMenu,
+			reinterpret_cast<LPVOID*>(&fpAppendInteractionsForMenu)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::AppendInteractionsForMenu) != MH_OK)
+		{
+			return false;
+		}
+	}
+
+	if (ADDRESS_VALID(Addresses::ScenegraphAddGameVersion)) {
+		if (MH_CreateHook(Addresses::ScenegraphAddGameVersion, &DetourAddGameVersion,
+			reinterpret_cast<LPVOID*>(&fpAddGameVersion)) != MH_OK)
+		{
+			return false;
+		}
+		if (MH_EnableHook(Addresses::ScenegraphAddGameVersion) != MH_OK)
+		{
+			return false;
+		}
 	}
 
 	return true;
