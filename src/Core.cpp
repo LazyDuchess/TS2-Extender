@@ -570,7 +570,11 @@ bool Core::Initialize() {
 
 	if (Config::ExtendedLua && luaValid) {
 		WriteToMemory((DWORD)Addresses::LuaUnregister, retOverride, 1);
+#if TS2_LC
 		Nop((BYTE*)Addresses::LuaPrintStub, 16);
+#else
+		Nop((BYTE*)Addresses::LuaPrintStub, 20);
+#endif
 		if (MH_CreateHook(Addresses::GZLua5Open, &DetourLua5Open,
 			reinterpret_cast<LPVOID*>(&fpLua5Open)) != MH_OK)
 		{

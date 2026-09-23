@@ -41,7 +41,10 @@ static char introEngPushLookup[] = {
 };
 static char introEngPushLookupMask[] = "????xxxx????xxxxx????xxxxxxxxxxxxxxx";
 
+// GHIDRA: 00e20010 (1.18.0.98)
 // CE: "Sims2EP9.exe"+B64460 (1.18.0.187)
+// MAC: 006ad6ec
+// nTSLua::Unregister()
 static char luaUnregisterLookup[] = {
 	0x56,
 	0x8B, 0x74, 0x24, 0x08,
@@ -54,7 +57,10 @@ static char luaUnregisterLookup[] = {
 };
 static char luaUnregisterLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 0082df95 (1.18.0.98)
 // CE: "Sims2EP9.exe"+56E295 (1.18.0.187)
+// MAC: 00abbd86
+// in RegisterGeneralSimulatorLuaCommands()
 static char luaPrintStubLookup[] = {
 	0xFF, 0x50, 0x10,
 	0x8B, 0xF8,
@@ -70,6 +76,8 @@ static char luaPrintStubLookup[] = {
 static char luaPrintStubLookupMask[] = "xxxxxxxxxx????x????xxxxxxxxxxx";
 
 // CE: "Sims2EP9.exe"+C78B10 (1.18.0.187)
+// MAC: 001c6dd2
+// cGZLua5::Open()
 static char lua5OpenLookup[] = {
 	0x53,
 	0x55,
@@ -86,7 +94,10 @@ static char lua5OpenLookup[] = {
 };
 static char lua5OpenLookupMask[] = "xxxxxxx????xxxxxxxxx????xxx";
 
+// GHIDRA: 0082f680 (1.18.0.98)
 // CE: "Sims2EP9.exe"+56F980 (1.18.0.187)
+// MAC: 00ab9762
+// RegisterPrimitiveSupportLuaCommands()
 static char registerLuaCommandsLookup[] = {
 	0x56,
 	0x8B, 0x74, 0x24, 0x08,
@@ -102,6 +113,8 @@ static char registerLuaCommandsLookup[] = {
 static char registerLuaCommandsLookupMask[] = "xxxxxxxxxx?????xxxxx????x????xxxxxx";
 
 // CE: "Sims2EP9.exe"+C7E590 (1.18.0.187)
+// MAC: 001ceaa7
+// _lua_pushstring()
 static char luaPushStringLookup[] = {
 	0x55,
 	0x8B, 0x6C, 0x24, 0x0C,

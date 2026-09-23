@@ -135,8 +135,10 @@ namespace Addresses {
 		ADDRESS(IntroPush, introEngPushLookup);
 		ADDRESS(LuaUnregister, luaUnregisterLookup);
 		ADDRESS(LuaPrintStub, luaPrintStubLookup);
+#if TS2_LC
 		if (ADDRESS_VALID(LuaPrintStub))
 			LuaPrintStub = (void*)((DWORD)LuaPrintStub + 9);
+#endif
 		ADDRESS(GZLua5Open, lua5OpenLookup);
 		ADDRESS(RegisterLuaCommands, registerLuaCommandsLookup);
 		ADDRESS(LuaPushString, luaPushStringLookup);
