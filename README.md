@@ -8,11 +8,13 @@ Tested to work with the Steam version.
 
 * Skip intro videos.
 * Adds completely new Lua functionality for modders, and a text Lua script loader for easier modding.
-* Allows you to use separate top/bottom clothes in outfit categories other than just Everyday, if you have the CC for it. Can be enabled via the .ini.
+* Allows use of separate top/bottoms for all clothing categories if you have appropriate CC.
+* Configurable UI scaling.
 
 ## Fixes
 
 * Fixes a Maxis oversight that caused pink flashing on 64 bit computers. Thanks to [@spockthewok](https://github.com/spockthewok) for discovering this.
+* Fixes poor performance in the makeup/accessories/overlays section in Create-A-Sim.
 * Fixes the game's random number generator, solving Firstborn Syndrome and other random number quirks.
 * Fixes Open For Business uniforms messing up employee's faces.
 * Fixes broken date stood up timer.
@@ -39,3 +41,7 @@ On Wine, the installation is the same, minus an extra step to configure the ASI 
 * In winecfg, select the "Libraries" tab. Under the "New override for library" dropdown, select wininet and click "Add"
 
 The mod can be configured via the .ini file.
+
+## Troubleshooting
+
+If the mod doesn't work, try deleting the "wininet.dll" file from TSBin, instead putting in the "winmm.dll" file from [here](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases) (winmm.dll under Win32, latest release) If it now works, keep the "winmm.dll" file in your TSBin and make sure the "wininet.dll" file is always removed if you download an update.
