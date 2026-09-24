@@ -85,8 +85,10 @@ namespace Config {
 		}
 		else
 		{
-			if (Dirty)
+			if (Dirty) {
+				Log("Appending missing values to config file.\n");
 				file.write(Ini, true);
+			}
 		}
 	}
 }
