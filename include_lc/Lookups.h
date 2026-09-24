@@ -215,7 +215,10 @@ static char registerTestingCheatLookup[] = {
 };
 static char registerTestingCheatLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// Ghidra: 00661950 (1.18.0.98)
 // CE: "Sims2EP9.exe"+3A18B0 (1.18.0.187)
+// MAC: 00833144
+// nTSSG::RegisterTSSGCheats()
 static char registerTSSGCheatsLookup[] = {
 	0x55,
 	0x8B, 0xEC,
