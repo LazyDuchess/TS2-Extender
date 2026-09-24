@@ -18,6 +18,8 @@ namespace Config {
 	bool UIScale;
 	float UIScaleResolution;
 
+	static bool Dirty = false;
+
 	static bool Has(const std::string& section, const std::string& key) {
 		if (!Ini[section].has(key)) return false;
 		return true;
@@ -25,6 +27,7 @@ namespace Config {
 
 	static std::string GetString(const std::string& section, const std::string& key, std::string defaultValue) {
 		if (!Has(section, key)) {
+			Dirty = true;
 			Ini[section][key] = defaultValue;
 			return defaultValue;
 		}
@@ -33,6 +36,7 @@ namespace Config {
 
 	static int GetInt(const std::string& section, const std::string& key, int defaultValue) {
 		if (!Has(section, key)) {
+			Dirty = true;
 			Ini[section][key] = std::to_string(defaultValue);
 			return defaultValue;
 		}
@@ -41,6 +45,7 @@ namespace Config {
 
 	static float GetFloat(const std::string& section, const std::string& key, float defaultValue) {
 		if (!Has(section, key)) {
+			Dirty = true;
 			Ini[section][key] = std::to_string(defaultValue);
 			return defaultValue;
 		}
@@ -80,7 +85,8 @@ namespace Config {
 		}
 		else
 		{
-			file.write(Ini, true);
+			if (Dirty)
+				file.write(Ini, true);
 		}
 	}
 }
