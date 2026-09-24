@@ -568,25 +568,35 @@ bool Core::Initialize() {
 
 	bool luaValid = ADDRESS_VALID(Addresses::GZLua5Open) && ADDRESS_VALID(Addresses::LuaUnregister) && ADDRESS_VALID(Addresses::RegisterLuaCommands) && ADDRESS_VALID(Addresses::RegisterTSSGCheats);
 
-	if (Config::ExtendedLua && luaValid) {
-		WriteToMemory((DWORD)Addresses::LuaUnregister, retOverride, 1);
+	if (Config::ExtendedLua) {
+		if (ADDRESS_VALID(Addresses::LuaUnregister))
+			WriteToMemory((DWORD)Addresses::LuaUnregister, retOverride, 1);
+
+		if (ADDRESS_VALID(Addresses::LuaPrintStub)) {
 #if TS2_LC
-		Nop((BYTE*)Addresses::LuaPrintStub, 16);
+			Nop((BYTE*)Addresses::LuaPrintStub, 16);
 #else
-		Nop((BYTE*)Addresses::LuaPrintStub, 20);
+			// Nop 2 arg pushes and the call later.
+			Nop((BYTE*)Addresses::LuaPrintStub, 10);
+			Nop((BYTE*)((DWORD)Addresses::LuaPrintStub + 14), 6);
 #endif
-		if (MH_CreateHook(Addresses::GZLua5Open, &DetourLua5Open,
-			reinterpret_cast<LPVOID*>(&fpLua5Open)) != MH_OK)
-		{
-			Log("ExtendedLua Patch Failed!\n");
-			return false;
 		}
-		if (MH_EnableHook(Addresses::GZLua5Open) != MH_OK)
-		{
-			Log("ExtendedLua Patch Failed!\n");
-			return false;
+		if (ADDRESS_VALID(Addresses::GZLua5Open)) {
+			if (MH_CreateHook(Addresses::GZLua5Open, &DetourLua5Open,
+				reinterpret_cast<LPVOID*>(&fpLua5Open)) != MH_OK)
+			{
+				Log("ExtendedLua Patch Failed!\n");
+				return false;
+			}
+			if (MH_EnableHook(Addresses::GZLua5Open) != MH_OK)
+			{
+				Log("ExtendedLua Patch Failed!\n");
+				return false;
+			}
 		}
-		if (!LuaExtensions::Initialize()) return false;
+		if (luaValid) {
+			if (!LuaExtensions::Initialize()) return false;
+		}
 	}
 
 	if (Config::FixPinkFlashing && ADDRESS_VALID(Addresses::LAAPointerCheck)) {
