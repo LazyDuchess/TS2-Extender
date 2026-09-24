@@ -454,7 +454,7 @@ bool Core::CacheUserData() {
 	);
 #else
 	LSTATUS keyStatus = RegOpenKeyExW(
-		HKEY_CURRENT_USER,
+		HKEY_LOCAL_MACHINE,
 		L"SOFTWARE\\EA GAMES\\The Sims 2",
 		0,
 		KEY_READ | KEY_WOW64_32KEY,
@@ -465,11 +465,7 @@ bool Core::CacheUserData() {
 	if (keyStatus != ERROR_SUCCESS) return false;
 
 	DWORD finalSize = 0;
-#if TS2_LC
 	const wchar_t keyName[] = L"displayname";
-#else
-	const wchar_t keyName[] = L"Name";
-#endif
 
 	LSTATUS valueStatus = RegGetValueW(
 		nameKey,
