@@ -44,6 +44,16 @@ namespace LuaExtensions {
 		return "";
 	}
 
+	// IsLegacy()
+	static int __cdecl LuaIsLegacy(lua_State* luaState) {
+#if TS2_LC
+		lua_pushboolean(luaState, 1);
+#else
+		lua_pushboolean(luaState, 0);
+#endif
+		return 1;
+	}
+
 	// KBM_GetKeyDown(number vk)
 	static int __cdecl LuaGetKeyDown(lua_State* luaState) {
 		int vk = static_cast<int>(lua_tonumber(luaState, 1));
@@ -358,6 +368,7 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaGetKeyDown, "KBM_GetKeyDown");
 			luaThread->Register(&LuaGetKeyHeld, "KBM_GetKey");
 			luaThread->Register(&LuaGetKeyUp, "KBM_GetKeyUp");
+			luaThread->Register(&LuaIsLegacy, "IsLegacy");
 		}
 		return res;
 	}
