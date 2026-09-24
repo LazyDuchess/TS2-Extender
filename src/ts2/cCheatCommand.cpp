@@ -31,6 +31,7 @@ namespace TS2 {
 		return 0;
 	}
 	void* cCheatCommand::Destructor(bool freeMemory) {
+		// Caused crash on quit on UC, address might be wrong.
 #if TS2_LC
 		using DestructorFunc = void*(__thiscall*)(cCheatCommand* me, bool freeMemory);
 		DestructorFunc func = reinterpret_cast<DestructorFunc>(Addresses::CheatDestructor);
