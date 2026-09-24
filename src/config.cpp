@@ -80,14 +80,14 @@ namespace Config {
 		UIScaleResolution = GetFloat("Enhancements", "UIScaleResolution", 1080.0f);
 
 		if (!iniExisted) {
-			Log("Default config is being written to %s cause it didn't exist.\n", ConfigFilename);
+			Log("Default config is being written to %s because it didn't exist.\n", ConfigFilename);
 			file.generate(Ini, true);
 		}
 		else
 		{
 			if (Dirty) {
-				Log("Appending missing values to config file.\n");
-				file.write(Ini, true);
+				Log("The config file was missing some settings so they've been initialized to default.\n");
+				//file.write(Ini, true);
 			}
 		}
 	}
