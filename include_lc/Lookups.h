@@ -782,6 +782,7 @@ static char addCheatInteractionLookup[] = {
 static char addCheatInteractionLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 // CE: "Sims2EP9.exe"+1EE803 (1.18.0.187)
+// in unkown func
 static char tsGlobalsCallLookup[] = {
 	0xFF, 0xFF, 0xFF, 0xFF,
 	0x8B, 0xC8,

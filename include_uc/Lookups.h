@@ -745,8 +745,10 @@ static char addCheatInteractionLookup[] = {
 };
 static char addCheatInteractionLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 004aec83
+// in unknown func
 static char tsGlobalsCallLookup[] = {
-	0xFF, 0xFF, 0xFF, 0xFF,
+	0xF4, 0xF5, 0x01, 0x00,
 	0x8B, 0xC8,
 	0x8B, 0x10,
 	0x8B, 0x42, 0x60,
@@ -756,9 +758,12 @@ static char tsGlobalsCallLookup[] = {
 	0x8D, 0x45, 0xD4,
 	0x89, 0x7D, 0xF0,
 	0x50,
-	0x8B, 0x11
+	0x8B, 0x11,
+	0x8B, 0x52, 0x0C,
+	0xFF, 0xD2,
+	0x8B, 0xCF
 };
-static char tsGlobalsCallLookupMask[] = "????xxxxxxxxxxxxxxxxxxxxxxx";
+static char tsGlobalsCallLookupMask[] = "????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 // GHIDRA: 010cef80
 // _lua_pushboolean()
