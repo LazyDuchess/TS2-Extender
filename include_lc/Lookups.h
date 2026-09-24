@@ -235,6 +235,8 @@ static char registerTSSGCheatsLookup[] = {
 static char registerTSSGCheatsLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxx????xx";
 
 // CE: "Sims2EP9.exe"+C7E750 (1.18.0.187)
+// MAC: 001cee76
+// _lua_rawgeti()
 static char luaRawGetILookup[] = {
 	0x8B, 0x4C, 0x24, 0x08,
 	0x56,
@@ -257,6 +259,8 @@ static char luaRawGetILookup[] = {
 static char luaRawGetILookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxx";
 
 // CE: "Sims2EP9.exe"+C7EA30 (1.18.0.187)
+// MAC: 001ce3fa
+// _lua_settop()
 static char luaSetTopLookup[] = {
 	0x8B, 0x44, 0x24, 0x08,
 	0x8B, 0x4C, 0x24, 0x04,
