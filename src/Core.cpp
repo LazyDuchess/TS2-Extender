@@ -182,6 +182,8 @@ static void __declspec(naked) ModifyVoiceEventHook2() {
 	}
 }
 
+// Override visibility flags for clothing dialog for employee dress fix.
+#if TS2_LC
 static void __declspec(naked) ClothingDialogHook1() {
 	__asm {
 		cmp[esi + 0xE8], 0x00000000
@@ -201,6 +203,27 @@ static void __declspec(naked) ClothingDialogHook2() {
 		jmp[ClothingDialogHook2Return]
 	}
 }
+#else
+static void __declspec(naked) ClothingDialogHook1() {
+	__asm {
+		cmp[esi + 0xD8], 0x00000000
+		je goBack
+		mov[esi + 0x000000D8], edx
+		goBack :
+		jmp[ClothingDialogHook1Return]
+	}
+}
+
+static void __declspec(naked) ClothingDialogHook2() {
+	__asm {
+		cmp[esi + 0xD8], 0x00000000
+		je goBack
+		or dword ptr[esi + 0xD8], 0x01
+		goBack:
+		jmp[ClothingDialogHook2Return]
+	}
+}
+#endif
 
 static void AddCheatInteraction(std::vector<cTSInteraction*>* interactions, cTSPerson* person, cTSObject* object, int interactionType, short flags, const char* name, short instanceId) {
 	((void(__cdecl*)(std::vector<cTSInteraction*>*, void*, void*, int, short, const char*, short))Addresses::AddCheatInteraction)(interactions, person, object, interactionType, flags, name, instanceId);
@@ -404,10 +427,17 @@ static unsigned int __fastcall DetourClothingDialogOnAttach(void* me, void* _, v
 		CancelNextClothingDialog = false;
 		int res = fpClothingDialogOnAttach(me, unk1, unk2);
 		((void(__thiscall*)(void*))Addresses::ClothingDialogOnCancel)(me);
+#if TS2_LC
 		((char*)unk1)[0xE8] = 0x00;
 		((char*)unk1)[0xE9] = 0x00;
 		((char*)unk1)[0xEA] = 0x00;
 		((char*)unk1)[0xEB] = 0x00;
+#else
+		((char*)unk1)[0xD8] = 0x00;
+		((char*)unk1)[0xD9] = 0x00;
+		((char*)unk1)[0xDA] = 0x00;
+		((char*)unk1)[0xDB] = 0x00;
+#endif
 		return 0;
 	}
 	return fpClothingDialogOnAttach(me, unk1, unk2);
@@ -624,7 +654,11 @@ bool Core::Initialize() {
 			return false;
 		}
 
+#if TS2_LC
 		Nop((BYTE*)Addresses::ClothingDialogSetState, 10);
+#else
+		Nop((BYTE*)Addresses::ClothingDialogSetState, 14);
+#endif
 
 		ClothingDialogHook1Return = (void*)((DWORD)Addresses::ClothingDialogHack1 + 6);
 		ClothingDialogHook2Return = (void*)((DWORD)Addresses::ClothingDialogHack2 + 7);

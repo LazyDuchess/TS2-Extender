@@ -586,7 +586,9 @@ static char clothingDialogSetStateLookup[] = {
 };
 static char clothingDialogSetStateLookupMask[] = "xxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxx";
 
+// GHIDRA: 009afb04 (1.18.0.98)
 // CE: "Sims2EP9.exe"+6EFF84 (1.18.0.187)
+// cTSWinProcDressEmployeeDialog::onAttach()
 static char dressEmployeeDialogOnAttachLookup[]{
 	0x56,
 	0xFF, 0x74, 0x24, 0x0C,
@@ -602,7 +604,9 @@ static char dressEmployeeDialogOnAttachLookup[]{
 };
 static char dressEmployeeDialogOnAttachLookupMask[] = "xxxxxxxxxxxx????xxxxxxxxxxxxxxxx";
 
+// GHIDRA: 00beea6b (1.18.0.98)
 // CE: "Sims2EP9.exe"+932CAB (1.18.0.187)
+// in cGZWin::SetFlag
 static char clothingDialogHack1Lookup[]{
 	0x89, 0x8E, 0xE8, 0x00, 0x00, 0x00,
 	0x3B, 0xCA,
@@ -617,7 +621,9 @@ static char clothingDialogHack1Lookup[]{
 };
 static char clothingDialogHack1LookupMask[] = "xxxxxxxxxxxxx????xxxxxx????xxxxx????";
 
+// GHIDRA: 00beec33 (1.18.0.98)
 // CE: "Sims2EP9.exe"+932E73 (1.18.0.187)
+// in cGZWin::SetFlag
 static char clothingDialogHack2Lookup[]{
 	0x83, 0x8E, 0xE8, 0x00, 0x00, 0x00, 0x01,
 	0x8B, 0x01,

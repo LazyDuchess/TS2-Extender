@@ -31,9 +31,13 @@ namespace TS2 {
 		return 0;
 	}
 	void* cCheatCommand::Destructor(bool freeMemory) {
+#if TS2_LC
 		using DestructorFunc = void*(__thiscall*)(cCheatCommand* me, bool freeMemory);
 		DestructorFunc func = reinterpret_cast<DestructorFunc>(Addresses::CheatDestructor);
 		return func(this, freeMemory);
+#else
+		return this;
+#endif
 	}
 	const char* cCheatCommand::Description() {
 		return "";
