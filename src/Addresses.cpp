@@ -71,7 +71,6 @@ namespace Addresses {
 	void* GetCheatSystem;
 	void* RegisterTestingCheat;
 	void* RegisterTSSGCheats;
-	void* CheatSystem;
 
 	void* CalculateOutfitPartVisibility;
 	void* CalculateBuyPartVisibility;
@@ -164,7 +163,6 @@ namespace Addresses {
 		ADDRESS(DressEmployeeDialogOnAttach, dressEmployeeDialogOnAttachLookup);
 		ADDRESS(ClothingDialogHack1, clothingDialogHack1Lookup);
 		ADDRESS(ClothingDialogHack2, clothingDialogHack2Lookup);
-		ADDRESS(CheatSystem, cheatSystemLookup);
 		ADDRESS(CalculateOutfitPartVisibility, calculateOutfitPartVisibilityLookup);
 		ADDRESS(CalculateBuyPartVisibility, calculateBuyPartVisibilityLookup);
 		ADDRESS(CalculateTryOnPartVisibility, calculateTryOnPartVisibilityLookup);

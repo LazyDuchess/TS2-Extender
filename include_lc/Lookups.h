@@ -129,7 +129,10 @@ static char luaPushStringLookup[] = {
 };
 static char luaPushStringLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 00490a8a (1.18.0.98)
 // CE: "Sims2EP9.exe"+1D0B4A (1.18.0.187)
+// MAC: 005b884e
+// cITSCheatSystem::cCheatCommand::QueryInterface()
 static char cheatQueryInterfaceLookup[] = {
 	0x8B, 0x44, 0x24, 0x08,
 	0x85, 0xC0,
@@ -143,6 +146,7 @@ static char cheatQueryInterfaceLookup[] = {
 static char cheatQueryInterfaceLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 // CE: "Sims2EP9.exe"+1D0BE0 (1.18.0.187)
+// cITSCheatSystem::cCheatCommand::Release()
 static char cheatReleaseLookup[] = {
 	0x8B, 0x41, 0x08,
 	0x83, 0xE8, 0x01,
@@ -156,7 +160,10 @@ static char cheatReleaseLookup[] = {
 };
 static char cheatReleaseLookupMask[] = "xxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 006606f0 (1.18.0.98)
 // CE: "Sims2EP9.exe"+14C620 (1.18.0.187)
+// MAC: 005b8814
+// cITSCheatSystem::cCheatCommand::dtor
 static char cheatDestructorLookup[] = {
 	0xF6, 0x44, 0x24, 0x04, 0x01,
 	0x56,
@@ -168,8 +175,9 @@ static char cheatDestructorLookup[] = {
 };
 static char cheatDestructorLookupMask[] = "xxxxxxxxxx????xxxxx";
 
-// CE: "Sims2EP9.exe"+14F330 (1.18.0.187)
-static char getCheatSystemLookup[] = {
+// CE: "Sims2EP9.exe"+B38F10 (1.18.0.187)
+// TS::CheatSystem()
+static char getCheatSystemLookup[]{
 	0x51,
 	0xA1, 0x00, 0x4B, 0x3A, 0x01,
 	0x85, 0xC0,
@@ -178,11 +186,19 @@ static char getCheatSystemLookup[] = {
 	0xE8, 0x5D, 0xE7, 0x60, 0xFF,
 	0x8B, 0xC8,
 	0x85, 0xC9,
-	0x74, 0x13
+	0x74, 0x13,
+	0x8B, 0x01,
+	0x8D, 0x14, 0x24,
+	0x52,
+	0x68, 0x00, 0x0E, 0x49, 0x4A,
+	0x68, 0xEA, 0x15, 0x49, 0x2A,
+	0xFF, 0x50, 0x14,
+
 };
-static char getCheatSystemLookupMask[] = "xx????xxxxxxxx????xxxxxx";
+static char getCheatSystemLookupMask[] = "xx????xxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxx";
 
 // CE: "Sims2EP9.exe"+B39640 (1.18.0.187)
+// TSRegisterTestingCheat()
 static char registerTestingCheatLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -601,27 +617,6 @@ static char clothingDialogHack2Lookup[]{
 	0xF7, 0x86, 0xE8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08
 };
 static char clothingDialogHack2LookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-
-// CE: "Sims2EP9.exe"+B38F10 (1.18.0.187)
-static char cheatSystemLookup[]{
-	0x51,
-	0xA1, 0x00, 0x4B, 0x3A, 0x01,
-	0x85, 0xC0,
-	0x75, 0x36,
-	0x89, 0x04, 0x24,
-	0xE8, 0x5D, 0xE7, 0x60, 0xFF,
-	0x8B, 0xC8,
-	0x85, 0xC9,
-	0x74, 0x13,
-	0x8B, 0x01,
-	0x8D, 0x14, 0x24,
-	0x52,
-	0x68, 0x00, 0x0E, 0x49, 0x4A,
-	0x68, 0xEA, 0x15, 0x49, 0x2A,
-	0xFF, 0x50, 0x14,
-
-};
-static char cheatSystemLookupMask[] = "xx????xxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxx";
 
 // CE: "Sims2EP9.exe"+745E61 (1.18.0.187)
 static char calculateOutfitPartVisibilityLookup[] = {

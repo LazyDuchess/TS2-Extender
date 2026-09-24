@@ -371,19 +371,23 @@ namespace LuaExtensions {
 		if (MH_CreateHook(Addresses::RegisterLuaCommands, &DetourRegisterPrimitiveSupportLuaCommands,
 			reinterpret_cast<LPVOID*>(&fpRegisterPrimitiveSupportLuaCommands)) != MH_OK)
 		{
+			Log("LuaExtensions PrimitiveSupportLuaCommands patch failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::RegisterLuaCommands) != MH_OK)
 		{
+			Log("LuaExtensions PrimitiveSupportLuaCommands patch failed!\n");
 			return false;
 		}
 		if (MH_CreateHook(Addresses::RegisterTSSGCheats, &DetourRegisterTSSGCheats,
 			reinterpret_cast<LPVOID*>(&fpRegisterTSSGCheats)) != MH_OK)
 		{
+			Log("LuaExtensions RegisterTSSGCheats patch failed!\n");
 			return false;
 		}
 		if (MH_EnableHook(Addresses::RegisterTSSGCheats) != MH_OK)
 		{
+			Log("LuaExtensions RegisterTSSGCheats patch failed!\n");
 			return false;
 		}
 		return true;

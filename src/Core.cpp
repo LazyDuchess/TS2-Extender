@@ -566,7 +566,7 @@ bool Core::Initialize() {
 
 	// TODO: Improve checks for those that rely on multiple addresses
 
-	bool luaValid = ADDRESS_VALID(Addresses::GZLua5Open) && ADDRESS_VALID(Addresses::LuaUnregister);
+	bool luaValid = ADDRESS_VALID(Addresses::GZLua5Open) && ADDRESS_VALID(Addresses::LuaUnregister) && ADDRESS_VALID(Addresses::RegisterLuaCommands) && ADDRESS_VALID(Addresses::RegisterTSSGCheats);
 
 	if (Config::ExtendedLua && luaValid) {
 		WriteToMemory((DWORD)Addresses::LuaUnregister, retOverride, 1);

@@ -3,7 +3,7 @@
 
 namespace TS2 {
 	cTSCheatSystem* CheatSystem() {
-		return ((cTSCheatSystem*(__stdcall*)())Addresses::CheatSystem)();
+		return ((cTSCheatSystem*(__stdcall*)())Addresses::GetCheatSystem)();
 	}
 
 	void TSRegisterTestingCheat(cCheatCommand* cheat) {
