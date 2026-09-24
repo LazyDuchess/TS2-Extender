@@ -208,7 +208,7 @@ static void __declspec(naked) ClothingDialogHook1() {
 	__asm {
 		cmp[esi + 0xD8], 0x00000000
 		je goBack
-		mov[esi + 0x000000D8], edx
+		mov[esi + 0x000000D8], eax
 		goBack :
 		jmp[ClothingDialogHook1Return]
 	}
@@ -437,6 +437,7 @@ static unsigned int __fastcall DetourClothingDialogOnAttach(void* me, void* _, v
 		((char*)unk1)[0xD9] = 0x00;
 		((char*)unk1)[0xDA] = 0x00;
 		((char*)unk1)[0xDB] = 0x00;
+		Log("CLOTHING DIALOG STEP2");
 #endif
 		return 0;
 	}
