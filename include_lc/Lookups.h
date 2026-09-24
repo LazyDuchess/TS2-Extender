@@ -536,7 +536,9 @@ static char luaToBooleanLookup[] = {
 };
 static char luaToBooleanLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 0098d8d8 (1.18.0.98)
 // CE: "Sims2EP9.exe"+6CDD5A (1.18.0.187)
+// cTSWinProcClothingDialog::OnCancel()
 static char clothingDialogOnCancelLookup[] = {
 	0x56,
 	0x8B, 0xF1,
@@ -566,7 +568,9 @@ static char clothingDialogOnAttachLookup[] = {
 };
 static char clothingDialogOnAttachLookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxx????";
 
+// GHIDRA: 0098ed88 (1.18.0.98)
 // CE: "Sims2EP9.exe"+6CF20A (1.18.0.187)
+// in cTSWinProcClothingDialog::Show
 static char clothingDialogSetStateLookup[] = {
 	0xC7, 0x86, 0x90, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
 	0x8B, 0x13,
