@@ -367,7 +367,9 @@ static int __fastcall DetourOverlaysDoMessage(void* self, void* _, cGZMessage* m
 }
 
 static void* UITabChangeHookReturn;
+static void* UIMirrorTabChangeHookReturn;
 
+#if TS2_LC
 static void __declspec(naked) UITabChangeHook() {
 	__asm {
 		mov[shouldTickOverlays], 0x1
@@ -377,15 +379,32 @@ static void __declspec(naked) UITabChangeHook() {
 	}
 }
 
-static void* UIMirrorTabChangeHookReturn;
+static void __declspec(naked) UIMirrorTabChangeHook() {
+	__asm {
+		mov[shouldTickOverlays], 0x1
+		call dword ptr[edx + 0x00000154]
+		jmp[UIMirrorTabChangeHookReturn]
+	}
+}
+#else
+static void __declspec(naked) UITabChangeHook() {
+	__asm {
+		mov[shouldTickOverlays], 0x1
+		mov eax, [esi + 0x08]
+		cmp eax, ebx
+		jmp[UITabChangeHookReturn]
+	}
+}
 
 static void __declspec(naked) UIMirrorTabChangeHook() {
 	__asm {
 		mov[shouldTickOverlays], 0x1
-		call dword ptr [edx+0x00000154]
+		lea ecx, [ebp + -0x18]
+		mov byte ptr [ebp + -0xd], 0x1
 		jmp[UIMirrorTabChangeHookReturn]
 	}
 }
+#endif
 
 static int __fastcall DetourOverlaysOnTick(void* self, void* _, int unk) {
 	if (shouldTickOverlays) {
@@ -748,11 +767,19 @@ bool Core::Initialize() {
 
 		// TODO: One or both of these might not be needed now that we are also hooking cTSUICASComponentOverlays::Activate?
 
+#if TS2_LC
 		UITabChangeHookReturn = (void*)((DWORD)Addresses::UnknownUITabChange + 6);
 		MakeJMP((BYTE*)Addresses::UnknownUITabChange, (DWORD)UITabChangeHook, 6);
 
 		UIMirrorTabChangeHookReturn = (void*)((DWORD)Addresses::UnknownMirrorUITabChange + 6);
 		MakeJMP((BYTE*)Addresses::UnknownMirrorUITabChange, (DWORD)UIMirrorTabChangeHook, 6);
+#else
+		UITabChangeHookReturn = (void*)((DWORD)Addresses::UnknownUITabChange + 5);
+		MakeJMP((BYTE*)Addresses::UnknownUITabChange, (DWORD)UITabChangeHook, 5);
+
+		UIMirrorTabChangeHookReturn = (void*)((DWORD)Addresses::UnknownMirrorUITabChange + 7);
+		MakeJMP((BYTE*)Addresses::UnknownMirrorUITabChange, (DWORD)UIMirrorTabChangeHook, 7);
+#endif
 	}
 
 	if (ADDRESS_VALID(Addresses::cTSSGSystemOncePerFrameUpdate)) {

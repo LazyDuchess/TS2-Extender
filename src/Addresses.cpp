@@ -206,8 +206,13 @@ namespace Addresses {
 		ADDRESS(SimEditorHandleTabWizard, SimEditorHandleTabWizardLookup);
 
 		if (ADDRESS_VALID(CASStringLookup)) {
+#if TS2_LC
 			CASLotName = *(char**)((DWORD)CASStringLookup + 0x6);
 			YACASLotName = *(char**)((DWORD)CASStringLookup + 0x18);
+#else
+			CASLotName = *(char**)((DWORD)CASStringLookup + 0x6);
+			YACASLotName = *(char**)((DWORD)CASStringLookup + 0x1A);
+#endif
 		}
 		return true;
 	}

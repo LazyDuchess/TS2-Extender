@@ -76,8 +76,10 @@ namespace Config {
 		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
 		Separates4All = GetBool("Enhancements", "Separates4All", false);
 		FreeZodiac = GetBool("Enhancements", "FreeZodiac", false);
+#if TS2_LC
 		UIScale = GetBool("Enhancements", "UIScale", false);
 		UIScaleResolution = GetFloat("Enhancements", "UIScaleResolution", 1080.0f);
+#endif
 
 		if (!iniExisted) {
 			Log("Default config is being written to %s because it didn't exist.\n", ConfigFilename);

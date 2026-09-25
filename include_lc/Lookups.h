@@ -877,7 +877,9 @@ static char voxModifierModifyEventLookup[] = {
 };
 static char voxModifierModifyEventLookupMask[] = "xxxxx????x????xxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 0093ba9d (1.18.0.98)
 // CE: "Sims2EP9.exe"+67BF1D (1.18.0.187)
+// cTSUserToolObject::Init
 static char cTSUserToolObjectInitLookup[] = {
 	0x56,
 	0x8B, 0xF1,
@@ -901,6 +903,7 @@ static char cTSUserToolObjectInitLookup[] = {
 static char cTSUserToolObjectInitLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxx";
 
 // CE: "Sims2EP9.exe"+67F38A (1.18.0.187)
+// cTSUserToolObject::Shutdown
 static char cTSUserToolObjectShutdownLookup[] = {
 	0x53,
 	0x56,
@@ -935,7 +938,9 @@ static char LegacyCalculateUIScaleLookup[] = {
 };
 static char LegacyCalculateUIScaleLookupMask[] = "xxxxxxx????xx????xxxxxxxx????xxxx";
 
+// GHIDRA: 004d6beb (1.18.0.98)
 // CE: "Sims2EP9.exe"+21676B (1.18.0.187)
+// in cTSAudioMusicManager::_HandleTransitionMessages
 static char CASStringLookupLookup[] = {
 	0x8B, 0x01,
 	0x56,
@@ -955,7 +960,9 @@ static char CASStringLookupLookup[] = {
 };
 static char CASStringLookupLookupMask[] = "xxxxxx????xxxxxxxxxxxxxx????xxxxxxxxx";
 
+// GHIDRA: 0050ff90 (1.18.0.98)
 // CE: "Sims2EP9.exe"+24FB30 (1.18.0.187)
+// nTSSG::cTSSGSystem::OncePerFrameUpdate
 static char cTSSGSystemOncePerFrameUpdateLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -972,7 +979,9 @@ static char cTSSGSystemOncePerFrameUpdateLookup[] = {
 };
 static char cTSSGSystemOncePerFrameUpdateLookupMask[] = "xxxxxxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxx????";
 
+// GHIDRA: 008bb0b1 (1.18.0.98)
 // CE: "Sims2EP9.exe"+5FB453 (1.18.0.187)
+// nTSUICAS::cTSUICASComponentOverlays::OnTick
 static char cTSUICASComponentOverlaysOnTickLookup[] = {
 	0x56,
 	0xFF, 0x74, 0x24, 0x08,
@@ -990,7 +999,9 @@ static char cTSUICASComponentOverlaysOnTickLookup[] = {
 };
 static char cTSUICASComponentOverlaysOnTickLookupMask[] = "xxxxxxxx????xxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxx";
 
+// GHIDRA: 008ba344 (1.18.0.98)
 // CE: "Sims2EP9.exe"+5FA6E6 (1.18.0.187)
+// nTSUICAS::cTSUICASComponentOverlays::DoMessage
 static char cTSUICASComponentOverlaysDoMessageLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -1010,7 +1021,9 @@ static char cTSUICASComponentOverlaysDoMessageLookup[] = {
 };
 static char cTSUICASComponentOverlaysDoMessageLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 00a0564a (1.18.0.98)
 // CE: "Sims2EP9.exe"+745ADA (1.18.0.187)
+// in cTSUITabGroup::HandleTabSelection
 static char UnknownUITabChangeLookup[] = {
 	0x8B, 0x47, 0x08,
 	0x89, 0x45, 0x0C,
@@ -1031,7 +1044,9 @@ static char UnknownUITabChangeLookup[] = {
 };
 static char UnknownUITabChangeLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxx";
 
+// GHIDRA: 009964b1 (1.18.0.98)
 // CE: "Sims2EP9.exe"+6D6933 (1.18.0.187)
+// in cTSWinProcVanityDialog::HandleTabSelect
 static char UnknownMirrorUITabChangeLookup[] = {
 	0xFF, 0x92, 0x54, 0x01, 0x00, 0x00,
 	0xC6, 0x45, 0xF3, 0x01,
@@ -1046,7 +1061,9 @@ static char UnknownMirrorUITabChangeLookup[] = {
 };
 static char UnknownMirrorUITabChangeLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 008b948a (1.18.0.98)
 // CE: "Sims2EP9.exe"+5F982C (1.18.0.187)
+// nTSUICAS::cTSUICASComponentOverlays::Activate
 static char cTSUICASComponentOverlaysActivateLookup[] = {
 	0x55,
 	0x83, 0xEC, 0x68,
@@ -1065,6 +1082,7 @@ static char cTSUICASComponentOverlaysActivateLookup[] = {
 static char cTSUICASComponentOverlaysActivateLookupMask[] = "xxxxx????x????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 // CE: "Sims2EP9.exe"+5BDA91 (1.18.0.187)
+// cTSWinProcSceneGraph::AddGameVersion
 static char ScenegraphAddGameVersionLookup[] = {
 	0xB8, 0x3F, 0x7C, 0xFF, 0x00,
 	0xE8, 0x4E, 0x54, 0x26, 0x00,
@@ -1084,7 +1102,9 @@ static char ScenegraphAddGameVersionLookup[] = {
 };
 static char ScenegraphAddGameVersionLookupMask[] = "x????x????xxxxxxxxxxxxxxxx?????x????xxxxx????xx";
 
+// GHIDRA: 008a79ac (1.18.0.98)
 // CE: "Sims2EP9.exe"+5E7D45 (1.18.0.187)
+// cTSUISimEditor::SetupUIForSimCreation
 static char SetupUIForSimCreationLookup[] = {
 	0xB8, 0x23, 0xA4, 0xFF, 0x00,
 	0xE8, 0xB2, 0xB1, 0x23, 0x00,
@@ -1100,7 +1120,9 @@ static char SetupUIForSimCreationLookup[] = {
 };
 static char SetupUIForSimCreationLookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 008a8f38 (1.18.0.98)
 // CE: "Sims2EP9.exe"+5E92D7 (1.18.0.187)
+// cTSUISimEditor::UpdateUI
 static char SimEditorUpdateUILookup[] = {
 	0xB8, 0x38, 0xA5, 0xFF, 0x00,
 	0xE8, 0x26, 0x9C, 0x23, 0x00,
@@ -1116,7 +1138,9 @@ static char SimEditorUpdateUILookup[] = {
 };
 static char SimEditorUpdateUILookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 008ae6ac (1.18.0.98)
 // CE: "Sims2EP9.exe"+5EEA4E (1.18.0.187)
+// in nTSUICAS::cTSUICASComponentPersonality::UpdatePersonality
 static char CalcZodiacAddressLookup[] = {
 	0x74, 0x1A,
 	0x8B, 0x8D, 0x84, 0x01, 0x00, 0x00,
@@ -1136,7 +1160,9 @@ static char CalcZodiacAddressLookup[] = {
 };
 static char CalcZodiacAddressLookupMask[] = "xxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 008a2825 (1.18.0.98)
 // CE: "Sims2EP9.exe"+5E2BB5 (1.18.0.187)
+// cTSUISimEditor::LoadCASComponent
 static char SimEditorLoadCASComponentLookup[] = {
 	0xB8, 0x7B, 0x9F, 0xFF, 0x00,
 	0xE8, 0x39, 0x03, 0x24, 0x00,
@@ -1154,7 +1180,9 @@ static char SimEditorLoadCASComponentLookup[] = {
 };
 static char SimEditorLoadCASComponentLookupMask[] = "x????x????xxxxxxxxxxxxxxxxxxxx????xxxxx";
 
+// GHIDRA: 008a9b58 (1.18.0.98)
 // CE: "Sims2EP9.exe"+5E9EF7 (1.18.0.187)
+// cTSUISimEditor::ValidateSim
 static char SimEditorValidateSimLookup[] = {
 	0x55,
 	0x83, 0xEC, 0x5C,
@@ -1172,7 +1200,9 @@ static char SimEditorValidateSimLookup[] = {
 };
 static char SimEditorValidateSimLookupMask[] = "xxxxx????x????xxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 0089ecb1 (1.18.0.98)
 // CE: "Sims2EP9.exe"+5DF041 (1.18.0.187)
+// cTSUISimEditor::DoMessage
 static char SimEditorDoMessageLookup[] = {
 	0xB8, 0xB1, 0x9C, 0xFF, 0x00,
 	0xE8, 0xAD, 0x3E, 0x54, 0x00,
@@ -1190,7 +1220,9 @@ static char SimEditorDoMessageLookup[] = {
 };
 static char SimEditorDoMessageLookupMask[] = "x????x????xxxxxxxx????xxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 008a1a12 (1.18.0.98)
 // CE: "Sims2EP9.exe"+5E1DA2 (1.18.0.187)
+// cTSUISimEditor::HandleTabWizard
 static char SimEditorHandleTabWizardLookup[] = {
 	0xB8, 0xE8, 0x9E, 0xFF, 0x00,
 	0xE8, 0x4C, 0x11, 0x24, 0x00,
