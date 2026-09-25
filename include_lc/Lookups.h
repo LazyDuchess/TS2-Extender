@@ -697,7 +697,10 @@ static char calculateTryOnPartVisibilityLookup[] = {
 };
 static char calculateTryOnPartVisibilityLookupMask[] = "xxxxxxxx????xxxxxxxxxx????xxxxxxxxxxxxx";
 
+// TODO: Am I high? this just returns TS::SimSystem*. Make it call the actual func like we did with TS::Globals, and fix the name.
+// GHIDRA: 004ce3f4 (1.18.0.98)
 // CE: "Sims2EP9.exe"+20DF74 (1.18.0.187)
+// in TS::SimSystem
 static char getNodeTextInputFieldLookup[] = {
 	0xFF, 0xFF, 0xFF, 0xFF,
 	0x85, 0xC0,
@@ -707,7 +710,9 @@ static char getNodeTextInputFieldLookup[] = {
 };
 static char getNodeTextInputFieldLookupMask[] = "????xxxxxxxxxxxx";
 
+// GHIDRA: 00491010 (1.18.0.98)
 // CE: "Sims2EP9.exe"+1D10D0 (1.18.0.187)
+// cTSString::Load
 static char tsStringLoadLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -724,7 +729,9 @@ static char tsStringLoadLookup[] = {
 };
 static char tsStringLoadLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 00dfd6e0 (1.18.0.98)
 // CE: "Sims2EP9.exe"+B41B50 (1.18.0.187)
+// nTSUI::LoadUIScript
 static char loadUiScriptLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -738,7 +745,10 @@ static char loadUiScriptLookup[] = {
 };
 static char loadUiScriptLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+
+// GHIDRA: 0046cec4 (1.18.0.98)
 // CE: "Sims2EP9.exe"+1ACF84 (1.18.0.187)
+// cRZString::FromChar
 static char crzstringFromCharLookup[] = {
 	0x83, 0xC1, 0x04,
 	0x83, 0x7C, 0x24, 0x04, 0x00,
@@ -754,7 +764,9 @@ static char crzstringFromCharLookup[] = {
 };
 static char crzstringFromCharLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 00a037b8 (1.18.0.98)
 // CE: "Sims2EP9.exe"+743C47 (1.18.0.187)
+// nTSUI::MakeMoneyString
 static char uiMakeMoneyStringLookup[] = {
 	0xB8, 0xFF, 0xFF, 0xFF, 0xFF,
 	0xE8, 0xFF, 0xFF, 0xFF, 0xFF,
