@@ -782,6 +782,7 @@ static char uiMakeMoneyStringLookup[] = {
 static char uiMakeMoneyStringLookupMask[] = "x????x????xxxxxxxxx????xxxxxxx????";
 
 // CE: "Sims2EP9.exe"+44FF80 (1.18.0.187)
+// cEdithObjectTestSim::AppendInteractionsForMenu
 static char appendInteractionsForMenuLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -798,6 +799,7 @@ static char appendInteractionsForMenuLookup[] = {
 static char appendInteractionsForMenuLookupMask[] = "xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 // CE: "Sims2EP9.exe"+44F760 (1.18.0.187)
+// AddCheatInteraction
 static char addCheatInteractionLookup[] = {
 	0x55,
 	0x8B, 0xEC,
@@ -856,7 +858,9 @@ static char laaPointerCheckLookup[] = {
 };
 static char laaPointerCheckLookupMask[] = "xxxxxxxxxxxxx";
 
+// GHIDRA: 00501d66 (1.18.0.98)
 // CE: "Sims2EP9.exe"+2418E6 (1.18.0.187)
+// cEMVoxModifier::ModifyEvent
 static char voxModifierModifyEventLookup[] = {
 	0x55,
 	0x83, 0xEC, 0x64,

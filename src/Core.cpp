@@ -75,17 +75,6 @@ static unsigned int modifyVoiceEventObjectId = 0;
 static void* ModifyVoiceEventHook1Return;
 static void* ModifyVoiceEventHook2Return;
 
-// Store the Object ID for cEMVoxModifier::ModifyEvent, contained in ESI.
-static void __declspec(naked) ModifyVoiceEventHook1() {
-	__asm {
-		mov [modifyVoiceEventObjectId], esi
-		mov ecx, eax
-		mov edx, [eax]
-		call dword ptr [edx+0x68]
-		jmp[ModifyVoiceEventHook1Return]
-	}
-}
-
 static int MakeLuaTableForModifyVoiceEvent(lua_State* luaState, cRZString* str, unsigned int objectId) {
 	lua_newtable(luaState);
 	int tableId = lua_gettop(luaState);
@@ -155,6 +144,18 @@ static void __stdcall ModifyVoiceEventInternalCall(cRZString* str) {
 	str->FromChar(finalStr.c_str());
 }
 
+#if TS2_LC
+// Store the Object ID for cEMVoxModifier::ModifyEvent, contained in ESI.
+static void __declspec(naked) ModifyVoiceEventHook1() {
+	__asm {
+		mov [modifyVoiceEventObjectId], esi
+		mov ecx, eax
+		mov edx, [eax]
+		call dword ptr [edx+0x68]
+		jmp[ModifyVoiceEventHook1Return]
+	}
+}
+
 // At this point, the built cRZString for the voice filename is in EAX.
 static void __declspec(naked) ModifyVoiceEventHook2() {
 	__asm {
@@ -182,6 +183,46 @@ static void __declspec(naked) ModifyVoiceEventHook2() {
 		jmp[ModifyVoiceEventHook2Return]
 	}
 }
+#else
+// Store the Object ID for cEMVoxModifier::ModifyEvent, contained in EDI.
+static void __declspec(naked) ModifyVoiceEventHook1() {
+	__asm {
+		mov[modifyVoiceEventObjectId], edi
+		mov edx, [eax]
+		mov ecx, eax
+		call dword ptr[edx + 0x68]
+		jmp[ModifyVoiceEventHook1Return]
+	}
+}
+
+// At this point, the built cRZString for the voice filename is in EAX.
+static void __declspec(naked) ModifyVoiceEventHook2() {
+	__asm {
+		push eax
+		push ebx
+		push ecx
+		push edx
+		push esi
+		push edi
+		push ebp
+
+		push eax
+		call ModifyVoiceEventInternalCall
+
+		pop ebp
+		pop edi
+		pop esi
+		pop edx
+		pop ecx
+		pop ebx
+		pop eax
+
+		mov eax, [esi]
+		add esp, 0x14
+		jmp[ModifyVoiceEventHook2Return]
+	}
+}
+#endif
 
 // Override visibility flags for clothing dialog for employee dress fix.
 #if TS2_LC
@@ -770,9 +811,17 @@ bool Core::Initialize() {
 	}
 
 	if (ADDRESS_VALID(Addresses::cEMVoxModifierModifyEvent)) {
+#if TS2_LC
 		ModifyVoiceEventHook1Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x2D + 7);
 		ModifyVoiceEventHook2Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x3B1 + 5);
+		MakeJMP((BYTE*)Addresses::cEMVoxModifierModifyEvent + 0x2D, (DWORD)ModifyVoiceEventHook1, 7);
 		MakeJMP((BYTE*)Addresses::cEMVoxModifierModifyEvent + 0x3B1, (DWORD)ModifyVoiceEventHook2, 5);
+#else
+		ModifyVoiceEventHook1Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x2B + 7);
+		ModifyVoiceEventHook2Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x4B0 + 5);
+		MakeJMP((BYTE*)Addresses::cEMVoxModifierModifyEvent + 0x2B, (DWORD)ModifyVoiceEventHook1, 7);
+		MakeJMP((BYTE*)Addresses::cEMVoxModifierModifyEvent + 0x4B0, (DWORD)ModifyVoiceEventHook2, 5);
+#endif
 	}
 	
 	if (ADDRESS_VALID(Addresses::TSStringLoad)) {

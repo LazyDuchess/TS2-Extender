@@ -184,7 +184,11 @@ namespace Addresses {
 		ADDRESS(cEMVoxModifierModifyEvent, voxModifierModifyEventLookup);
 		ADDRESS(cTSUserToolObjectInit, cTSUserToolObjectInitLookup);
 		ADDRESS(cTSUserToolObjectShutdown, cTSUserToolObjectShutdownLookup);
+#if TS2_LC
 		ADDRESS(LegacyCalculateUIScale, LegacyCalculateUIScaleLookup);
+#else
+		LegacyCalculateUIScale = nullptr;
+#endif
 		ADDRESS(CASStringLookup, CASStringLookupLookup);
 		ADDRESS(cTSSGSystemOncePerFrameUpdate, cTSSGSystemOncePerFrameUpdateLookup);
 		ADDRESS(cTSUICASComponentOverlaysOnTick, cTSUICASComponentOverlaysOnTickLookup);
