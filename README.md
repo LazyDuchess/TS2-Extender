@@ -1,15 +1,15 @@
 # TS2 Extender
  
-A mod that greatly expands The Sims 2 Legacy Collection by fixing several issues, implementing new features, enhancing modding support and tweaks.
+A mod that greatly expands The Sims 2 by fixing several issues, implementing new features, enhancing modding support and tweaks.
 
-Tested to work with the Steam version.
+Tested to work with the Steam version of Legacy Collection and The Sims 2 Ultimate Collection.
 
 ## Features
 
 * Skip intro videos.
 * Adds completely new Lua functionality for modders, and a text Lua script loader for easier modding.
 * Allows use of separate top/bottoms for all clothing categories if you have appropriate CC.
-* Configurable UI scaling.
+* Configurable UI scaling for Legacy Collection.
 * Allows editing personality in Create-A-Sim without refreshing their zodiac sign.
 
 ## Fixes
@@ -39,10 +39,10 @@ Check out the [Documentation](https://lazyduchess.github.io/TS2-Extender-Docs) i
 ## On Wine/Linux
 
 On Wine, the installation is the same, minus an extra step to configure the ASI loader proxy:
-* In winecfg, select the "Libraries" tab. Under the "New override for library" dropdown, select wininet and click "Add"
+* In winecfg, select the "Libraries" tab. Under the "New override for library" dropdown, select wininet if on LC, or dsound if on UC and click "Add"
 
 The mod can be configured via the .ini file.
 
 ## Troubleshooting
 
-If the mod doesn't work, try deleting the "wininet.dll" file from TSBin, instead putting in the "winmm.dll" file from [here](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases) (winmm.dll under Win32, latest release) If it now works, keep the "winmm.dll" file in your TSBin and make sure the "wininet.dll" file is always removed if you download an update.
+If the mod doesn't work on Legacy Collection, try deleting the "wininet.dll" file from TSBin, instead putting in the "winmm.dll" file from [here](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases) (winmm.dll under Win32, latest release) If it now works, keep the "winmm.dll" file in your TSBin and make sure the "wininet.dll" file is always removed if you download an update.
