@@ -13,10 +13,10 @@ $PSNativeCommandUseErrorActionPreference = $true
 Set-Location $PSScriptRoot/..
 [Environment]::CurrentDirectory = (Get-Location -PSProvider FileSystem).ProviderPath
 
-#if($Null -ne $(git status --untracked-files=no --porcelain=v1)) {
-#        Write-Error "Git status shows modified files. This script cannot commit a new version while there are uncommitted, modified files."
-#        return
-#}
+if($Null -ne $(git status --untracked-files=no --porcelain=v1)) {
+        Write-Error "Git status shows modified files. This script cannot commit a new version while there are uncommitted, modified files."
+        return
+}
 
 if ($version){
     $major = $False
