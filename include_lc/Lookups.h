@@ -635,7 +635,9 @@ static char clothingDialogHack2Lookup[]{
 };
 static char clothingDialogHack2LookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 00a059d1 (1.18.0.98)
 // CE: "Sims2EP9.exe"+745E61 (1.18.0.187)
+// in cTSUITabGroup::SetVisibility
 static char calculateOutfitPartVisibilityLookup[] = {
 	0xFF, 0x74, 0x24, 0x0C,
 	0x8B, 0xC8,
@@ -651,25 +653,33 @@ static char calculateOutfitPartVisibilityLookup[] = {
 };
 static char calculateOutfitPartVisibilityLookupMask[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+// GHIDRA: 009924aa (1.18.0.98)
 // CE: "Sims2EP9.exe"+6D292C (1.18.0.187)
+// in cTSWinProcClothingPurchaseDialog::SyncUI
 static char calculateBuyPartVisibilityLookup[] = {
 	0xFF, 0x75, 0xEF,
 	0x56,
 	0xFF, 0x73, 0x14,
-	0xE8, 0xA0, 0x29, 0x26, 0x00,
+	0xE8, 0xE2, 0xEB, 0x25, 0x00,
 	0x6A, 0x01,
 	0xFF, 0x75, 0xEF,
 	0x57,
 	0xFF, 0x73, 0x14,
-	0xE8, 0x92, 0x29, 0x26, 0x00,
+	0xE8, 0xD4, 0xEB, 0x25, 0x00,
 	0x6A, 0x01,
 	0xFF, 0x75, 0xEF,
 	0x68, 0x02, 0x00, 0xC7, 0xEC,
 	0xFF, 0x73, 0x14,
+	0xE8, 0xC2, 0xEB, 0x25, 0x00,
+	0x8B, 0x83, 0xC4, 0x00, 0x00, 0x00,
+	0x83, 0xC4, 0x40,
+	0xBE, 0x78, 0xA3, 0x09, 0x01
 };
-static char calculateBuyPartVisibilityLookupMask[] = "xxxxxxxx????xxxxxxxxxx????xxxxxxxxxxxxx";
+static char calculateBuyPartVisibilityLookupMask[] = "xxxxxxxx????xxxxxxxxxx????xxxxxxxxxxxxxx????xxxxxxxxxx????";
 
+// GHIDRA: 00995174 (1.18.0.98)
 // CE: "Sims2EP9.exe"+6D55F6 (1.18.0.187)
+// in cTSWinProcClothingTryOnDialog::SyncUI
 static char calculateTryOnPartVisibilityLookup[] = {
 	0xFF, 0x75, 0xEC,
 	0x56,

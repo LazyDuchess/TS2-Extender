@@ -67,6 +67,7 @@ static void* ClothingDialogHook2Return;
 
 // Simply a PUSH 01 with 2 NOPS. Tells function to always keep separates visible in UI.
 static char separatesPatch[] = { 0x6A, 0x01, 0x90, 0x90 };
+
 // PUSH 01 with 1 NOP. Tells buy and try on to keep separates visibles in UI.
 static char separatesBuyPatch[] = { 0x6A, 0x01, 0x90 };
 
@@ -728,6 +729,7 @@ bool Core::Initialize() {
 	}
 
 	if (Config::Separates4All && ADDRESS_VALID(Addresses::CalculateOutfitPartVisibility)) {
+#if TS2_LC
 		WriteToMemory((DWORD)Addresses::CalculateOutfitPartVisibility, &separatesPatch, 4);
 
 		WriteToMemory((DWORD)Addresses::CalculateBuyPartVisibility, &separatesBuyPatch, 3);
@@ -737,6 +739,17 @@ bool Core::Initialize() {
 		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility, &separatesBuyPatch, 3);
 		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0xE, &separatesBuyPatch, 3);
 		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0xE + 0xE, &separatesBuyPatch, 3);
+#else
+		WriteToMemory((DWORD)Addresses::CalculateOutfitPartVisibility, &separatesPatch, 3);
+
+		WriteToMemory((DWORD)Addresses::CalculateBuyPartVisibility, &separatesBuyPatch, 3);
+		WriteToMemory((DWORD)Addresses::CalculateBuyPartVisibility + 0xF, &separatesBuyPatch, 3);
+		WriteToMemory((DWORD)Addresses::CalculateBuyPartVisibility + 0x22, &separatesBuyPatch, 3);
+
+		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility, &separatesBuyPatch, 3);
+		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0xE, &separatesBuyPatch, 3);
+		WriteToMemory((DWORD)Addresses::CalculateTryOnPartVisibility + 0x20, &separatesBuyPatch, 3);
+#endif
 	}
 
 	if (Config::UIScale && ADDRESS_VALID(Addresses::LegacyCalculateUIScale)) {
