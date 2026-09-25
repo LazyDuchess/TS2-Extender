@@ -10,6 +10,10 @@ $line = $versionLines[1]
 $version = $line.Substring(40);
 $version = $version.Replace('"', "")
 
+Write-Host "Make sure you've built the CMake build targets from out/build/x86!"
+
+Write-Host "Working..."
+
 function EnsureDir($path) {
     if(!(Test-Path $path)) { New-Item -Type Directory $path > $null }
 }
@@ -55,7 +59,7 @@ function CreateLCZip(){
     }
     Pop-Location
 
-    AddToZip($zip, "out/build/x86/bin/TS2Extender.asi", "TSBin/TS2Extender.asi")
+    AddToZip $zip "out/build/x86/bin/TS2Extender.asi" "TSBin/TS2Extender.asi"
 
     $zip.Dispose()
 
@@ -80,7 +84,7 @@ function CreateUCZip(){
     }
     Pop-Location
 
-    AddToZip($zip, "out/build/x86/bin/TS2ExtenderUC.asi", "TSBin/TS2Extender.asi")
+    AddToZip $zip "out/build/x86/bin/TS2ExtenderUC.asi" "TSBin/TS2ExtenderUC.asi"
 
     $zip.Dispose()
 
@@ -91,3 +95,5 @@ Clean
 EnsureDir "Build"
 CreateLCZip
 CreateUCZip
+
+Write-Host "Done! Output is in the Build directory."
