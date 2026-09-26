@@ -9,6 +9,7 @@ namespace Config {
 	extern bool FixOFBUniform;
 	extern bool FixPinkFlashing;
 	extern bool FixMakeupLag;
+	extern bool FixPoolShadows;
 	extern bool ExtendedLua;
 	extern bool Separates4All;
 	extern bool FreeZodiac;

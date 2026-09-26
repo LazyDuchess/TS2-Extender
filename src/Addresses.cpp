@@ -128,6 +128,8 @@ namespace Addresses {
 	void* SimEditorDoMessage;
 	void* SimEditorHandleTabWizard;
 
+	void* PoolManagerUpdate;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -204,6 +206,7 @@ namespace Addresses {
 		ADDRESS(SimEditorValidateSim, SimEditorValidateSimLookup);
 		ADDRESS(SimEditorDoMessage, SimEditorDoMessageLookup);
 		ADDRESS(SimEditorHandleTabWizard, SimEditorHandleTabWizardLookup);
+		ADDRESS(PoolManagerUpdate, PoolManagerUpdateLookup);
 
 		if (ADDRESS_VALID(CASStringLookup)) {
 #if TS2_LC

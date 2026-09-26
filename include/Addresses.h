@@ -98,6 +98,8 @@ namespace Addresses {
 	extern void* SimEditorDoMessage;
 	extern void* SimEditorHandleTabWizard;
 
+	extern void* PoolManagerUpdate;
+
 	bool Initialize();
 }
 

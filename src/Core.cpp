@@ -837,6 +837,14 @@ bool Core::Initialize() {
 		WriteToMemory((DWORD)Addresses::CalcZodiacAddress, (void*)(&jmpChar), 1);
 	}
 
+	if (Config::FixPoolShadows && ADDRESS_VALID(Addresses::PoolManagerUpdate)) {
+#if TS2_LC
+		Nop((BYTE*)((DWORD)Addresses::PoolManagerUpdate + 0x62), 2);
+#else
+		Nop((BYTE*)((DWORD)Addresses::PoolManagerUpdate + 0xA2), 2);
+#endif
+	}
+
 	if (ADDRESS_VALID(Addresses::cEMVoxModifierModifyEvent)) {
 #if TS2_LC
 		ModifyVoiceEventHook1Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x2D + 7);

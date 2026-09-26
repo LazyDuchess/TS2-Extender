@@ -12,6 +12,7 @@ namespace Config {
 	bool FixOFBUniform;
 	bool FixPinkFlashing;
 	bool FixMakeupLag;
+	bool FixPoolShadows;
 	bool ExtendedLua;
 	bool Separates4All;
 	bool FreeZodiac;
@@ -73,6 +74,7 @@ namespace Config {
 		FixOFBUniform = GetBool("Fixes", "FixOFBUniform", true);
 		FixPinkFlashing = GetBool("Fixes", "FixPinkFlashing", true);
 		FixMakeupLag = GetBool("Fixes", "FixMakeupLag", true);
+		FixPoolShadows = GetBool("Fixes", "FixPoolShadows", true);
 		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
 		Separates4All = GetBool("Enhancements", "Separates4All", false);
 		FreeZodiac = GetBool("Enhancements", "FreeZodiac", false);
