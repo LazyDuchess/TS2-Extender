@@ -344,30 +344,46 @@ static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTS
 	return tableId;
 }
 
-static void __fastcall DetourShadowManagerCtor(cShadowManager* self, void* _) {
-	fpShadowManagerCtor(self);
-	shadowManager = self;
-	shadowManager->SetShadowVar1(0.9f);
-}
-
 // We set this lil shadow variable to 0.9, which fixes clipping, but makes indoor shadows smaller
 // So we conditionally reset it to its original value of 0.7 when updating indoor shadows.
 
-static void* ShadowUpdateSettingsHookReturn;
+// TODO: some taller things still get cut off at the top, changing some of the surrounding variables might be able to solve that.
 
+static void* ShadowUpdateSettingsHookReturn;
+static const float IndoorShadowBias = 0.7f;
+static const float OutdoorShadowBias = 1.0f;
+
+static void __fastcall DetourShadowManagerCtor(cShadowManager* self, void* _) {
+	fpShadowManagerCtor(self);
+	shadowManager = self;
+	shadowManager->SetShadowVar1(OutdoorShadowBias);
+}
+
+#if TS2_LC
 static void __declspec(naked) ShadowUpdateSettingsHook() {
 	__asm {
-		mov dword ptr[esi + 0x1c], 0x3f333333
+		mov eax, [IndoorShadowBias]
+		mov dword ptr[esi + 0x24], eax
+		movss xmm5, dword ptr [esi + 0x24]
+		jmp[ShadowUpdateSettingsHookReturn]
+	}
+}
+#else
+static void __declspec(naked) ShadowUpdateSettingsHook() {
+	__asm {
+		mov eax, [IndoorShadowBias]
+		mov dword ptr[esi + 0x1c], eax
 		fld float ptr[esp + 0x28]
 		fmul float ptr[esi + 0x1c]
 		jmp[ShadowUpdateSettingsHookReturn]
 	}
 }
+#endif
 
 static void __fastcall DetourShadowUpdateSettings(cShadow* self, void* _) {
-	shadowManager->SetShadowVar1(0.9f);
+	shadowManager->SetShadowVar1(OutdoorShadowBias);
 	fpShadowUpdateSettings(self);
-	shadowManager->SetShadowVar1(0.9f);
+	shadowManager->SetShadowVar1(OutdoorShadowBias);
 }
 
 static int __fastcall DetourAddGameVersion(void* self, void* _) {
@@ -905,7 +921,8 @@ bool Core::Initialize() {
 			return false;
 		}
 #if TS2_LC
-
+		ShadowUpdateSettingsHookReturn = (void*)((DWORD)Addresses::ShadowUpdateSettings + 0x715 + 5);
+		MakeJMP((BYTE*)((DWORD)Addresses::ShadowUpdateSettings + 0x715), (DWORD)ShadowUpdateSettingsHook, 5);
 #else
 		ShadowUpdateSettingsHookReturn = (void*)((DWORD)Addresses::ShadowUpdateSettings + 0x6A9 + 7);
 		MakeJMP((BYTE*)((DWORD)Addresses::ShadowUpdateSettings + 0x6A9), (DWORD)ShadowUpdateSettingsHook, 7);
