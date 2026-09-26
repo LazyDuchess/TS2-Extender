@@ -347,16 +347,27 @@ static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTS
 static void __fastcall DetourShadowManagerCtor(cShadowManager* self, void* _) {
 	fpShadowManagerCtor(self);
 	shadowManager = self;
+	shadowManager->SetShadowVar1(0.9f);
+}
+
+// We set this lil shadow variable to 0.9, which fixes clipping, but makes indoor shadows smaller
+// So we conditionally reset it to its original value of 0.7 when updating indoor shadows.
+
+static void* ShadowUpdateSettingsHookReturn;
+
+static void __declspec(naked) ShadowUpdateSettingsHook() {
+	__asm {
+		mov dword ptr[esi + 0x1c], 0x3f333333
+		fld float ptr[esp + 0x28]
+		fmul float ptr[esi + 0x1c]
+		jmp[ShadowUpdateSettingsHookReturn]
+	}
 }
 
 static void __fastcall DetourShadowUpdateSettings(cShadow* self, void* _) {
-	// 0.9 prevents clipping the outdoor shadow, but makes the indoor shadows smaller, so we only do it conditionally.
-	if (self->IsOutside())
-		shadowManager->SetShadowVar1(0.9f);
-	else
-		shadowManager->SetShadowVar1(0.7f);
+	shadowManager->SetShadowVar1(0.9f);
 	fpShadowUpdateSettings(self);
-	shadowManager->SetShadowVar1(0.7f);
+	shadowManager->SetShadowVar1(0.9f);
 }
 
 static int __fastcall DetourAddGameVersion(void* self, void* _) {
@@ -893,6 +904,12 @@ bool Core::Initialize() {
 			Log("ShadowUpdateSettings Patch Failed!\n");
 			return false;
 		}
+#if TS2_LC
+
+#else
+		ShadowUpdateSettingsHookReturn = (void*)((DWORD)Addresses::ShadowUpdateSettings + 0x6A9 + 7);
+		MakeJMP((BYTE*)((DWORD)Addresses::ShadowUpdateSettings + 0x6A9), (DWORD)ShadowUpdateSettingsHook, 7);
+#endif
 	}
 
 	if (ADDRESS_VALID(Addresses::cEMVoxModifierModifyEvent)) {
