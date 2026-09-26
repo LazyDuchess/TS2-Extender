@@ -845,6 +845,20 @@ bool Core::Initialize() {
 #endif
 	}
 
+	static const float kOutdoorShadowFixValue = 0.8f;
+
+	if (Config::FixOutdoorShadows && ADDRESS_VALID(Addresses::ShadowManagerCtor)) {
+#if TS2_LC
+		Nop((BYTE*)((DWORD)Addresses::ShadowManagerCtor + 0x3C7), 2);
+		WriteToMemory((DWORD)Addresses::ShadowManagerCtor + 0x3CE, (void*)(&kOutdoorShadowFixValue), 4);
+
+		Nop((BYTE*)((DWORD)Addresses::ShadowManagerCtor + 0x400), 2);
+		WriteToMemory((DWORD)Addresses::ShadowManagerCtor + 0x40A, (void*)(&kOutdoorShadowFixValue), 4);
+#else
+		WriteToMemory((DWORD)Addresses::ShadowManagerCtor + 0x236, (void*)(&kOutdoorShadowFixValue), 4);
+#endif
+	}
+
 	if (ADDRESS_VALID(Addresses::cEMVoxModifierModifyEvent)) {
 #if TS2_LC
 		ModifyVoiceEventHook1Return = (void*)((DWORD)Addresses::cEMVoxModifierModifyEvent + 0x2D + 7);

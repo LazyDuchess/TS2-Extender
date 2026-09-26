@@ -10,6 +10,7 @@ namespace Config {
 	extern bool FixPinkFlashing;
 	extern bool FixMakeupLag;
 	extern bool FixPoolShadows;
+	extern bool FixOutdoorShadows;
 	extern bool ExtendedLua;
 	extern bool Separates4All;
 	extern bool FreeZodiac;

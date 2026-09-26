@@ -100,6 +100,8 @@ namespace Addresses {
 
 	extern void* PoolManagerUpdate;
 
+	extern void* ShadowManagerCtor;
+
 	bool Initialize();
 }
 
