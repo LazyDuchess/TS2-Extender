@@ -839,9 +839,9 @@ bool Core::Initialize() {
 
 	if (Config::FixPoolShadows && ADDRESS_VALID(Addresses::PoolManagerUpdate)) {
 #if TS2_LC
-		Nop((BYTE*)((DWORD)Addresses::PoolManagerUpdate + 0x62), 2);
+		Nop((BYTE*)((DWORD)Addresses::PoolManagerUpdate + 0xA2), 2);
 #else
-		Nop((BYTE*)((DWORD)Addresses::PoolManagerUpdate + 0x5B), 2);
+		Nop((BYTE*)((DWORD)Addresses::PoolManagerUpdate + 0x62), 2);
 #endif
 	}
 
