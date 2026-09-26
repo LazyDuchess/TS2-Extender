@@ -130,6 +130,8 @@ namespace Addresses {
 
 	void* PoolManagerUpdate;
 	void* ShadowManagerCtor;
+	void* ShadowUpdateSettings;
+	void* ShadowIsOutside;
 
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
@@ -209,6 +211,17 @@ namespace Addresses {
 		ADDRESS(SimEditorHandleTabWizard, SimEditorHandleTabWizardLookup);
 		ADDRESS(PoolManagerUpdate, PoolManagerUpdateLookup);
 		ADDRESS(ShadowManagerCtor, ShadowManagerCtorLookup);
+		ADDRESS(ShadowUpdateSettings, ShadowUpdateSettingsLookup);
+
+		if (ADDRESS_VALID(ShadowUpdateSettings)) {
+#if TS2_LC
+			DWORD relativeCall = *(DWORD*)((DWORD)ShadowUpdateSettings + 0x3A);
+			ShadowIsOutside = (void*)((DWORD)((DWORD)ShadowUpdateSettings + 0x3A) + relativeCall + 4);
+#else
+			DWORD relativeCall = *(DWORD*)((DWORD)ShadowUpdateSettings + 0x2E);
+			ShadowIsOutside = (void*)((DWORD)((DWORD)ShadowUpdateSettings + 0x2E) + relativeCall + 4);
+#endif
+		}
 
 		if (ADDRESS_VALID(CASStringLookup)) {
 #if TS2_LC

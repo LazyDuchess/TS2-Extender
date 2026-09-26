@@ -101,6 +101,8 @@ namespace Addresses {
 	extern void* PoolManagerUpdate;
 
 	extern void* ShadowManagerCtor;
+	extern void* ShadowIsOutside;
+	extern void* ShadowUpdateSettings;
 
 	bool Initialize();
 }

@@ -21,6 +21,8 @@
 #include <cstring>
 #include <string>
 #include "ts2/cGZMessage.h"
+#include "ts2/cShadowManager.h"
+#include "ts2/cShadow.h"
 #include "Utils.h"
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
@@ -42,6 +44,13 @@ typedef int(__thiscall* OVERLAYSACTIVATE)(void* self);
 typedef void(__thiscall* ONCEPERFRAMEUPDATE)(void* self);
 
 typedef int(__thiscall* ADDGAMEVERSION)(void* self);
+
+typedef void(__thiscall* SHADOWMANAGERCTOR)(cShadowManager* self);
+typedef void(__thiscall* SHADOWUPDATESETTINGS)(cShadow* self);
+
+static SHADOWMANAGERCTOR fpShadowManagerCtor = NULL;
+static SHADOWUPDATESETTINGS fpShadowUpdateSettings = NULL;
+static cShadowManager* shadowManager = NULL;
 
 static ADDGAMEVERSION fpAddGameVersion = NULL;
 static ONCEPERFRAMEUPDATE fpOncePerFrameUpdate = NULL;
@@ -333,6 +342,21 @@ static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTS
 	lua_settable(luaState, -3);
 
 	return tableId;
+}
+
+static void __fastcall DetourShadowManagerCtor(cShadowManager* self, void* _) {
+	fpShadowManagerCtor(self);
+	shadowManager = self;
+}
+
+static void __fastcall DetourShadowUpdateSettings(cShadow* self, void* _) {
+	// 0.9 prevents clipping the outdoor shadow, but makes the indoor shadows smaller, so we only do it conditionally.
+	if (self->IsOutside())
+		shadowManager->SetShadowVar1(0.9f);
+	else
+		shadowManager->SetShadowVar1(0.7f);
+	fpShadowUpdateSettings(self);
+	shadowManager->SetShadowVar1(0.7f);
 }
 
 static int __fastcall DetourAddGameVersion(void* self, void* _) {
@@ -845,18 +869,30 @@ bool Core::Initialize() {
 #endif
 	}
 
-	static const float kOutdoorShadowFixValue = 0.8f;
+	if (Config::FixOutdoorShadows && ADDRESS_VALID(Addresses::ShadowManagerCtor) && ADDRESS_VALID(Addresses::ShadowUpdateSettings)) {
+		if (MH_CreateHook(Addresses::ShadowManagerCtor, &DetourShadowManagerCtor,
+			reinterpret_cast<LPVOID*>(&fpShadowManagerCtor)) != MH_OK)
+		{
+			Log("ShadowManagerCtor Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::ShadowManagerCtor) != MH_OK)
+		{
+			Log("ShadowManagerCtor Patch Failed!\n");
+			return false;
+		}
 
-	if (Config::FixOutdoorShadows && ADDRESS_VALID(Addresses::ShadowManagerCtor)) {
-#if TS2_LC
-		Nop((BYTE*)((DWORD)Addresses::ShadowManagerCtor + 0x3C7), 2);
-		WriteToMemory((DWORD)Addresses::ShadowManagerCtor + 0x3CE, (void*)(&kOutdoorShadowFixValue), 4);
-
-		Nop((BYTE*)((DWORD)Addresses::ShadowManagerCtor + 0x400), 2);
-		WriteToMemory((DWORD)Addresses::ShadowManagerCtor + 0x40A, (void*)(&kOutdoorShadowFixValue), 4);
-#else
-		WriteToMemory((DWORD)Addresses::ShadowManagerCtor + 0x236, (void*)(&kOutdoorShadowFixValue), 4);
-#endif
+		if (MH_CreateHook(Addresses::ShadowUpdateSettings, &DetourShadowUpdateSettings,
+			reinterpret_cast<LPVOID*>(&fpShadowUpdateSettings)) != MH_OK)
+		{
+			Log("ShadowUpdateSettings Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::ShadowUpdateSettings) != MH_OK)
+		{
+			Log("ShadowUpdateSettings Patch Failed!\n");
+			return false;
+		}
 	}
 
 	if (ADDRESS_VALID(Addresses::cEMVoxModifierModifyEvent)) {
