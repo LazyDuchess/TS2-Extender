@@ -50,6 +50,23 @@ typedef void(__thiscall* SHADOWUPDATESETTINGS)(cShadow* self);
 
 typedef int(__thiscall* CREATEVISUALEFFECT)(void* self, const char* effectName, void** ppEffect);
 
+typedef int(__thiscall* RECALCBLTAREA)(void* self);
+
+typedef void(__thiscall* SELECTPLOTCONTEXT)(void* self, void* drawContext);
+typedef void(__thiscall* PUSHTRANSFORM)(void* self);
+
+typedef void(__thiscall* DRAWNOTRANSFORMINTERNAL)(void* self, int drawOp, float* transform, int unk);
+
+typedef void(__thiscall* UPDATETRANSFORMDIRECT)(void* self, void* rect);
+
+typedef void(__thiscall* SETTRANSFORM)(void* self, float* mtx);
+
+static SETTRANSFORM fpSetTransform = NULL;
+static UPDATETRANSFORMDIRECT fpUpdateTransformDirect = NULL;
+static DRAWNOTRANSFORMINTERNAL fpDrawNoTransformInternal = NULL;
+static PUSHTRANSFORM fpPushTransform = NULL;
+static SELECTPLOTCONTEXT fpSelectPlotContext = NULL;
+static RECALCBLTAREA fpRecalcBltArea = NULL;
 static CREATEVISUALEFFECT fpCreateVisualEffect = NULL;
 static SHADOWMANAGERCTOR fpShadowManagerCtor = NULL;
 static SHADOWUPDATESETTINGS fpShadowUpdateSettings = NULL;
@@ -68,6 +85,97 @@ static RANDOMUINT32UNIFORM fpRandomUint32Uniform = NULL;
 static LUA5OPEN fpLua5Open = NULL;
 static char placeholderMoviePath[] = "";
 static char retOverride[] = { 0xC3 };
+
+static int resW = 1910;
+static int resH = 1030;
+
+// Assume 955x515 UI scale, half
+static int uiWMult = 2;
+static int uiHMult = 2;
+
+static float fUiWMult = 2.0f;
+static float fUiHMult = 2.0f;
+
+static int targetUiW = 955;
+static int targetUiH = 515;
+
+static bool uiScaleEnabled = false;
+
+static void __fastcall DetourSetTransform(
+	void* self,
+	void*,
+	float* matrix)
+{
+	if (!uiScaleEnabled) {
+		fpSetTransform(self, matrix);
+		return;
+	}
+
+	float scaled[16];
+	memcpy(scaled, matrix, sizeof(scaled));
+
+	scaled[0] *= fUiWMult;
+	scaled[5] *= fUiHMult;
+
+	fpSetTransform(self, scaled);
+}
+
+static void __fastcall DetourUpdateTransformDirect(void* self, void* _, void* rect) {
+	/*
+	if (uiScaleEnabled) {
+		(*(int*)((DWORD)rect + 0x8)) = targetUiW;
+		(*(int*)((DWORD)rect + 0xC)) = targetUiH;
+	}*/
+	fpUpdateTransformDirect(self, rect);
+}
+
+static void __fastcall DetourDrawNoTransformInternal(void* self, void* _, int drawOp, float* transform, int tfCount) {
+	/*
+	if (uiScaleEnabled) {
+		for (int i = 0; i < tfCount; i++) {
+			transform[(i * 2) + 0] *= fUiWMult;
+			transform[(i * 2) + 1] *= fUiHMult;
+		}
+	}*/
+	fpDrawNoTransformInternal(self, drawOp, transform, tfCount);
+}
+
+static void __fastcall DetourPushTransform(void* self, void* _) {
+	/*
+	if (uiScaleEnabled) {
+		// cTransform embedded in cGZDrawContext
+		void* tf = (void*)((DWORD)self + 0x1C);
+		(*(int*)((DWORD)tf + 0x10)) = targetUiW;
+		(*(int*)((DWORD)tf + 0x14)) = targetUiH;
+	}*/
+	fpPushTransform(self);
+}
+
+static void __fastcall DetourSelectPlotContext(void* self, void* _, void* drawContext) {
+	/*
+	if (uiScaleEnabled) {
+		(*(int*)((DWORD)drawContext + 0x3C)) = targetUiW;
+		(*(int*)((DWORD)drawContext + 0x40)) = targetUiH;
+	}*/
+	fpSelectPlotContext(self, drawContext);
+}
+
+static int __fastcall DetourRecalcBltArea(void* self, void* _) {
+	int res = fpRecalcBltArea(self);
+	/*
+	if (uiScaleEnabled) {
+		// X
+		(*(int*)((DWORD)self + 0xC8)) *= uiWMult;
+		// Scale Y
+		(*(int*)((DWORD)self + 0xCC)) *= uiHMult;
+
+		// Scale X
+		(*(int*)((DWORD)self + 0xD0)) *= uiWMult;
+		// Bottom Y
+		(*(int*)((DWORD)self + 0xD4)) *= uiHMult;
+	}*/
+	return res;
+}
 
 static DIALOGONATTACH fpClothingDialogOnAttach = NULL;
 static DIALOGONATTACH fpDressEmployeeDialogOnAttach = NULL;
@@ -416,6 +524,17 @@ static int __fastcall DetourAddGameVersion(void* self, void* _) {
 
 static bool shouldTickOverlays = false;
 
+static bool wasKeyJustPressed(int vk)
+{
+	static SHORT lastState[256]{};
+
+	SHORT state = GetAsyncKeyState(vk);
+	bool pressed = (state & 0x8000) && !(lastState[vk] & 0x8000);
+
+	lastState[vk] = state;
+	return pressed;
+}
+
 static void __fastcall DetourOncePerFrameUpdate(void* self, void* _) {
 	fpOncePerFrameUpdate(self);
 	shouldTickOverlays = false;
@@ -428,6 +547,9 @@ static void __fastcall DetourOncePerFrameUpdate(void* self, void* _) {
 		}
 	}
 	LuaExtensions::FrameUpdate();
+	if (wasKeyJustPressed(VK_F8)) {
+		uiScaleEnabled = !uiScaleEnabled;
+	}
 }
 
 static int __fastcall DetourOverlaysActivate(void* self, void* _) {
@@ -1052,6 +1174,83 @@ bool Core::Initialize() {
 			Log("EffectsManagerCreateVisualEffect Patch Failed!\n");
 			return false;
 		}
+	}
+
+	if (MH_CreateHook((LPVOID)0x006F08FF, &DetourRecalcBltArea,
+		reinterpret_cast<LPVOID*>(&fpRecalcBltArea)) != MH_OK)
+	{
+		Log("RECALCBLTAREA Patch Failed!\n");
+		return false;
+	}
+	if (MH_EnableHook((LPVOID)0x006F08FF) != MH_OK)
+	{
+		Log("RECALCBLTAREA Patch Failed!\n");
+		return false;
+	}
+
+	// cGZWinPlotContext::SelectContext
+	if (MH_CreateHook((LPVOID)0x006f0148, &DetourSelectPlotContext,
+		reinterpret_cast<LPVOID*>(&fpSelectPlotContext)) != MH_OK)
+	{
+		Log("SELECTPLOTCONTEXT Patch Failed!\n");
+		return false;
+	}
+	if (MH_EnableHook((LPVOID)0x006f0148) != MH_OK)
+	{
+		Log("SELECTPLOTCONTEXT Patch Failed!\n");
+		return false;
+	}
+
+	// cGZDrawContext::PushTransform
+	if (MH_CreateHook((LPVOID)0x00966ea0, &DetourPushTransform,
+		reinterpret_cast<LPVOID*>(&fpPushTransform)) != MH_OK)
+	{
+		Log("PUSHTRANSFORM Patch Failed!\n");
+		return false;
+	}
+	if (MH_EnableHook((LPVOID)0x00966ea0) != MH_OK)
+	{
+		Log("PUSHTRANSFORM Patch Failed!\n");
+		return false;
+	}
+
+	// cGZDrawContext::DrawNoTransformInternal
+	if (MH_CreateHook((LPVOID)0x00969c00, &DetourDrawNoTransformInternal,
+		reinterpret_cast<LPVOID*>(&fpDrawNoTransformInternal)) != MH_OK)
+	{
+		Log("DrawNoTransformInternal Patch Failed!\n");
+		return false;
+	}
+	if (MH_EnableHook((LPVOID)0x00969c00) != MH_OK)
+	{
+		Log("DrawNoTransformInternal Patch Failed!\n");
+		return false;
+	}
+
+	// cGZDrawContextRenderToHardware::UpdateTransformDirect
+	if (MH_CreateHook((LPVOID)0x0095b8c0, &DetourUpdateTransformDirect,
+		reinterpret_cast<LPVOID*>(&fpUpdateTransformDirect)) != MH_OK)
+	{
+		Log("DrawNoTransformInternal Patch Failed!\n");
+		return false;
+	}
+	if (MH_EnableHook((LPVOID)0x0095b8c0) != MH_OK)
+	{
+		Log("DrawNoTransformInternal Patch Failed!\n");
+		return false;
+	}
+
+	// __ZThn8_N11nGZGraphic47cDraw2D14HWSetTransformEPKf
+	if (MH_CreateHook((LPVOID)0x0067dc80, &DetourSetTransform,
+		reinterpret_cast<LPVOID*>(&fpSetTransform)) != MH_OK)
+	{
+		Log("SetTransform Patch Failed!\n");
+		return false;
+	}
+	if (MH_EnableHook((LPVOID)0x0067dc80) != MH_OK)
+	{
+		Log("SetTransform Patch Failed!\n");
+		return false;
 	}
 
 	return true;
