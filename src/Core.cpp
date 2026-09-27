@@ -50,23 +50,7 @@ typedef void(__thiscall* SHADOWUPDATESETTINGS)(cShadow* self);
 
 typedef int(__thiscall* CREATEVISUALEFFECT)(void* self, const char* effectName, void** ppEffect);
 
-typedef int(__thiscall* RECALCBLTAREA)(void* self);
 
-typedef void(__thiscall* SELECTPLOTCONTEXT)(void* self, void* drawContext);
-typedef void(__thiscall* PUSHTRANSFORM)(void* self);
-
-typedef void(__thiscall* DRAWNOTRANSFORMINTERNAL)(void* self, int drawOp, float* transform, int unk);
-
-typedef void(__thiscall* UPDATETRANSFORMDIRECT)(void* self, void* rect);
-
-typedef void(__thiscall* SETTRANSFORM)(void* self, float* mtx);
-
-static SETTRANSFORM fpSetTransform = NULL;
-static UPDATETRANSFORMDIRECT fpUpdateTransformDirect = NULL;
-static DRAWNOTRANSFORMINTERNAL fpDrawNoTransformInternal = NULL;
-static PUSHTRANSFORM fpPushTransform = NULL;
-static SELECTPLOTCONTEXT fpSelectPlotContext = NULL;
-static RECALCBLTAREA fpRecalcBltArea = NULL;
 static CREATEVISUALEFFECT fpCreateVisualEffect = NULL;
 static SHADOWMANAGERCTOR fpShadowManagerCtor = NULL;
 static SHADOWUPDATESETTINGS fpShadowUpdateSettings = NULL;
@@ -86,20 +70,78 @@ static LUA5OPEN fpLua5Open = NULL;
 static char placeholderMoviePath[] = "";
 static char retOverride[] = { 0xC3 };
 
-static int resW = 1910;
-static int resH = 1030;
+#if TS2_UC
 
-// Assume 955x515 UI scale, half
-static int uiWMult = 2;
-static int uiHMult = 2;
+typedef void(__thiscall* SETTRANSFORM)(void* self, float* mtx);
+typedef void(__thiscall* ONMOUSEMOVE)(void* self, void* hwnd, int mouseX, int mouseY, int unk);
+typedef void(__thiscall* ONMOUSEBUTTON)(void* self, void* hwnd, int mouseX, int mouseY, int unk1, int unk2);
 
-static float fUiWMult = 2.0f;
-static float fUiHMult = 2.0f;
+static SETTRANSFORM fpSetTransform = NULL;
 
-static int targetUiW = 955;
-static int targetUiH = 515;
+static ONMOUSEMOVE fpOnMouseMove = NULL;
+static ONMOUSEBUTTON fpOnLButtonDown = NULL;
+static ONMOUSEBUTTON fpOnLButtonUp = NULL;
+static ONMOUSEBUTTON fpOnRButtonDown = NULL;
+static ONMOUSEBUTTON fpOnRButtonUp = NULL;
+static ONMOUSEBUTTON fpOnMButtonDown = NULL;
+static ONMOUSEBUTTON fpOnMButtonUp = NULL;
 
 static bool uiScaleEnabled = false;
+static int uiScaleTargetW = 0;
+static int uiScaleTargetH = 0;
+
+static void GetCurrentDisplayResolution(int* outWidth, int* outHeight) {
+	*outWidth = 1910;
+	*outHeight = 1030;
+}
+
+static void ScaleMouse(int* mouseX, int* mouseY) {
+	if (uiScaleEnabled) {
+		int w, h;
+		GetCurrentDisplayResolution(&w, &h);
+
+		float mulX = (float)uiScaleTargetW / w;
+		float mulY = (float)uiScaleTargetH / h;
+
+		*mouseX = static_cast<int>((float)*mouseX * mulX);
+		*mouseY = static_cast<int>((float)*mouseY * mulY);
+	}
+}
+
+static void __fastcall DetourOnMouseMove(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk) {
+	ScaleMouse(&mouseX, &mouseY);
+	fpOnMouseMove(self, hwnd, mouseX, mouseY, unk);
+}
+
+static void __fastcall DetourOnLButtonDown(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+	ScaleMouse(&mouseX, &mouseY);
+	fpOnLButtonDown(self, hwnd, mouseX, mouseY, unk, unk2);
+}
+
+static void __fastcall DetourOnLButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+	ScaleMouse(&mouseX, &mouseY);
+	fpOnLButtonUp(self, hwnd, mouseX, mouseY, unk, unk2);
+}
+
+static void __fastcall DetourOnRButtonDown(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+	ScaleMouse(&mouseX, &mouseY);
+	fpOnRButtonDown(self, hwnd, mouseX, mouseY, unk, unk2);
+}
+
+static void __fastcall DetourOnRButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+	ScaleMouse(&mouseX, &mouseY);
+	fpOnRButtonUp(self, hwnd, mouseX, mouseY, unk, unk2);
+}
+
+static void __fastcall DetourOnMButtonDown(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+	ScaleMouse(&mouseX, &mouseY);
+	fpOnMButtonDown(self, hwnd, mouseX, mouseY, unk, unk2);
+}
+
+static void __fastcall DetourOnMButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+	ScaleMouse(&mouseX, &mouseY);
+	fpOnMButtonUp(self, hwnd, mouseX, mouseY, unk, unk2);
+}
 
 static void __fastcall DetourSetTransform(
 	void* self,
@@ -114,68 +156,19 @@ static void __fastcall DetourSetTransform(
 	float scaled[16];
 	memcpy(scaled, matrix, sizeof(scaled));
 
-	scaled[0] *= fUiWMult;
-	scaled[5] *= fUiHMult;
+	int w, h;
+	GetCurrentDisplayResolution(&w, &h);
+
+	float wMult = (float)w / uiScaleTargetW;
+	float hMult = (float)h / uiScaleTargetH;
+
+	scaled[0] *= wMult;
+	scaled[5] *= hMult;
 
 	fpSetTransform(self, scaled);
 }
 
-static void __fastcall DetourUpdateTransformDirect(void* self, void* _, void* rect) {
-	/*
-	if (uiScaleEnabled) {
-		(*(int*)((DWORD)rect + 0x8)) = targetUiW;
-		(*(int*)((DWORD)rect + 0xC)) = targetUiH;
-	}*/
-	fpUpdateTransformDirect(self, rect);
-}
-
-static void __fastcall DetourDrawNoTransformInternal(void* self, void* _, int drawOp, float* transform, int tfCount) {
-	/*
-	if (uiScaleEnabled) {
-		for (int i = 0; i < tfCount; i++) {
-			transform[(i * 2) + 0] *= fUiWMult;
-			transform[(i * 2) + 1] *= fUiHMult;
-		}
-	}*/
-	fpDrawNoTransformInternal(self, drawOp, transform, tfCount);
-}
-
-static void __fastcall DetourPushTransform(void* self, void* _) {
-	/*
-	if (uiScaleEnabled) {
-		// cTransform embedded in cGZDrawContext
-		void* tf = (void*)((DWORD)self + 0x1C);
-		(*(int*)((DWORD)tf + 0x10)) = targetUiW;
-		(*(int*)((DWORD)tf + 0x14)) = targetUiH;
-	}*/
-	fpPushTransform(self);
-}
-
-static void __fastcall DetourSelectPlotContext(void* self, void* _, void* drawContext) {
-	/*
-	if (uiScaleEnabled) {
-		(*(int*)((DWORD)drawContext + 0x3C)) = targetUiW;
-		(*(int*)((DWORD)drawContext + 0x40)) = targetUiH;
-	}*/
-	fpSelectPlotContext(self, drawContext);
-}
-
-static int __fastcall DetourRecalcBltArea(void* self, void* _) {
-	int res = fpRecalcBltArea(self);
-	/*
-	if (uiScaleEnabled) {
-		// X
-		(*(int*)((DWORD)self + 0xC8)) *= uiWMult;
-		// Scale Y
-		(*(int*)((DWORD)self + 0xCC)) *= uiHMult;
-
-		// Scale X
-		(*(int*)((DWORD)self + 0xD0)) *= uiWMult;
-		// Bottom Y
-		(*(int*)((DWORD)self + 0xD4)) *= uiHMult;
-	}*/
-	return res;
-}
+#endif
 
 static DIALOGONATTACH fpClothingDialogOnAttach = NULL;
 static DIALOGONATTACH fpDressEmployeeDialogOnAttach = NULL;
@@ -1176,82 +1169,124 @@ bool Core::Initialize() {
 		}
 	}
 
-	if (MH_CreateHook((LPVOID)0x006F08FF, &DetourRecalcBltArea,
-		reinterpret_cast<LPVOID*>(&fpRecalcBltArea)) != MH_OK)
-	{
-		Log("RECALCBLTAREA Patch Failed!\n");
-		return false;
-	}
-	if (MH_EnableHook((LPVOID)0x006F08FF) != MH_OK)
-	{
-		Log("RECALCBLTAREA Patch Failed!\n");
-		return false;
-	}
+#if TS2_UC
 
-	// cGZWinPlotContext::SelectContext
-	if (MH_CreateHook((LPVOID)0x006f0148, &DetourSelectPlotContext,
-		reinterpret_cast<LPVOID*>(&fpSelectPlotContext)) != MH_OK)
-	{
-		Log("SELECTPLOTCONTEXT Patch Failed!\n");
-		return false;
-	}
-	if (MH_EnableHook((LPVOID)0x006f0148) != MH_OK)
-	{
-		Log("SELECTPLOTCONTEXT Patch Failed!\n");
-		return false;
-	}
+	if (Config::UIScale) {
 
-	// cGZDrawContext::PushTransform
-	if (MH_CreateHook((LPVOID)0x00966ea0, &DetourPushTransform,
-		reinterpret_cast<LPVOID*>(&fpPushTransform)) != MH_OK)
-	{
-		Log("PUSHTRANSFORM Patch Failed!\n");
-		return false;
-	}
-	if (MH_EnableHook((LPVOID)0x00966ea0) != MH_OK)
-	{
-		Log("PUSHTRANSFORM Patch Failed!\n");
-		return false;
-	}
+		int w, h;
+		GetCurrentDisplayResolution(&w, &h);
 
-	// cGZDrawContext::DrawNoTransformInternal
-	if (MH_CreateHook((LPVOID)0x00969c00, &DetourDrawNoTransformInternal,
-		reinterpret_cast<LPVOID*>(&fpDrawNoTransformInternal)) != MH_OK)
-	{
-		Log("DrawNoTransformInternal Patch Failed!\n");
-		return false;
-	}
-	if (MH_EnableHook((LPVOID)0x00969c00) != MH_OK)
-	{
-		Log("DrawNoTransformInternal Patch Failed!\n");
-		return false;
-	}
+		uiScaleEnabled = true;
+		uiScaleTargetH = static_cast<int>(Config::UIScaleResolution);
+		uiScaleTargetW = static_cast<int>(((float)uiScaleTargetH / h) * w);
 
-	// cGZDrawContextRenderToHardware::UpdateTransformDirect
-	if (MH_CreateHook((LPVOID)0x0095b8c0, &DetourUpdateTransformDirect,
-		reinterpret_cast<LPVOID*>(&fpUpdateTransformDirect)) != MH_OK)
-	{
-		Log("DrawNoTransformInternal Patch Failed!\n");
-		return false;
-	}
-	if (MH_EnableHook((LPVOID)0x0095b8c0) != MH_OK)
-	{
-		Log("DrawNoTransformInternal Patch Failed!\n");
-		return false;
-	}
+		Log("UC UI Scaling enabled\nReal: %ix%i\nTarget: %ix%i\n", w, h, uiScaleTargetW, uiScaleTargetH);
 
-	// __ZThn8_N11nGZGraphic47cDraw2D14HWSetTransformEPKf
-	if (MH_CreateHook((LPVOID)0x0067dc80, &DetourSetTransform,
-		reinterpret_cast<LPVOID*>(&fpSetTransform)) != MH_OK)
-	{
-		Log("SetTransform Patch Failed!\n");
-		return false;
+		// __ZThn8_N11nGZGraphic47cDraw2D14HWSetTransformEPKf
+		if (MH_CreateHook((LPVOID)0x0067dc80, &DetourSetTransform,
+			reinterpret_cast<LPVOID*>(&fpSetTransform)) != MH_OK)
+		{
+			Log("SetTransform Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x0067dc80) != MH_OK)
+		{
+			Log("SetTransform Patch Failed!\n");
+			return false;
+		}
+
+		// nGZGraphic4::cCanvasW32::OnMouseMove
+		if (MH_CreateHook((LPVOID)0x006953a0, &DetourOnMouseMove,
+			reinterpret_cast<LPVOID*>(&fpOnMouseMove)) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x006953a0) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+
+		// nGZGraphic4::cCanvasW32::OnLButtonDown
+		if (MH_CreateHook((LPVOID)0x00695640, &DetourOnLButtonDown,
+			reinterpret_cast<LPVOID*>(&fpOnLButtonDown)) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x00695640) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+
+		// nGZGraphic4::cCanvasW32::OnLButtonUp
+		if (MH_CreateHook((LPVOID)0x00695880, &DetourOnLButtonUp,
+			reinterpret_cast<LPVOID*>(&fpOnLButtonUp)) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x00695880) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+
+		// nGZGraphic4::cCanvasW32::OnRButtonDown
+		if (MH_CreateHook((LPVOID)0x006957c0, &DetourOnRButtonDown,
+			reinterpret_cast<LPVOID*>(&fpOnRButtonDown)) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x006957c0) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+
+		// nGZGraphic4::cCanvasW32::OnRButtonUp
+		if (MH_CreateHook((LPVOID)0x006959c0, &DetourOnRButtonUp,
+			reinterpret_cast<LPVOID*>(&fpOnRButtonUp)) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x006959c0) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+
+		// nGZGraphic4::cCanvasW32::OnMButtonDown
+		if (MH_CreateHook((LPVOID)0x00695700, &DetourOnMButtonDown,
+			reinterpret_cast<LPVOID*>(&fpOnMButtonDown)) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x00695700) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+
+		// nGZGraphic4::cCanvasW32::OnMButtonUp
+		if (MH_CreateHook((LPVOID)0x00695920, &DetourOnMButtonUp,
+			reinterpret_cast<LPVOID*>(&fpOnMButtonUp)) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x00695920) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
 	}
-	if (MH_EnableHook((LPVOID)0x0067dc80) != MH_OK)
-	{
-		Log("SetTransform Patch Failed!\n");
-		return false;
-	}
+#endif
 
 	return true;
 }
