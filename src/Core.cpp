@@ -597,6 +597,7 @@ static unsigned int __fastcall DetourRandomUint32Uniform(TS2::cRZRandom* me, voi
 }
 
 Core* Core::_instance = nullptr;
+std::string Core::DllPath;
 
 void Core::DoDefaultUserData() {
 	m_GameDisplayName = L"The Sims 2";
@@ -677,7 +678,7 @@ bool Core::Create() {
 
 
 bool Core::Initialize() {
-	Config::Load();
+	Config::Load(DllPath);
 
 #if !FORCE_CONSOLE
 	if (Config::Console) {
@@ -691,6 +692,8 @@ bool Core::Initialize() {
 	Log("TS2 Extender %s\n", Version);
 
 	Log("Core initializing\n");
+
+	Log("Core Path: %s\n", DllPath);
 
 	if (!Addresses::Initialize()) return false;
 

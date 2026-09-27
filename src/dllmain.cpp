@@ -2,6 +2,7 @@
 #include "framework.h"
 #include "Core.h"
 #include "Logging.h"
+#include "Utils.h"
 #include <iostream>
 
 static bool IsGame() {
@@ -23,6 +24,14 @@ static bool IsGame() {
 #endif
 }
 
+static void CacheCoreDirectory(HMODULE handle) {
+    wchar_t path[MAX_PATH];
+    GetModuleFileNameW(handle, path, MAX_PATH);
+    std::wstring finalPath = path;
+    size_t pos = finalPath.find_last_of(L"\\/");
+    Core::DllPath = WCharToString(finalPath.substr(0, pos).c_str());
+}
+
 BOOL WINAPI DllMain(HMODULE hModule,
     DWORD  ul_reason_for_call,
     LPVOID lpReserved
@@ -39,6 +48,7 @@ BOOL WINAPI DllMain(HMODULE hModule,
 #endif
         DisableThreadLibraryCalls(hModule);
         if (!IsGame()) return TRUE;
+        CacheCoreDirectory(hModule);
         if (!Core::Create()) {
             Log("Failed to initialize Core!\n");
             return TRUE;

@@ -1,7 +1,8 @@
 #pragma once
+#include <string>
 
 namespace Config {
-	void Load();
+	void Load(std::string& basePath);
 
 	extern bool Console;
 	extern bool SkipIntro;

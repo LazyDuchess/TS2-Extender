@@ -1,6 +1,5 @@
 #include "config.h"
 #include "ini.h"
-#include <string>
 #include "Logging.h"
 
 namespace Config {
@@ -61,11 +60,11 @@ namespace Config {
 		return false;
 	}
 
-	void Load() {
+	void Load(std::string &basePath) {
 		bool iniExisted = false;
-		mINI::INIFile file(ConfigFilename);
+		mINI::INIFile file(basePath + "/" + ConfigFilename);
 
-		Log("Reading config from %s.\n", ConfigFilename);
+		Log("Reading config from %s.\n", basePath + "/" + ConfigFilename);
 
 		if (file.read(Ini))
 			iniExisted = true;
