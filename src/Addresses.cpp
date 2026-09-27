@@ -133,6 +133,8 @@ namespace Addresses {
 	void* ShadowUpdateSettings;
 	void* ShadowIsOutside;
 
+	void* EffectsManagerCreateVisualEffect;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -212,6 +214,7 @@ namespace Addresses {
 		ADDRESS(PoolManagerUpdate, PoolManagerUpdateLookup);
 		ADDRESS(ShadowManagerCtor, ShadowManagerCtorLookup);
 		ADDRESS(ShadowUpdateSettings, ShadowUpdateSettingsLookup);
+		ADDRESS(EffectsManagerCreateVisualEffect, EffectsManagerCreateVisualEffectLookup);
 
 		if (ADDRESS_VALID(ShadowUpdateSettings)) {
 #if TS2_LC

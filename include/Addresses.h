@@ -104,6 +104,8 @@ namespace Addresses {
 	extern void* ShadowIsOutside;
 	extern void* ShadowUpdateSettings;
 
+	extern void* EffectsManagerCreateVisualEffect;
+
 	bool Initialize();
 }
 

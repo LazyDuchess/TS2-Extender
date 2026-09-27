@@ -48,6 +48,9 @@ typedef int(__thiscall* ADDGAMEVERSION)(void* self);
 typedef void(__thiscall* SHADOWMANAGERCTOR)(cShadowManager* self);
 typedef void(__thiscall* SHADOWUPDATESETTINGS)(cShadow* self);
 
+typedef int(__thiscall* CREATEVISUALEFFECT)(void* self, const char* effectName, void** ppEffect);
+
+static CREATEVISUALEFFECT fpCreateVisualEffect = NULL;
 static SHADOWMANAGERCTOR fpShadowManagerCtor = NULL;
 static SHADOWUPDATESETTINGS fpShadowUpdateSettings = NULL;
 static cShadowManager* shadowManager = NULL;
@@ -344,6 +347,27 @@ static int MakeLuaTableForInteractionVector(lua_State* luaState, std::vector<cTS
 	return tableId;
 }
 
+static bool moonCreated = false;
+static bool sunCreated = false;
+
+static int __fastcall DetourCreateVisualEffect(void* self, void* _, const char* effectName, void** ppEffect) {
+	if (strcmp(effectName, "CASfx") == 0 || strcmp(effectName, "lotfx") == 0) {
+		moonCreated = false;
+		sunCreated = false;
+	}
+	else if (strcmp(effectName, "LotSunHolder") == 0) {
+		if (sunCreated) return 0;
+		sunCreated = true;
+		moonCreated = false;
+	}
+	else if (strcmp(effectName, "LotMoonHolder") == 0) {
+		if (moonCreated) return 0;
+		moonCreated = true;
+		sunCreated = false;
+	}
+	return fpCreateVisualEffect(self, effectName, ppEffect);
+}
+
 // We set this lil shadow variable to 0.9, which fixes clipping, but makes indoor shadows smaller
 // So we conditionally reset it to its original value of 0.7 when updating indoor shadows.
 
@@ -534,7 +558,7 @@ static unsigned int __fastcall DetourDressEmployeeDialogOnAttach(void* me, void*
 }
 
 static unsigned int __fastcall DetourClothingDialogOnAttach(void* me, void* _, void* unk1, int unk2) {
-	Log("Created Clothing Dialog: %p, Window: %p\n", me, unk1);
+	//Log("Created Clothing Dialog: %p, Window: %p\n", me, unk1);
 	if (CancelNextClothingDialog) {
 		CancelNextClothingDialog = false;
 		int res = fpClothingDialogOnAttach(me, unk1, unk2);
@@ -549,7 +573,7 @@ static unsigned int __fastcall DetourClothingDialogOnAttach(void* me, void* _, v
 		((char*)unk1)[0xD9] = 0x00;
 		((char*)unk1)[0xDA] = 0x00;
 		((char*)unk1)[0xDB] = 0x00;
-		Log("CLOTHING DIALOG STEP2");
+		//Log("CLOTHING DIALOG STEP2");
 #endif
 		return 0;
 	}
@@ -1009,6 +1033,20 @@ bool Core::Initialize() {
 		if (MH_EnableHook(Addresses::ScenegraphAddGameVersion) != MH_OK)
 		{
 			Log("ScenegraphAddGameVersion Patch Failed!\n");
+			return false;
+		}
+	}
+
+	if (Config::FixSun && ADDRESS_VALID(Addresses::EffectsManagerCreateVisualEffect)) {
+		if (MH_CreateHook(Addresses::EffectsManagerCreateVisualEffect, &DetourCreateVisualEffect,
+			reinterpret_cast<LPVOID*>(&fpCreateVisualEffect)) != MH_OK)
+		{
+			Log("EffectsManagerCreateVisualEffect Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::EffectsManagerCreateVisualEffect) != MH_OK)
+		{
+			Log("EffectsManagerCreateVisualEffect Patch Failed!\n");
 			return false;
 		}
 	}

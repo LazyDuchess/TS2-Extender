@@ -11,6 +11,7 @@ namespace Config {
 	extern bool FixMakeupLag;
 	extern bool FixPoolShadows;
 	extern bool FixOutdoorShadows;
+	extern bool FixSun;
 	extern bool ExtendedLua;
 	extern bool Separates4All;
 	extern bool FreeZodiac;
