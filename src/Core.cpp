@@ -74,14 +74,26 @@ static char retOverride[] = { 0xC3 };
 
 typedef void(__thiscall* SETTRANSFORM)(void* self, float* mtx);
 
-typedef void(__thiscall* INITMOUSEMESSAGE)(void* self, int ev, int* point, int unk1, int unk2);
-typedef void(__thiscall* SETCURSORPOSITION)(void* self, int x, int y);
+typedef void(__thiscall* SCREENTOWINDOW)(void* self, int* x, int* y);
 
 static SETTRANSFORM fpSetTransform = NULL;
+
+static SCREENTOWINDOW fpScreenToWindow = NULL;
+
+typedef void(__thiscall* INITMOUSEMESSAGE)(void* self, int ev, int* point, int unk1, int unk2);
+typedef void(__thiscall* SETCURSORPOSITION)(void* self, int x, int y);
 
 static INITMOUSEMESSAGE fpInitMouseMessage = NULL;
 
 static SETCURSORPOSITION fpSetCursorPosition = NULL;
+
+typedef void(__thiscall* GETCURSORRELATIVEPOSITION)(void* self, void* win, int* x, int* y);
+
+static GETCURSORRELATIVEPOSITION fpGetCursorRelativePosition = NULL;
+
+typedef void(__thiscall* PICKRAY)(void* self, float* outRay, int x, int y);
+
+static PICKRAY fpPickRay = NULL;
 
 static bool uiScaleEnabled = false;
 static int uiScaleTargetW = 0;
@@ -116,6 +128,26 @@ static void __fastcall UnScaleMouse(int* mouseX, int* mouseY) {
 		*mouseX = static_cast<int>((float)*mouseX * mulX);
 		*mouseY = static_cast<int>((float)*mouseY * mulY);
 	}
+}
+
+static void __fastcall DetourPickRay(void* self, void*, float* outRay, int x, int y) {
+	UnScaleMouse(&x, &y);
+	fpPickRay(self, outRay, x, y);
+}
+
+static void __fastcall DetourGetCursorRelativePosition(void* self, void*, void* win, int* x, int* y) {
+	fpGetCursorRelativePosition(self, win, x, y);
+	//UnScaleMouse(x, y);
+}
+
+static void __fastcall DetourScreenToWindow(void* self, void*, int* x, int* y) {
+	//ScaleMouse(x, y);
+	fpScreenToWindow(self, x, y);
+	/*
+	if ((*(int*)((DWORD)self + 0x10)) == 0x480e8304)
+	{
+		UnScaleMouse(x, y);
+	}*/
 }
 
 static void __fastcall DetourSetCursorPosition(void* self, void* _, int x, int y) {
@@ -1180,6 +1212,19 @@ bool Core::Initialize() {
 			return false;
 		}
 
+		// cGZWin::ScreenToWindowCoordinates
+		if (MH_CreateHook((LPVOID)0x006efb3e, &DetourScreenToWindow,
+			reinterpret_cast<LPVOID*>(&fpScreenToWindow)) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x006efb3e) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+
 		// nGZGraphic4::cGZMouseMessage::Initialize
 		if (MH_CreateHook((LPVOID)0x006849a0, &DetourInitMouseMessage,
 			reinterpret_cast<LPVOID*>(&fpInitMouseMessage)) != MH_OK)
@@ -1201,6 +1246,32 @@ bool Core::Initialize() {
 			return false;
 		}
 		if (MH_EnableHook((LPVOID)0x0072e77d) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+
+		// cGZWinMgrBase::GetCursorRelativePosition
+		if (MH_CreateHook((LPVOID)0x0072fd0c, &DetourGetCursorRelativePosition,
+			reinterpret_cast<LPVOID*>(&fpGetCursorRelativePosition)) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x0072fd0c) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+
+		// cTSWinSceneGraph::PickRay
+		if (MH_CreateHook((LPVOID)0x005b77fa, &DetourPickRay,
+			reinterpret_cast<LPVOID*>(&fpPickRay)) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x005b77fa) != MH_OK)
 		{
 			Log("Mouse Patch Failed!\n");
 			return false;
