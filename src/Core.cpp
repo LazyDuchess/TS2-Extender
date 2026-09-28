@@ -155,6 +155,8 @@ static void __fastcall DetourSetCursorPosition(void* self, void* _, int x, int y
 	fpSetCursorPosition(self, x, y);
 }
 
+// TODO: some unscaled mouse positions still get thru for like 1 frame?
+
 static void __fastcall DetourInitMouseMessage(void* self, void*, int ev, int* point, int unk1, int unk2) {
 	ScaleMouse(&point[0], &point[1]);
 	fpInitMouseMessage(self, ev, point, unk1, unk2);
@@ -1278,6 +1280,5 @@ bool Core::Initialize() {
 		}
 	}
 #endif
-
 	return true;
 }
