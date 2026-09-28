@@ -378,6 +378,10 @@ static cShadowManager* __fastcall DetourShadowManagerCtor(cShadowManager* self, 
 		self->SetResolution(512);
 		self->SetIndoorBlur(12);
 		break;
+	case 3:
+		self->SetResolution(1024);
+		self->SetIndoorBlur(12);
+		break;
 	}
 	return self;
 }
