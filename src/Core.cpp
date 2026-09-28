@@ -74,17 +74,22 @@ static char retOverride[] = { 0xC3 };
 
 typedef void(__thiscall* SETTRANSFORM)(void* self, float* mtx);
 typedef void(__thiscall* ONMOUSEMOVE)(void* self, void* hwnd, int mouseX, int mouseY, int unk);
-typedef void(__thiscall* ONMOUSEBUTTON)(void* self, void* hwnd, int mouseX, int mouseY, int unk1, int unk2);
+typedef void(__thiscall* ONMOUSEBUTTONDOWN)(void* self, void* hwnd, int press, int mouseX, int mouseY, int unk);
+typedef void(__thiscall* ONMOUSEBUTTONUP)(void* self, void* hwnd, int mouseX, int mouseY, int unk);
+
+typedef void(__thiscall* SETCURSORPOSITION)(void* self, int x, int y);
 
 static SETTRANSFORM fpSetTransform = NULL;
 
 static ONMOUSEMOVE fpOnMouseMove = NULL;
-static ONMOUSEBUTTON fpOnLButtonDown = NULL;
-static ONMOUSEBUTTON fpOnLButtonUp = NULL;
-static ONMOUSEBUTTON fpOnRButtonDown = NULL;
-static ONMOUSEBUTTON fpOnRButtonUp = NULL;
-static ONMOUSEBUTTON fpOnMButtonDown = NULL;
-static ONMOUSEBUTTON fpOnMButtonUp = NULL;
+static ONMOUSEBUTTONDOWN fpOnLButtonDown = NULL;
+static ONMOUSEBUTTONUP fpOnLButtonUp = NULL;
+static ONMOUSEBUTTONDOWN fpOnRButtonDown = NULL;
+static ONMOUSEBUTTONUP fpOnRButtonUp = NULL;
+static ONMOUSEBUTTONDOWN fpOnMButtonDown = NULL;
+static ONMOUSEBUTTONUP fpOnMButtonUp = NULL;
+
+static SETCURSORPOSITION fpSetCursorPosition = NULL;
 
 static bool uiScaleEnabled = false;
 static int uiScaleTargetW = 0;
@@ -108,39 +113,57 @@ static void ScaleMouse(int* mouseX, int* mouseY) {
 	}
 }
 
+static void __fastcall UnScaleMouse(int* mouseX, int* mouseY) {
+	if (uiScaleEnabled) {
+		int w, h;
+		GetCurrentDisplayResolution(&w, &h);
+
+		float mulX = (float)w / uiScaleTargetW;
+		float mulY = (float)h / uiScaleTargetH;
+
+		*mouseX = static_cast<int>((float)*mouseX * mulX);
+		*mouseY = static_cast<int>((float)*mouseY * mulY);
+	}
+}
+
+static void __fastcall DetourSetCursorPosition(void* self, void* _, int x, int y) {
+	UnScaleMouse(&x, &y);
+	fpSetCursorPosition(self, x, y);
+}
+
 static void __fastcall DetourOnMouseMove(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk) {
 	ScaleMouse(&mouseX, &mouseY);
 	fpOnMouseMove(self, hwnd, mouseX, mouseY, unk);
 }
 
-static void __fastcall DetourOnLButtonDown(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+static void __fastcall DetourOnLButtonDown(void* self, void* _, void* hwnd, int press, int mouseX, int mouseY, int unk) {
 	ScaleMouse(&mouseX, &mouseY);
-	fpOnLButtonDown(self, hwnd, mouseX, mouseY, unk, unk2);
+	fpOnLButtonDown(self, hwnd, press, mouseX, mouseY, unk);
 }
 
-static void __fastcall DetourOnLButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+static void __fastcall DetourOnLButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk) {
 	ScaleMouse(&mouseX, &mouseY);
-	fpOnLButtonUp(self, hwnd, mouseX, mouseY, unk, unk2);
+	fpOnLButtonUp(self, hwnd, mouseX, mouseY, unk);
 }
 
-static void __fastcall DetourOnRButtonDown(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+static void __fastcall DetourOnRButtonDown(void* self, void* _, void* hwnd, int press, int mouseX, int mouseY, int unk) {
 	ScaleMouse(&mouseX, &mouseY);
-	fpOnRButtonDown(self, hwnd, mouseX, mouseY, unk, unk2);
+	fpOnRButtonDown(self, hwnd, press, mouseX, mouseY, unk);
 }
 
-static void __fastcall DetourOnRButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+static void __fastcall DetourOnRButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk) {
 	ScaleMouse(&mouseX, &mouseY);
-	fpOnRButtonUp(self, hwnd, mouseX, mouseY, unk, unk2);
+	fpOnRButtonUp(self, hwnd, mouseX, mouseY, unk);
 }
 
-static void __fastcall DetourOnMButtonDown(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+static void __fastcall DetourOnMButtonDown(void* self, void* _, void* hwnd, int press, int mouseX, int mouseY, int unk) {
 	ScaleMouse(&mouseX, &mouseY);
-	fpOnMButtonDown(self, hwnd, mouseX, mouseY, unk, unk2);
+	fpOnMButtonDown(self, hwnd, press, mouseX, mouseY, unk);
 }
 
-static void __fastcall DetourOnMButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk, int unk2) {
+static void __fastcall DetourOnMButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk) {
 	ScaleMouse(&mouseX, &mouseY);
-	fpOnMButtonUp(self, hwnd, mouseX, mouseY, unk, unk2);
+	fpOnMButtonUp(self, hwnd, mouseX, mouseY, unk);
 }
 
 static void __fastcall DetourSetTransform(
@@ -1281,6 +1304,19 @@ bool Core::Initialize() {
 			return false;
 		}
 		if (MH_EnableHook((LPVOID)0x00695920) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+
+		// cGZWinMgrW32::SetCursorPosition
+		if (MH_CreateHook((LPVOID)0x0072e77d, &DetourSetCursorPosition,
+			reinterpret_cast<LPVOID*>(&fpSetCursorPosition)) != MH_OK)
+		{
+			Log("Mouse Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook((LPVOID)0x0072e77d) != MH_OK)
 		{
 			Log("Mouse Patch Failed!\n");
 			return false;
