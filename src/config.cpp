@@ -19,6 +19,7 @@ namespace Config {
 	bool FreeZodiac;
 	bool UIScale;
 	float UIScaleResolution;
+	int ShadowQuality;
 
 	static bool Dirty = false;
 
@@ -85,7 +86,7 @@ namespace Config {
 		UIScale = GetBool("Enhancements", "UIScale", false);
 		UIScaleResolution = GetFloat("Enhancements", "UIScaleResolution", 1080.0f);
 #endif
-
+		ShadowQuality = GetInt("Enhancements", "ShadowQuality", 0);
 		if (!iniExisted) {
 			Log("Default config is being written to %s because it didn't exist.\n", ConfigFilename);
 			file.generate(Ini, true);

@@ -18,4 +18,5 @@ namespace Config {
 	extern bool FreeZodiac;
 	extern bool UIScale;
 	extern float UIScaleResolution;
+	extern int ShadowQuality;
 }

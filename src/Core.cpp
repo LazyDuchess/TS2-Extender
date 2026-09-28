@@ -45,7 +45,7 @@ typedef void(__thiscall* ONCEPERFRAMEUPDATE)(void* self);
 
 typedef int(__thiscall* ADDGAMEVERSION)(void* self);
 
-typedef void(__thiscall* SHADOWMANAGERCTOR)(cShadowManager* self);
+typedef cShadowManager*(__thiscall* SHADOWMANAGERCTOR)(cShadowManager* self);
 typedef void(__thiscall* SHADOWUPDATESETTINGS)(cShadow* self);
 
 typedef int(__thiscall* CREATEVISUALEFFECT)(void* self, const char* effectName, void** ppEffect);
@@ -53,7 +53,6 @@ typedef int(__thiscall* CREATEVISUALEFFECT)(void* self, const char* effectName, 
 static CREATEVISUALEFFECT fpCreateVisualEffect = NULL;
 static SHADOWMANAGERCTOR fpShadowManagerCtor = NULL;
 static SHADOWUPDATESETTINGS fpShadowUpdateSettings = NULL;
-static cShadowManager* shadowManager = NULL;
 
 static ADDGAMEVERSION fpAddGameVersion = NULL;
 static ONCEPERFRAMEUPDATE fpOncePerFrameUpdate = NULL;
@@ -368,46 +367,23 @@ static int __fastcall DetourCreateVisualEffect(void* self, void* _, const char* 
 	return fpCreateVisualEffect(self, effectName, ppEffect);
 }
 
-// We set this lil shadow variable to 0.9, which fixes clipping, but makes indoor shadows smaller
-// So we conditionally reset it to its original value of 0.7 when updating indoor shadows.
-
-// TODO: some taller things still get cut off at the top, changing some of the surrounding variables might be able to solve that.
-
-static void* ShadowUpdateSettingsHookReturn;
-static const float IndoorShadowBias = 0.7f;
-static const float OutdoorShadowBias = 1.0f;
-
-static void __fastcall DetourShadowManagerCtor(cShadowManager* self, void* _) {
+static cShadowManager* __fastcall DetourShadowManagerCtor(cShadowManager* self, void* _) {
 	fpShadowManagerCtor(self);
-	shadowManager = self;
-	shadowManager->SetShadowVar1(OutdoorShadowBias);
-}
-
-#if TS2_LC
-static void __declspec(naked) ShadowUpdateSettingsHook() {
-	__asm {
-		mov eax, [IndoorShadowBias]
-		mov dword ptr[esi + 0x24], eax
-		movss xmm5, dword ptr [esi + 0x24]
-		jmp[ShadowUpdateSettingsHookReturn]
+	switch (Config::ShadowQuality) {
+	case 1:
+		self->SetResolution(256);
+		self->SetIndoorBlur(6);
+		break;
+	case 2:
+		self->SetResolution(512);
+		self->SetIndoorBlur(12);
+		break;
 	}
+	return self;
 }
-#else
-static void __declspec(naked) ShadowUpdateSettingsHook() {
-	__asm {
-		mov eax, [IndoorShadowBias]
-		mov dword ptr[esi + 0x1c], eax
-		fld float ptr[esp + 0x28]
-		fmul float ptr[esi + 0x1c]
-		jmp[ShadowUpdateSettingsHookReturn]
-	}
-}
-#endif
 
 static void __fastcall DetourShadowUpdateSettings(cShadow* self, void* _) {
-	shadowManager->SetShadowVar1(OutdoorShadowBias);
 	fpShadowUpdateSettings(self);
-	shadowManager->SetShadowVar1(OutdoorShadowBias);
 }
 
 static int __fastcall DetourAddGameVersion(void* self, void* _) {
@@ -925,6 +901,20 @@ bool Core::Initialize() {
 
 	if (Config::FixOutdoorShadows && ADDRESS_VALID(Addresses::RTAspectRatioCheck)) {
 		Nop((BYTE*)Addresses::RTAspectRatioCheck, 2);
+	}
+
+	if (ADDRESS_VALID(Addresses::ShadowManagerCtor)) {
+		if (MH_CreateHook(Addresses::ShadowManagerCtor, &DetourShadowManagerCtor,
+			reinterpret_cast<LPVOID*>(&fpShadowManagerCtor)) != MH_OK)
+		{
+			Log("ShadowManagerCtor Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::ShadowManagerCtor) != MH_OK)
+		{
+			Log("ShadowManagerCtor Patch Failed!\n");
+			return false;
+		}
 	}
 
 	/*
