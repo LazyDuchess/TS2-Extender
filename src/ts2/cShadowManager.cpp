@@ -7,7 +7,7 @@ void cShadowManager::SetShadowVar1(float val) {
 void cShadowManager::SetResolution(int res) {
 #if TS2_LC
 	(*(int*)(this + 0x34)) = res;
-	(*(int*)(this + 0x48)) = res;
+	(*(int*)(this + 0x38)) = res;
 #else
 	(*(int*)(this + 0x3C)) = res;
 	(*(int*)(this + 0x40)) = res;
