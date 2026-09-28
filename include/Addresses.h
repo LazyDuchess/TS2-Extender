@@ -106,6 +106,9 @@ namespace Addresses {
 
 	extern void* EffectsManagerCreateVisualEffect;
 
+	// in nGZSceneGraph::cViewerRefNodeImpl::ComputeCameraToClipSpaceTransform, calculates aspect ratio clipping for render texture cams
+	extern void* RTAspectRatioCheck;
+
 	bool Initialize();
 }
 

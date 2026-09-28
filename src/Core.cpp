@@ -923,6 +923,11 @@ bool Core::Initialize() {
 #endif
 	}
 
+	if (Config::FixOutdoorShadows && ADDRESS_VALID(Addresses::RTAspectRatioCheck)) {
+		Nop((BYTE*)Addresses::RTAspectRatioCheck, 2);
+	}
+
+	/*
 	if (Config::FixOutdoorShadows && ADDRESS_VALID(Addresses::ShadowManagerCtor) && ADDRESS_VALID(Addresses::ShadowUpdateSettings)) {
 		if (MH_CreateHook(Addresses::ShadowManagerCtor, &DetourShadowManagerCtor,
 			reinterpret_cast<LPVOID*>(&fpShadowManagerCtor)) != MH_OK)
@@ -954,7 +959,7 @@ bool Core::Initialize() {
 		ShadowUpdateSettingsHookReturn = (void*)((DWORD)Addresses::ShadowUpdateSettings + 0x6A9 + 7);
 		MakeJMP((BYTE*)((DWORD)Addresses::ShadowUpdateSettings + 0x6A9), (DWORD)ShadowUpdateSettingsHook, 7);
 #endif
-	}
+	}*/
 
 	if (ADDRESS_VALID(Addresses::cEMVoxModifierModifyEvent)) {
 #if TS2_LC
