@@ -73,21 +73,13 @@ static char retOverride[] = { 0xC3 };
 #if TS2_UC
 
 typedef void(__thiscall* SETTRANSFORM)(void* self, float* mtx);
-typedef void(__thiscall* ONMOUSEMOVE)(void* self, void* hwnd, int mouseX, int mouseY, int unk);
-typedef void(__thiscall* ONMOUSEBUTTONDOWN)(void* self, void* hwnd, int press, int mouseX, int mouseY, int unk);
-typedef void(__thiscall* ONMOUSEBUTTONUP)(void* self, void* hwnd, int mouseX, int mouseY, int unk);
 
+typedef void(__thiscall* INITMOUSEMESSAGE)(void* self, int ev, int* point, int unk1, int unk2);
 typedef void(__thiscall* SETCURSORPOSITION)(void* self, int x, int y);
 
 static SETTRANSFORM fpSetTransform = NULL;
 
-static ONMOUSEMOVE fpOnMouseMove = NULL;
-static ONMOUSEBUTTONDOWN fpOnLButtonDown = NULL;
-static ONMOUSEBUTTONUP fpOnLButtonUp = NULL;
-static ONMOUSEBUTTONDOWN fpOnRButtonDown = NULL;
-static ONMOUSEBUTTONUP fpOnRButtonUp = NULL;
-static ONMOUSEBUTTONDOWN fpOnMButtonDown = NULL;
-static ONMOUSEBUTTONUP fpOnMButtonUp = NULL;
+static INITMOUSEMESSAGE fpInitMouseMessage = NULL;
 
 static SETCURSORPOSITION fpSetCursorPosition = NULL;
 
@@ -131,39 +123,9 @@ static void __fastcall DetourSetCursorPosition(void* self, void* _, int x, int y
 	fpSetCursorPosition(self, x, y);
 }
 
-static void __fastcall DetourOnMouseMove(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk) {
-	ScaleMouse(&mouseX, &mouseY);
-	fpOnMouseMove(self, hwnd, mouseX, mouseY, unk);
-}
-
-static void __fastcall DetourOnLButtonDown(void* self, void* _, void* hwnd, int press, int mouseX, int mouseY, int unk) {
-	ScaleMouse(&mouseX, &mouseY);
-	fpOnLButtonDown(self, hwnd, press, mouseX, mouseY, unk);
-}
-
-static void __fastcall DetourOnLButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk) {
-	ScaleMouse(&mouseX, &mouseY);
-	fpOnLButtonUp(self, hwnd, mouseX, mouseY, unk);
-}
-
-static void __fastcall DetourOnRButtonDown(void* self, void* _, void* hwnd, int press, int mouseX, int mouseY, int unk) {
-	ScaleMouse(&mouseX, &mouseY);
-	fpOnRButtonDown(self, hwnd, press, mouseX, mouseY, unk);
-}
-
-static void __fastcall DetourOnRButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk) {
-	ScaleMouse(&mouseX, &mouseY);
-	fpOnRButtonUp(self, hwnd, mouseX, mouseY, unk);
-}
-
-static void __fastcall DetourOnMButtonDown(void* self, void* _, void* hwnd, int press, int mouseX, int mouseY, int unk) {
-	ScaleMouse(&mouseX, &mouseY);
-	fpOnMButtonDown(self, hwnd, press, mouseX, mouseY, unk);
-}
-
-static void __fastcall DetourOnMButtonUp(void* self, void* _, void* hwnd, int mouseX, int mouseY, int unk) {
-	ScaleMouse(&mouseX, &mouseY);
-	fpOnMButtonUp(self, hwnd, mouseX, mouseY, unk);
+static void __fastcall DetourInitMouseMessage(void* self, void*, int ev, int* point, int unk1, int unk2) {
+	ScaleMouse(&point[0], &point[1]);
+	fpInitMouseMessage(self, ev, point, unk1, unk2);
 }
 
 static void __fastcall DetourSetTransform(
@@ -1218,92 +1180,14 @@ bool Core::Initialize() {
 			return false;
 		}
 
-		// nGZGraphic4::cCanvasW32::OnMouseMove
-		if (MH_CreateHook((LPVOID)0x006953a0, &DetourOnMouseMove,
-			reinterpret_cast<LPVOID*>(&fpOnMouseMove)) != MH_OK)
+		// nGZGraphic4::cGZMouseMessage::Initialize
+		if (MH_CreateHook((LPVOID)0x006849a0, &DetourInitMouseMessage,
+			reinterpret_cast<LPVOID*>(&fpInitMouseMessage)) != MH_OK)
 		{
 			Log("Mouse Patch Failed!\n");
 			return false;
 		}
-		if (MH_EnableHook((LPVOID)0x006953a0) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-
-		// nGZGraphic4::cCanvasW32::OnLButtonDown
-		if (MH_CreateHook((LPVOID)0x00695640, &DetourOnLButtonDown,
-			reinterpret_cast<LPVOID*>(&fpOnLButtonDown)) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-		if (MH_EnableHook((LPVOID)0x00695640) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-
-		// nGZGraphic4::cCanvasW32::OnLButtonUp
-		if (MH_CreateHook((LPVOID)0x00695880, &DetourOnLButtonUp,
-			reinterpret_cast<LPVOID*>(&fpOnLButtonUp)) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-		if (MH_EnableHook((LPVOID)0x00695880) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-
-		// nGZGraphic4::cCanvasW32::OnRButtonDown
-		if (MH_CreateHook((LPVOID)0x006957c0, &DetourOnRButtonDown,
-			reinterpret_cast<LPVOID*>(&fpOnRButtonDown)) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-		if (MH_EnableHook((LPVOID)0x006957c0) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-
-		// nGZGraphic4::cCanvasW32::OnRButtonUp
-		if (MH_CreateHook((LPVOID)0x006959c0, &DetourOnRButtonUp,
-			reinterpret_cast<LPVOID*>(&fpOnRButtonUp)) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-		if (MH_EnableHook((LPVOID)0x006959c0) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-
-		// nGZGraphic4::cCanvasW32::OnMButtonDown
-		if (MH_CreateHook((LPVOID)0x00695700, &DetourOnMButtonDown,
-			reinterpret_cast<LPVOID*>(&fpOnMButtonDown)) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-		if (MH_EnableHook((LPVOID)0x00695700) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-
-		// nGZGraphic4::cCanvasW32::OnMButtonUp
-		if (MH_CreateHook((LPVOID)0x00695920, &DetourOnMButtonUp,
-			reinterpret_cast<LPVOID*>(&fpOnMButtonUp)) != MH_OK)
-		{
-			Log("Mouse Patch Failed!\n");
-			return false;
-		}
-		if (MH_EnableHook((LPVOID)0x00695920) != MH_OK)
+		if (MH_EnableHook((LPVOID)0x006849a0) != MH_OK)
 		{
 			Log("Mouse Patch Failed!\n");
 			return false;
