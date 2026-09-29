@@ -44,6 +44,13 @@ namespace LuaExtensions {
 		return "";
 	}
 
+	// ExecuteCommand(string cheat)
+	static int __cdecl LuaExecuteCommand(lua_State* luaState) {
+		const char* cmd = lua_tostring(luaState, 1);
+		TS2::CheatSystem()->ExecuteCommand(cmd);
+		return 0;
+	}
+
 	// IsLegacy()
 	static int __cdecl LuaIsLegacy(lua_State* luaState) {
 #if TS2_LC
@@ -369,6 +376,7 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaGetKeyHeld, "KBM_GetKey");
 			luaThread->Register(&LuaGetKeyUp, "KBM_GetKeyUp");
 			luaThread->Register(&LuaIsLegacy, "IsLegacy");
+			luaThread->Register(&LuaExecuteCommand, "ExecuteCommand");
 		}
 		return res;
 	}

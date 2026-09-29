@@ -137,6 +137,8 @@ namespace Addresses {
 
 	void* RTAspectRatioCheck;
 
+	void* CheatParserExecuteCommand;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -218,6 +220,7 @@ namespace Addresses {
 		ADDRESS(ShadowUpdateSettings, ShadowUpdateSettingsLookup);
 		ADDRESS(EffectsManagerCreateVisualEffect, EffectsManagerCreateVisualEffectLookup);
 		ADDRESS(RTAspectRatioCheck, RTAspectRatioCheckLookup);
+		ADDRESS(CheatParserExecuteCommand, CheatParserExecuteCommandLookup);
 
 		if (ADDRESS_VALID(ShadowUpdateSettings)) {
 #if TS2_LC

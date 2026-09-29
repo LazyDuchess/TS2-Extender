@@ -11,4 +11,9 @@ namespace TS2 {
 		RegisterTestingCheatFunc func = reinterpret_cast<RegisterTestingCheatFunc>(Addresses::RegisterTestingCheat);
 		func(cheat);
 	}
+
+	void cTSCheatSystem::ExecuteCommand(const char* command) {
+		cTSCheatParser* parser = this->AsParser();
+		((void (__thiscall*)(cTSCheatParser*, const char*)) * (int*)(Addresses::RegisterTestingCheat))(parser, command);
+	}
 }
