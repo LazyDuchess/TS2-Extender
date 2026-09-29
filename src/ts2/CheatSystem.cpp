@@ -14,6 +14,6 @@ namespace TS2 {
 
 	void cTSCheatSystem::ExecuteCommand(const char* command) {
 		cTSCheatParser* parser = this->AsParser();
-		((void (__thiscall*)(cTSCheatParser*, const char*))Addresses::RegisterTestingCheat)(parser, command);
+		((void (__thiscall*)(cTSCheatParser*, const char*))Addresses::CheatParserExecuteCommand)(parser, command);
 	}
 }
