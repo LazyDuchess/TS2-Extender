@@ -111,6 +111,8 @@ namespace Addresses {
 
 	extern void* CheatParserExecuteCommand;
 
+	extern void* GetMaterialParser;
+
 	bool Initialize();
 }
 

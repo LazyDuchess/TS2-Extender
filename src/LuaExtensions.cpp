@@ -7,6 +7,7 @@
 #include "LuaCheatCommand.h"
 #include "PatchVersion.h"
 #include "ts2/cUserInput.h"
+#include "ts2/nRZSceneGraph.h"
 #include "Core.h"
 #include "Utils.h"
 #include <filesystem>
@@ -42,6 +43,21 @@ namespace LuaExtensions {
 			}
 		}
 		return "";
+	}
+
+	// MAT_RemoveVariable(string name)
+	static int __cdecl LuaMatRemoveVariable(lua_State* luaState) {
+		const char* varName = lua_tostring(luaState, 1);
+		nRZSceneGraph::MaterialParser()->RemoveVariable(0, varName);
+		return 0;
+	}
+
+	// MAT_SetVariable(string name, string value)
+	static int __cdecl LuaMatSetVariable(lua_State* luaState) {
+		const char* varName = lua_tostring(luaState, 1);
+		const char* varValue = lua_tostring(luaState, 2);
+		nRZSceneGraph::MaterialParser()->SetVariable(0, varName, varValue);
+		return 0;
 	}
 
 	// ExecuteCommand(string cheat)
@@ -377,6 +393,8 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaGetKeyUp, "KBM_GetKeyUp");
 			luaThread->Register(&LuaIsLegacy, "IsLegacy");
 			luaThread->Register(&LuaExecuteCommand, "ExecuteCommand");
+			luaThread->Register(&LuaMatSetVariable, "MAT_SetVariable");
+			luaThread->Register(&LuaMatRemoveVariable, "MAT_RemoveVariable");
 		}
 		return res;
 	}
