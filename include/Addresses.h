@@ -113,6 +113,10 @@ namespace Addresses {
 
 	extern void* GetMaterialParser;
 
+	extern void* PostLoadLot;
+
+	extern void* NhoodEntered;
+
 	bool Initialize();
 }
 
