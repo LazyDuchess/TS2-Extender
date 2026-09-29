@@ -49,6 +49,11 @@ typedef cShadowManager*(__thiscall* SHADOWMANAGERCTOR)(cShadowManager* self);
 typedef void(__thiscall* SHADOWUPDATESETTINGS)(cShadow* self);
 
 typedef int(__thiscall* CREATEVISUALEFFECT)(void* self, const char* effectName, void** ppEffect);
+typedef void(__thiscall* POSTLOADLOT)(void* self, int unk);
+typedef void(__thiscall* NHOODENTERED)(void* self, int unk1, int unk2);
+
+static POSTLOADLOT fpPostLoadLot = NULL;
+static NHOODENTERED fpNhoodEntered = NULL;
 
 static CREATEVISUALEFFECT fpCreateVisualEffect = NULL;
 static SHADOWMANAGERCTOR fpShadowManagerCtor = NULL;
@@ -85,6 +90,30 @@ static char separatesBuyPatch[] = { 0x6A, 0x01, 0x90 };
 static unsigned int modifyVoiceEventObjectId = 0;
 static void* ModifyVoiceEventHook1Return;
 static void* ModifyVoiceEventHook2Return;
+
+static void __fastcall DetourPostLoadLot(void* self, void*, int unk) {
+	fpPostLoadLot(self, unk);
+	Core* core = Core::_instance;
+	for (auto& cb : core->m_LuaDelegates[(int)Delegates::OnLotLoaded].m_Callbacks) {
+		lua_rawgeti(cb.m_luaState, LUA_REGISTRYINDEX, cb.m_LuaCall);
+		if (lua_pcall(cb.m_luaState, 0, 0, 0) != 0) {
+			Log("Error calling Lua callback: %s\n", lua_tostring(cb.m_luaState, -1));
+			lua_pop(cb.m_luaState, 1);
+		}
+	}
+}
+
+static void __fastcall DetourNhoodEntered(void* self, void*, int unk1, int unk2) {
+	fpNhoodEntered(self, unk1, unk2);
+	Core* core = Core::_instance;
+	for (auto& cb : core->m_LuaDelegates[(int)Delegates::OnNeighborhoodLoaded].m_Callbacks) {
+		lua_rawgeti(cb.m_luaState, LUA_REGISTRYINDEX, cb.m_LuaCall);
+		if (lua_pcall(cb.m_luaState, 0, 0, 0) != 0) {
+			Log("Error calling Lua callback: %s\n", lua_tostring(cb.m_luaState, -1));
+			lua_pop(cb.m_luaState, 1);
+		}
+	}
+}
 
 static int MakeLuaTableForModifyVoiceEvent(lua_State* luaState, cRZString* str, unsigned int objectId) {
 	lua_newtable(luaState);
@@ -1049,6 +1078,34 @@ bool Core::Initialize() {
 		if (MH_EnableHook(Addresses::EffectsManagerCreateVisualEffect) != MH_OK)
 		{
 			Log("EffectsManagerCreateVisualEffect Patch Failed!\n");
+			return false;
+		}
+	}
+
+	if (ADDRESS_VALID(Addresses::PostLoadLot)) {
+		if (MH_CreateHook(Addresses::PostLoadLot, &DetourPostLoadLot,
+			reinterpret_cast<LPVOID*>(&fpPostLoadLot)) != MH_OK)
+		{
+			Log("PostLoadLot Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::PostLoadLot) != MH_OK)
+		{
+			Log("PostLoadLot Patch Failed!\n");
+			return false;
+		}
+	}
+
+	if (ADDRESS_VALID(Addresses::NhoodEntered)) {
+		if (MH_CreateHook(Addresses::NhoodEntered, &DetourNhoodEntered,
+			reinterpret_cast<LPVOID*>(&fpNhoodEntered)) != MH_OK)
+		{
+			Log("NhoodEntered Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::NhoodEntered) != MH_OK)
+		{
+			Log("NhoodEntered Patch Failed!\n");
 			return false;
 		}
 	}

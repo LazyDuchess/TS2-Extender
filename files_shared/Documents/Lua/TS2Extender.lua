@@ -5,6 +5,8 @@ Delegates = {}
 Delegates.OnBuildPieMenu = 0
 Delegates.OnModifyVoiceEvent = 1
 Delegates.OnFrameUpdate = 2
+Delegates.OnNeighborhoodLoaded = 3
+Delegates.OnLotLoaded = 4
 
 -- Returns an UTF-8 string as a table, with each character as an element in the table. Can be useful for string manipulation or length checks.
 -- spec from https://en.wikipedia.org/wiki/UTF-8
@@ -155,3 +157,9 @@ local function TS2ExtenderCheatExecute()
 end
 
 RegisterCheat("TS2Extender", "Displays TS2Extender info.", TS2ExtenderCheatExecute)
+
+-- Lot Lighting Fixes support code
+AddGameCallback(Delegates.OnLotLoaded, function()
+	MAT_SetVariable("lotXScale", nWorld.GetLotSizeX())
+	MAT_SetVariable("lotYScale", nWorld.GetLotSizeY())
+end, 0)

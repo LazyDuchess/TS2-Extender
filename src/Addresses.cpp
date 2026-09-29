@@ -231,6 +231,11 @@ namespace Addresses {
 		ADDRESS(PostLoadLot, PostLoadLotLookup);
 		ADDRESS(NhoodEntered, NhoodEnteredLookup);
 
+		if (ADDRESS_VALID(GetMaterialParser)) {
+			DWORD relativeCall = *(DWORD*)GetMaterialParser;
+			GetMaterialParser = (void*)((DWORD)GetMaterialParser + relativeCall + 4);
+		}
+
 		if (ADDRESS_VALID(ShadowUpdateSettings)) {
 #if TS2_LC
 			DWORD relativeCall = *(DWORD*)((DWORD)ShadowUpdateSettings + 0x3A);

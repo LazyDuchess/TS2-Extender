@@ -9,7 +9,9 @@
 enum class Delegates {
 	OnBuildPieMenu = 0,
 	OnModifyVoiceEvent = 1,
-	OnFrameUpdate = 2
+	OnFrameUpdate = 2,
+	OnNeighborhoodLoaded = 3,
+	OnLotLoaded = 4
 };
 
 class Core {
@@ -26,7 +28,7 @@ public:
 	lua_State* m_LuaState = nullptr;
 	int m_MakeMoneyStringLuaCall = LUA_NOREF;
 
-	LuaDelegate m_LuaDelegates[3];
+	LuaDelegate m_LuaDelegates[5];
 
 	cEdithObjectTestSim* m_CurrentTestSim = nullptr;
 	bool m_LoadUIScriptDebug = false;
