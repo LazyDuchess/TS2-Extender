@@ -117,6 +117,8 @@ namespace Addresses {
 
 	extern void* NhoodEntered;
 
+	extern void* LotImposterManagerCtor;
+
 	bool Initialize();
 }
 

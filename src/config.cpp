@@ -20,6 +20,7 @@ namespace Config {
 	bool UIScale;
 	float UIScaleResolution;
 	int ShadowQuality;
+	int ImposterQuality;
 
 	static bool Dirty = false;
 
@@ -87,9 +88,10 @@ namespace Config {
 		UIScaleResolution = GetFloat("Enhancements", "UIScaleResolution", 1080.0f);
 #endif
 		ShadowQuality = GetInt("Enhancements", "ShadowQuality", 0);
+		ImposterQuality = GetInt("Enhancements", "ImposterQuality", 0);
 		if (!iniExisted) {
-			Log("Default config is being written to %s because it didn't exist.\n", ConfigFilename);
-			file.generate(Ini, true);
+			Log("Config file doesn't exist!\n", ConfigFilename);
+			//file.generate(Ini, true);
 		}
 		else
 		{

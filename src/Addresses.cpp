@@ -145,6 +145,8 @@ namespace Addresses {
 
 	void* NhoodEntered;
 
+	void* LotImposterManagerCtor;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -230,6 +232,7 @@ namespace Addresses {
 		ADDRESS(GetMaterialParser, GetMaterialParserLookup);
 		ADDRESS(PostLoadLot, PostLoadLotLookup);
 		ADDRESS(NhoodEntered, NhoodEnteredLookup);
+		ADDRESS(LotImposterManagerCtor, LotImposterManagerCtorLookup);
 
 		if (ADDRESS_VALID(GetMaterialParser)) {
 			DWORD relativeCall = *(DWORD*)GetMaterialParser;

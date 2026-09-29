@@ -19,4 +19,5 @@ namespace Config {
 	extern bool UIScale;
 	extern float UIScaleResolution;
 	extern int ShadowQuality;
+	extern int ImposterQuality;
 }

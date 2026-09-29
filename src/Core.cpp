@@ -24,6 +24,7 @@
 #include "ts2/cShadowManager.h"
 #include "ts2/cShadow.h"
 #include "Utils.h"
+#include "ts2/cLotImposterManager.h"
 #include <chrono>
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
@@ -52,7 +53,9 @@ typedef void(__thiscall* SHADOWUPDATESETTINGS)(cShadow* self);
 typedef int(__thiscall* CREATEVISUALEFFECT)(void* self, const char* effectName, void** ppEffect);
 typedef void(__thiscall* POSTLOADLOT)(void* self, int unk);
 typedef void(__thiscall* NHOODENTERED)(void* self, int unk1, int unk2);
+typedef nTSSG::cLotImposterManager* (__thiscall* LOTIMPOSTERMANAGERCTOR)(nTSSG::cLotImposterManager* self);
 
+static LOTIMPOSTERMANAGERCTOR fpLotImposterManagerCtor = NULL;
 static POSTLOADLOT fpPostLoadLot = NULL;
 static NHOODENTERED fpNhoodEntered = NULL;
 
@@ -93,6 +96,31 @@ static void* ModifyVoiceEventHook1Return;
 static void* ModifyVoiceEventHook2Return;
 
 static std::chrono::steady_clock::time_point deltaTimePoint;
+
+static nTSSG::cLotImposterManager* __fastcall DetourLotImposterManagerCtor(nTSSG::cLotImposterManager* self, void*) {
+	fpLotImposterManagerCtor(self);
+	switch (Config::ImposterQuality) {
+	case 1:
+		self->SetWidth(512);
+		self->SetHeight(512);
+		self->SetBlur(32);
+		self->SetSliceResolution(24);
+		break;
+	case 2:
+		self->SetWidth(512);
+		self->SetHeight(512);
+		self->SetBlur(64);
+		self->SetSliceResolution(64);
+		break;
+	case 3:
+		self->SetWidth(1024);
+		self->SetHeight(1024);
+		self->SetBlur(64);
+		self->SetSliceResolution(64);
+		break;
+	}
+	return self;
+}
 
 static void __fastcall DetourPostLoadLot(void* self, void*, int unk) {
 	fpPostLoadLot(self, unk);
@@ -1115,6 +1143,20 @@ bool Core::Initialize() {
 		if (MH_EnableHook(Addresses::NhoodEntered) != MH_OK)
 		{
 			Log("NhoodEntered Patch Failed!\n");
+			return false;
+		}
+	}
+
+	if (ADDRESS_VALID(Addresses::LotImposterManagerCtor)) {
+		if (MH_CreateHook(Addresses::LotImposterManagerCtor, &DetourLotImposterManagerCtor,
+			reinterpret_cast<LPVOID*>(&fpLotImposterManagerCtor)) != MH_OK)
+		{
+			Log("LotImposterManagerCtor Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::LotImposterManagerCtor) != MH_OK)
+		{
+			Log("LotImposterManagerCtor Patch Failed!\n");
 			return false;
 		}
 	}
