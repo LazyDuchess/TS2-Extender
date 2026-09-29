@@ -24,6 +24,7 @@
 #include "ts2/cShadowManager.h"
 #include "ts2/cShadow.h"
 #include "Utils.h"
+#include <chrono>
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
 typedef UINT(__thiscall* LUA5OPEN)(void*, UINT);
@@ -90,6 +91,8 @@ static char separatesBuyPatch[] = { 0x6A, 0x01, 0x90 };
 static unsigned int modifyVoiceEventObjectId = 0;
 static void* ModifyVoiceEventHook1Return;
 static void* ModifyVoiceEventHook2Return;
+
+static std::chrono::steady_clock::time_point deltaTimePoint;
 
 static void __fastcall DetourPostLoadLot(void* self, void*, int unk) {
 	fpPostLoadLot(self, unk);
@@ -426,12 +429,18 @@ static int __fastcall DetourAddGameVersion(void* self, void* _) {
 static bool shouldTickOverlays = false;
 
 static void __fastcall DetourOncePerFrameUpdate(void* self, void* _) {
+	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	std::chrono::duration<double> delta = now - deltaTimePoint;
+	double deltaTime = delta.count();
+	deltaTimePoint = now;
+
 	fpOncePerFrameUpdate(self);
 	shouldTickOverlays = false;
 	Core* core = Core::_instance;
 	for (auto& cb : core->m_LuaDelegates[(int)Delegates::OnFrameUpdate].m_Callbacks) {
 		lua_rawgeti(cb.m_luaState, LUA_REGISTRYINDEX, cb.m_LuaCall);
-		if (lua_pcall(cb.m_luaState, 0, 0, 0) != 0) {
+		lua_pushnumber(cb.m_luaState, deltaTime);
+		if (lua_pcall(cb.m_luaState, 1, 0, 0) != 0) {
 			Log("Error calling Lua callback: %s\n", lua_tostring(cb.m_luaState, -1));
 			lua_pop(cb.m_luaState, 1);
 		}
