@@ -153,6 +153,12 @@ namespace Addresses {
 
 	void* OptionsFillScreenSizeListBox;
 
+	void* SetWindowEnabled;
+
+	void* GetFramework;
+
+	void* CanvasShow;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -243,7 +249,15 @@ namespace Addresses {
 		ADDRESS(DeviceIsFullscreen, DeviceIsFullscreenLookup);
 		ADDRESS(DeviceSetup, DeviceSetupLookup);
 		ADDRESS(OptionsFillScreenSizeListBox, OptionsFillScreenSizeListBoxLookup);
+		ADDRESS(CanvasShow, CanvasShowLookup);
 #endif
+		ADDRESS(SetWindowEnabled, SetWindowEnabledLookup);
+		ADDRESS(GetFramework, GetFrameworkLookup);
+
+		if (ADDRESS_VALID(GetFramework)) {
+			DWORD relativeCall = *(DWORD*)GetFramework;
+			GetFramework = (void*)((DWORD)GetFramework + relativeCall + 4);
+		}
 
 		if (ADDRESS_VALID(GetMaterialParser)) {
 			DWORD relativeCall = *(DWORD*)GetMaterialParser;

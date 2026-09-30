@@ -125,6 +125,12 @@ namespace Addresses {
 
 	extern void* OptionsFillScreenSizeListBox;
 
+	extern void* SetWindowEnabled;
+
+	extern void* GetFramework;
+
+	extern void* CanvasShow;
+
 	bool Initialize();
 }
 

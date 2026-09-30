@@ -26,6 +26,8 @@
 #include "Utils.h"
 #include "ts2/cLotImposterManager.h"
 #include "ts2/cDeviceSetupParam.h"
+#include "ts2/nsGZWinUtils.h"
+#include "ts2/cGZFramework.h"
 #include <chrono>
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
@@ -57,9 +59,11 @@ typedef void(__thiscall* NHOODENTERED)(void* self, int unk1, int unk2);
 typedef bool(__thiscall* DEVICEISFULLSCREEN)(void* self);
 typedef bool(__thiscall* DEVICESETUP)(void* self, cDeviceSetupParam* params);
 typedef void(__thiscall* FILLSCREENSIZE)(void* self);
+typedef void(__thiscall* CANVASSHOW)(void* self, int unk);
 
 typedef nTSSG::cLotImposterManager* (__thiscall* LOTIMPOSTERMANAGERCTOR)(nTSSG::cLotImposterManager* self);
 
+static CANVASSHOW fpCanvasShow = NULL;
 static FILLSCREENSIZE fpFillScreenSize = NULL;
 static DEVICESETUP fpDeviceSetup = NULL;
 static DEVICEISFULLSCREEN fpDeviceIsFullscreen = NULL;
@@ -104,33 +108,182 @@ static unsigned int modifyVoiceEventObjectId = 0;
 static void* ModifyVoiceEventHook1Return;
 static void* ModifyVoiceEventHook2Return;
 
-static bool borderlessIsFullscreen = true;
+static bool isFullscreen = true;
 static bool wasDeviceSetup = false;
+static void* canvasInstance = nullptr;
 
 static std::chrono::steady_clock::time_point deltaTimePoint;
 
-// Borderless conditional patches
+static int oldWidth;
+static int oldHeight;
+static LONG oldWinStyle;
+static LONG oldWinExStyle;
+
+static void MakeWindowedFromBorderless() {
+	HWND win;
+	cIGZApp* app = nullptr;
+	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+	{
+		win = app->GetMainHWND();
+		app->Release();
+	}
+	else {
+		return;
+	}
+	SetWindowLong(win, GWL_STYLE, oldWinStyle);
+	SetWindowLong(win, GWL_EXSTYLE, oldWinExStyle);
+	int sw = GetSystemMetrics(SM_CXSCREEN);
+	int sh = GetSystemMetrics(SM_CYSCREEN);
+	int x = (sw - oldWidth) / 2;
+	int y = (sh - oldHeight) / 2;
+
+	SetWindowPos(win, HWND_TOP, x, y, oldWidth, oldHeight, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+}
+
+static void RecalculateWindowedLocation() {
+	HWND win;
+	cIGZApp* app = nullptr;
+	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+	{
+		win = app->GetMainHWND();
+		app->Release();
+	}
+	else {
+		return;
+	}
+	RECT winRect;
+	GetWindowRect(win, &winRect);
+	oldWidth = winRect.right - winRect.left;
+	oldHeight = winRect.bottom - winRect.top;
+	int sw = GetSystemMetrics(SM_CXSCREEN);
+	int sh = GetSystemMetrics(SM_CYSCREEN);
+	int x = (sw - oldWidth) / 2;
+	int y = (sh - oldHeight) / 2;
+	SetWindowPos(win, HWND_TOP, x, y, oldWidth, oldHeight, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+}
+
+static void MakeBorderlessFromWindowed() {
+	HWND win;
+	cIGZApp* app = nullptr;
+	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+	{
+		win = app->GetMainHWND();
+		app->Release();
+	}
+	else {
+		return;
+	}
+	RECT winRect;
+	GetWindowRect(win, &winRect);
+	oldWidth = winRect.right - winRect.left;
+	oldHeight = winRect.bottom - winRect.top;
+	LONG lStyle = GetWindowLong(win, GWL_STYLE);
+	oldWinStyle = lStyle;
+	lStyle &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU);
+	SetWindowLong(win, GWL_STYLE, lStyle);
+	LONG lExStyle = GetWindowLong(win, GWL_EXSTYLE);
+	oldWinExStyle = lExStyle;
+	lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
+	SetWindowLong(win, GWL_EXSTYLE, lExStyle);
+	SetWindowPos(win, HWND_TOP, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+}
+
+static void RecalculateWindow() {
+	if (!Config::Borderless) return;
+	if (isFullscreen) {
+		MakeBorderlessFromWindowed();
+	}
+	else
+	{
+		MakeWindowedFromBorderless();
+	}
+}
+
+static void __fastcall DetourCanvasShow(void* canvas, void*, int unk) {
+	fpCanvasShow(canvas, unk);
+	if (canvasInstance == nullptr) {
+		if (isFullscreen) {
+			MakeBorderlessFromWindowed();
+		}
+		canvasInstance = canvas;
+	}
+}
+
 static void __fastcall DetourFillScreenSize(void* self, void*) {
-	if (borderlessIsFullscreen) return;
-	fpFillScreenSize(self);
+	cIGZWin* window = *(cIGZWin**)((DWORD)self + 0x1c);
+	bool runFunc = true;
+	cIGZWin* screenSizesWin = window->GetChildWindowFromIDRecursive(0x35);
+	cIGZWin* refreshRatesWin = window->GetChildWindowFromIDRecursive(0x45);
+#if TS2_UC
+	if (Config::Borderless) {
+		if (isFullscreen) {
+			runFunc = false;
+			if (screenSizesWin != nullptr) {
+				screenSizesWin->ChildDeleteAll();
+			}
+			// disable screen size label.
+			nsGZWinUtils::SetWindowEnabled(window, 0x6767, false);
+		}
+		else
+		{
+			// enable screen size label.
+			nsGZWinUtils::SetWindowEnabled(window, 0x6767, true);
+		}
+		// disable square pixels
+		nsGZWinUtils::SetWindowEnabled(window, 0x6969, false);
+		nsGZWinUtils::SetWindowEnabled(window, 0x12, false);
+		nsGZWinUtils::SetWindowEnabled(window, 0x11, false);
+	}
+	else
+	{
+		if (isFullscreen) {
+			// enable square pixels
+			nsGZWinUtils::SetWindowEnabled(window, 0x6969, true);
+			nsGZWinUtils::SetWindowEnabled(window, 0x12, true);
+			nsGZWinUtils::SetWindowEnabled(window, 0x11, true);
+		}
+		else
+		{
+			nsGZWinUtils::SetWindowEnabled(window, 0x6969, false);
+			nsGZWinUtils::SetWindowEnabled(window, 0x12, false);
+			nsGZWinUtils::SetWindowEnabled(window, 0x11, false);
+		}
+	}
+#endif
+	if (runFunc)
+		fpFillScreenSize(self);
+	// Enable shadow setting that the game likes to disable in hood view
+	nsGZWinUtils::SetWindowEnabled(window, 0x93, true);
+	nsGZWinUtils::SetWindowEnabled(window, 0x92, true);
+	nsGZWinUtils::SetWindowEnabled(window, 0x91, true);
+	nsGZWinUtils::SetWindowEnabled(window, 0x94, true);
 }
 
 static bool __fastcall DetourDeviceSetup(void* self, void*, cDeviceSetupParam* param) {
-	borderlessIsFullscreen = !param->IsWindowed();
-	param->MakeWindowed();
-	bool res = fpDeviceSetup(self, param);
-	if (!wasDeviceSetup) {
-		// Nop out device re-creation as we don't do exclusive fullscreen anyways so it's a waste of time
-		Nop((BYTE*)((DWORD)Addresses::DeviceSetup + 0x27), 5);
-		static const char jmpChar = 0xEB;
-		WriteToMemory((DWORD)Addresses::DeviceSetup + 0x2F, (void*)(&jmpChar), 1);
+	bool wasFullscreen = isFullscreen;
+	isFullscreen = !param->IsWindowed();
+
+	if (Config::Borderless) {
+		param->MakeWindowed();
+		bool res = fpDeviceSetup(self, param);
+		if (!wasDeviceSetup) {
+			// Nop out device re-creation as we don't do exclusive fullscreen anyways so it's a waste of time
+			Nop((BYTE*)((DWORD)Addresses::DeviceSetup + 0x27), 5);
+			static const char jmpChar = 0xEB;
+			WriteToMemory((DWORD)Addresses::DeviceSetup + 0x2F, (void*)(&jmpChar), 1);
+		}
+		wasDeviceSetup = true;
+		if (canvasInstance != nullptr && wasFullscreen != isFullscreen)
+			RecalculateWindow();
+		if (!isFullscreen)
+			RecalculateWindowedLocation();
+		return res;
 	}
-	wasDeviceSetup = true;
-	return res;
+	return fpDeviceSetup(self, param);
 }
 
 static bool __fastcall DetourDeviceIsFullscreen(void* self, void*) {
-	return borderlessIsFullscreen;
+	return isFullscreen;
 }
 
 static nTSSG::cLotImposterManager* __fastcall DetourLotImposterManagerCtor(nTSSG::cLotImposterManager* self, void*) {
@@ -1214,32 +1367,46 @@ bool Core::Initialize() {
 			}
 		}
 
-		if (ADDRESS_VALID(Addresses::DeviceSetup)) {
-			if (MH_CreateHook(Addresses::DeviceSetup, &DetourDeviceSetup,
-				reinterpret_cast<LPVOID*>(&fpDeviceSetup)) != MH_OK)
+		if (ADDRESS_VALID(Addresses::CanvasShow)) {
+			if (MH_CreateHook(Addresses::CanvasShow, &DetourCanvasShow,
+				reinterpret_cast<LPVOID*>(&fpCanvasShow)) != MH_OK)
 			{
-				Log("DeviceSetup Patch Failed!\n");
+				Log("CanvasShow Patch Failed!\n");
 				return false;
 			}
-			if (MH_EnableHook(Addresses::DeviceSetup) != MH_OK)
+			if (MH_EnableHook(Addresses::CanvasShow) != MH_OK)
 			{
-				Log("DeviceSetup Patch Failed!\n");
+				Log("CanvasShow Patch Failed!\n");
 				return false;
 			}
 		}
+	}
 
-		if (ADDRESS_VALID(Addresses::OptionsFillScreenSizeListBox)) {
-			if (MH_CreateHook(Addresses::OptionsFillScreenSizeListBox, &DetourFillScreenSize,
-				reinterpret_cast<LPVOID*>(&fpFillScreenSize)) != MH_OK)
-			{
-				Log("OptionsFillScreenSizeListBox Patch Failed!\n");
-				return false;
-			}
-			if (MH_EnableHook(Addresses::OptionsFillScreenSizeListBox) != MH_OK)
-			{
-				Log("OptionsFillScreenSizeListBox Patch Failed!\n");
-				return false;
-			}
+	if (ADDRESS_VALID(Addresses::DeviceSetup)) {
+		if (MH_CreateHook(Addresses::DeviceSetup, &DetourDeviceSetup,
+			reinterpret_cast<LPVOID*>(&fpDeviceSetup)) != MH_OK)
+		{
+			Log("DeviceSetup Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::DeviceSetup) != MH_OK)
+		{
+			Log("DeviceSetup Patch Failed!\n");
+			return false;
+		}
+	}
+
+	if (ADDRESS_VALID(Addresses::OptionsFillScreenSizeListBox)) {
+		if (MH_CreateHook(Addresses::OptionsFillScreenSizeListBox, &DetourFillScreenSize,
+			reinterpret_cast<LPVOID*>(&fpFillScreenSize)) != MH_OK)
+		{
+			Log("OptionsFillScreenSizeListBox Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::OptionsFillScreenSizeListBox) != MH_OK)
+		{
+			Log("OptionsFillScreenSizeListBox Patch Failed!\n");
+			return false;
 		}
 	}
 #endif
