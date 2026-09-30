@@ -119,6 +119,39 @@ static int oldHeight;
 static LONG oldWinStyle;
 static LONG oldWinExStyle;
 
+static void RecalculateWindowedLocation() {
+	HWND win;
+	cIGZApp* app = nullptr;
+	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+	{
+		win = app->GetMainHWND();
+		app->Release();
+	}
+	else {
+		return;
+	}
+	RECT clientRect;
+	GetClientRect(win, &clientRect);
+
+	DWORD dwStyle = GetWindowLong(win, GWL_STYLE);
+	DWORD dwExStyle = GetWindowLong(win, GWL_EXSTYLE);
+	BOOL bHasMenu = (GetMenu(win) != NULL);
+
+	RECT winRect = clientRect;
+	AdjustWindowRectEx(&winRect, dwStyle, bHasMenu, dwExStyle);
+
+	oldWidth = winRect.right - winRect.left;
+	oldHeight = winRect.bottom - winRect.top;
+
+	int sw = GetSystemMetrics(SM_CXSCREEN);
+	int sh = GetSystemMetrics(SM_CYSCREEN);
+
+	int x = (sw - oldWidth) / 2;
+	int y = (sh - oldHeight) / 2;
+
+	SetWindowPos(win, HWND_TOP, x, y, oldWidth, oldHeight, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+}
+
 static void MakeWindowedFromBorderless() {
 	HWND win;
 	cIGZApp* app = nullptr;
@@ -132,34 +165,9 @@ static void MakeWindowedFromBorderless() {
 	}
 	SetWindowLong(win, GWL_STYLE, oldWinStyle);
 	SetWindowLong(win, GWL_EXSTYLE, oldWinExStyle);
-	int sw = GetSystemMetrics(SM_CXSCREEN);
-	int sh = GetSystemMetrics(SM_CYSCREEN);
-	int x = (sw - oldWidth) / 2;
-	int y = (sh - oldHeight) / 2;
 
-	SetWindowPos(win, HWND_TOP, x, y, oldWidth, oldHeight, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
-}
-
-static void RecalculateWindowedLocation() {
-	HWND win;
-	cIGZApp* app = nullptr;
-	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
-	{
-		win = app->GetMainHWND();
-		app->Release();
-	}
-	else {
-		return;
-	}
-	RECT winRect;
-	GetWindowRect(win, &winRect);
-	oldWidth = winRect.right - winRect.left;
-	oldHeight = winRect.bottom - winRect.top;
-	int sw = GetSystemMetrics(SM_CXSCREEN);
-	int sh = GetSystemMetrics(SM_CYSCREEN);
-	int x = (sw - oldWidth) / 2;
-	int y = (sh - oldHeight) / 2;
-	SetWindowPos(win, HWND_TOP, x, y, oldWidth, oldHeight, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+	SetWindowPos(win, HWND_TOP, 0, 0, oldWidth, oldHeight, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+	RecalculateWindowedLocation();
 }
 
 static void MakeBorderlessFromWindowed() {
@@ -173,10 +181,19 @@ static void MakeBorderlessFromWindowed() {
 	else {
 		return;
 	}
-	RECT winRect;
-	GetWindowRect(win, &winRect);
+	RECT clientRect;
+	GetClientRect(win, &clientRect);
+
+	DWORD dwStyle = GetWindowLong(win, GWL_STYLE);
+	DWORD dwExStyle = GetWindowLong(win, GWL_EXSTYLE);
+	BOOL bHasMenu = (GetMenu(win) != NULL);
+
+	RECT winRect = clientRect;
+	AdjustWindowRectEx(&winRect, dwStyle, bHasMenu, dwExStyle);
+
 	oldWidth = winRect.right - winRect.left;
 	oldHeight = winRect.bottom - winRect.top;
+
 	LONG lStyle = GetWindowLong(win, GWL_STYLE);
 	oldWinStyle = lStyle;
 	lStyle &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU);
