@@ -1,12 +1,15 @@
 #include "config.h"
 #include "ini.h"
 #include "Logging.h"
+#include <algorithm>
+#include <cctype>
 
 namespace Config {
 	static const char* ConfigFilename = "TS2Extender.ini";
 	static mINI::INIStructure Ini;
 	bool Console;
 	bool SkipIntro;
+	bool Borderless;
 	bool FixRNG;
 	bool FixOFBUniform;
 	bool FixPinkFlashing;
@@ -38,6 +41,17 @@ namespace Config {
 		return Ini[section][key];
 	}
 
+	static std::string GetStringLower(const std::string& section, const std::string& key, std::string defaultValue) {
+		std::transform(defaultValue.begin(), defaultValue.end(), defaultValue.begin(), [](unsigned char c) {
+			return std::tolower(c);
+		});
+		std::string value = GetString(section, key, defaultValue);
+		std::transform(value.begin(), value.end(), value.begin(), [](unsigned char c) {
+			return std::tolower(c);
+		});
+		return value;
+	}
+
 	static int GetInt(const std::string& section, const std::string& key, int defaultValue) {
 		if (!Has(section, key)) {
 			Dirty = true;
@@ -57,7 +71,7 @@ namespace Config {
 	}
 
 	static bool GetBool(const std::string& section, const std::string& key, bool defaultValue) {
-		std::string value = GetString(section, key, defaultValue == false ? "false" : "true");
+		std::string value = GetStringLower(section, key, defaultValue == false ? "false" : "true");
 		if (value == "true" || value == "1") return true;
 		return false;
 	}
@@ -73,6 +87,9 @@ namespace Config {
 
 		Console = GetBool("General", "Console", false);
 		SkipIntro = GetBool("General", "SkipIntro", true);
+#if TS2_UC
+		Borderless = GetBool("General", "Borderless", true);
+#endif
 		FixRNG = GetBool("Fixes", "FixRNG", true);
 		FixOFBUniform = GetBool("Fixes", "FixOFBUniform", true);
 		FixPinkFlashing = GetBool("Fixes", "FixPinkFlashing", true);

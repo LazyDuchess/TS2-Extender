@@ -67,7 +67,7 @@ namespace Addresses {
 
 	extern void* cTSUserToolObjectInit;
 	extern void* cTSUserToolObjectShutdown;
-	
+
 	extern void* LegacyCalculateUIScale;
 
 	extern void* CASStringLookup;
@@ -118,6 +118,12 @@ namespace Addresses {
 	extern void* NhoodEntered;
 
 	extern void* LotImposterManagerCtor;
+
+	extern void* DeviceIsFullscreen;
+
+	extern void* DeviceSetup;
+
+	extern void* OptionsFillScreenSizeListBox;
 
 	bool Initialize();
 }

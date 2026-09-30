@@ -25,6 +25,7 @@
 #include "ts2/cShadow.h"
 #include "Utils.h"
 #include "ts2/cLotImposterManager.h"
+#include "ts2/cDeviceSetupParam.h"
 #include <chrono>
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
@@ -53,7 +54,15 @@ typedef void(__thiscall* SHADOWUPDATESETTINGS)(cShadow* self);
 typedef int(__thiscall* CREATEVISUALEFFECT)(void* self, const char* effectName, void** ppEffect);
 typedef void(__thiscall* POSTLOADLOT)(void* self, int unk);
 typedef void(__thiscall* NHOODENTERED)(void* self, int unk1, int unk2);
+typedef bool(__thiscall* DEVICEISFULLSCREEN)(void* self);
+typedef bool(__thiscall* DEVICESETUP)(void* self, cDeviceSetupParam* params);
+typedef void(__thiscall* FILLSCREENSIZE)(void* self);
+
 typedef nTSSG::cLotImposterManager* (__thiscall* LOTIMPOSTERMANAGERCTOR)(nTSSG::cLotImposterManager* self);
+
+static FILLSCREENSIZE fpFillScreenSize = NULL;
+static DEVICESETUP fpDeviceSetup = NULL;
+static DEVICEISFULLSCREEN fpDeviceIsFullscreen = NULL;
 
 static LOTIMPOSTERMANAGERCTOR fpLotImposterManagerCtor = NULL;
 static POSTLOADLOT fpPostLoadLot = NULL;
@@ -95,7 +104,34 @@ static unsigned int modifyVoiceEventObjectId = 0;
 static void* ModifyVoiceEventHook1Return;
 static void* ModifyVoiceEventHook2Return;
 
+static bool borderlessIsFullscreen = true;
+static bool wasDeviceSetup = false;
+
 static std::chrono::steady_clock::time_point deltaTimePoint;
+
+// Borderless conditional patches
+static void __fastcall DetourFillScreenSize(void* self, void*) {
+	if (borderlessIsFullscreen) return;
+	fpFillScreenSize(self);
+}
+
+static bool __fastcall DetourDeviceSetup(void* self, void*, cDeviceSetupParam* param) {
+	borderlessIsFullscreen = !param->IsWindowed();
+	param->MakeWindowed();
+	bool res = fpDeviceSetup(self, param);
+	if (!wasDeviceSetup) {
+		// Nop out device re-creation as we don't do exclusive fullscreen anyways so it's a waste of time
+		Nop((BYTE*)((DWORD)Addresses::DeviceSetup + 0x27), 5);
+		static const char jmpChar = 0xEB;
+		WriteToMemory((DWORD)Addresses::DeviceSetup + 0x2F, (void*)(&jmpChar), 1);
+	}
+	wasDeviceSetup = true;
+	return res;
+}
+
+static bool __fastcall DetourDeviceIsFullscreen(void* self, void*) {
+	return borderlessIsFullscreen;
+}
 
 static nTSSG::cLotImposterManager* __fastcall DetourLotImposterManagerCtor(nTSSG::cLotImposterManager* self, void*) {
 	fpLotImposterManagerCtor(self);
@@ -1160,6 +1196,53 @@ bool Core::Initialize() {
 			return false;
 		}
 	}
+
+#if TS2_UC
+	if (Config::Borderless) {
+
+		if (ADDRESS_VALID(Addresses::DeviceIsFullscreen)) {
+			if (MH_CreateHook(Addresses::DeviceIsFullscreen, &DetourDeviceIsFullscreen,
+				reinterpret_cast<LPVOID*>(&fpDeviceIsFullscreen)) != MH_OK)
+			{
+				Log("DeviceIsFullscreen Patch Failed!\n");
+				return false;
+			}
+			if (MH_EnableHook(Addresses::DeviceIsFullscreen) != MH_OK)
+			{
+				Log("DeviceIsFullscreen Patch Failed!\n");
+				return false;
+			}
+		}
+
+		if (ADDRESS_VALID(Addresses::DeviceSetup)) {
+			if (MH_CreateHook(Addresses::DeviceSetup, &DetourDeviceSetup,
+				reinterpret_cast<LPVOID*>(&fpDeviceSetup)) != MH_OK)
+			{
+				Log("DeviceSetup Patch Failed!\n");
+				return false;
+			}
+			if (MH_EnableHook(Addresses::DeviceSetup) != MH_OK)
+			{
+				Log("DeviceSetup Patch Failed!\n");
+				return false;
+			}
+		}
+
+		if (ADDRESS_VALID(Addresses::OptionsFillScreenSizeListBox)) {
+			if (MH_CreateHook(Addresses::OptionsFillScreenSizeListBox, &DetourFillScreenSize,
+				reinterpret_cast<LPVOID*>(&fpFillScreenSize)) != MH_OK)
+			{
+				Log("OptionsFillScreenSizeListBox Patch Failed!\n");
+				return false;
+			}
+			if (MH_EnableHook(Addresses::OptionsFillScreenSizeListBox) != MH_OK)
+			{
+				Log("OptionsFillScreenSizeListBox Patch Failed!\n");
+				return false;
+			}
+		}
+	}
+#endif
 
 	return true;
 }

@@ -6,6 +6,7 @@ namespace Config {
 
 	extern bool Console;
 	extern bool SkipIntro;
+	extern bool Borderless;
 	extern bool FixRNG;
 	extern bool FixOFBUniform;
 	extern bool FixPinkFlashing;

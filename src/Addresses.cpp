@@ -147,6 +147,12 @@ namespace Addresses {
 
 	void* LotImposterManagerCtor;
 
+	void* DeviceIsFullscreen;
+
+	void* DeviceSetup;
+
+	void* OptionsFillScreenSizeListBox;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -233,6 +239,11 @@ namespace Addresses {
 		ADDRESS(PostLoadLot, PostLoadLotLookup);
 		ADDRESS(NhoodEntered, NhoodEnteredLookup);
 		ADDRESS(LotImposterManagerCtor, LotImposterManagerCtorLookup);
+#if TS2_UC
+		ADDRESS(DeviceIsFullscreen, DeviceIsFullscreenLookup);
+		ADDRESS(DeviceSetup, DeviceSetupLookup);
+		ADDRESS(OptionsFillScreenSizeListBox, OptionsFillScreenSizeListBoxLookup);
+#endif
 
 		if (ADDRESS_VALID(GetMaterialParser)) {
 			DWORD relativeCall = *(DWORD*)GetMaterialParser;
