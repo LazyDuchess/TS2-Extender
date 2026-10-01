@@ -131,6 +131,8 @@ namespace Addresses {
 
 	extern void* CanvasShow;
 
+	extern void* DesignOnButtonDown;
+
 	bool Initialize();
 }
 

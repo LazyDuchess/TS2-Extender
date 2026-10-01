@@ -24,6 +24,7 @@ namespace Config {
 	float UIScaleResolution;
 	int ShadowQuality;
 	int ImposterQuality;
+	int DesignToolPrice;
 
 	static bool Dirty = false;
 
@@ -106,6 +107,7 @@ namespace Config {
 #endif
 		ShadowQuality = GetInt("Enhancements", "ShadowQuality", 0);
 		ImposterQuality = GetInt("Enhancements", "ImposterQuality", 0);
+		DesignToolPrice = GetInt("Enhancements", "DesignToolPrice", 15);
 		if (!iniExisted) {
 			Log("Config file doesn't exist!\n", ConfigFilename);
 			//file.generate(Ini, true);

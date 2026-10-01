@@ -28,6 +28,7 @@
 #include "ts2/cDeviceSetupParam.h"
 #include "ts2/nsGZWinUtils.h"
 #include "ts2/cGZFramework.h"
+#include "ts2/cTSUserToolObjectDesign.h"
 #include <chrono>
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
@@ -60,9 +61,11 @@ typedef bool(__thiscall* DEVICEISFULLSCREEN)(void* self);
 typedef bool(__thiscall* DEVICESETUP)(void* self, cDeviceSetupParam* params);
 typedef void(__thiscall* FILLSCREENSIZE)(void* self);
 typedef void(__thiscall* CANVASSHOW)(void* self, int unk);
+typedef void(__thiscall* DESIGNONBUTTONDOWN)(cTSUserToolObjectDesign* self, void* point);
 
 typedef nTSSG::cLotImposterManager* (__thiscall* LOTIMPOSTERMANAGERCTOR)(nTSSG::cLotImposterManager* self);
 
+static DESIGNONBUTTONDOWN fpDesignOnButtonDown = NULL;
 static CANVASSHOW fpCanvasShow = NULL;
 static FILLSCREENSIZE fpFillScreenSize = NULL;
 static DEVICESETUP fpDeviceSetup = NULL;
@@ -118,6 +121,13 @@ static int oldWidth;
 static int oldHeight;
 static LONG oldWinStyle;
 static LONG oldWinExStyle;
+
+static void __fastcall DetourDesignOnButtonDown(cTSUserToolObjectDesign* self, void*, void* point) {
+	if (self->GetPrice() > 0) {
+		self->SetPrice(Config::DesignToolPrice);
+	}
+	fpDesignOnButtonDown(self, point);
+}
 
 static void RecalculateWindowedLocation() {
 	HWND win;
@@ -1422,6 +1432,18 @@ bool Core::Initialize() {
 		}
 	}
 #endif
-
+	if (ADDRESS_VALID(Addresses::DesignOnButtonDown)) {
+		if (MH_CreateHook(Addresses::DesignOnButtonDown, &DetourDesignOnButtonDown,
+			reinterpret_cast<LPVOID*>(&fpDesignOnButtonDown)) != MH_OK)
+		{
+			Log("DesignOnButtonDown Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::DesignOnButtonDown) != MH_OK)
+		{
+			Log("DesignOnButtonDown Patch Failed!\n");
+			return false;
+		}
+	}
 	return true;
 }

@@ -21,4 +21,5 @@ namespace Config {
 	extern float UIScaleResolution;
 	extern int ShadowQuality;
 	extern int ImposterQuality;
+	extern int DesignToolPrice;
 }
