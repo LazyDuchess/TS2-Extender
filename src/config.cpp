@@ -25,6 +25,7 @@ namespace Config {
 	int ShadowQuality;
 	int ImposterQuality;
 	int DesignToolPrice;
+	bool Sims3Camera;
 
 	static bool Dirty = false;
 
@@ -108,6 +109,8 @@ namespace Config {
 		ShadowQuality = GetInt("Enhancements", "ShadowQuality", 0);
 		ImposterQuality = GetInt("Enhancements", "ImposterQuality", 0);
 		DesignToolPrice = GetInt("Enhancements", "DesignToolPrice", 15);
+		Sims3Camera = GetBool("Enhancements", "Sims3Camera", false);
+
 		if (!iniExisted) {
 			Log("Config file doesn't exist!\n", ConfigFilename);
 			//file.generate(Ini, true);

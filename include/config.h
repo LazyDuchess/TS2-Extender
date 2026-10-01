@@ -22,4 +22,5 @@ namespace Config {
 	extern int ShadowQuality;
 	extern int ImposterQuality;
 	extern int DesignToolPrice;
+	extern bool Sims3Camera;
 }

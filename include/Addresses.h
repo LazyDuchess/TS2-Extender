@@ -133,6 +133,8 @@ namespace Addresses {
 
 	extern void* DesignOnButtonDown;
 
+	extern void* Sims1CameraHandleRequest;
+
 	bool Initialize();
 }
 

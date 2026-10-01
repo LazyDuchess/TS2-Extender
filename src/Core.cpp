@@ -1445,5 +1445,17 @@ bool Core::Initialize() {
 			return false;
 		}
 	}
+	if (ADDRESS_VALID(Addresses::Sims1CameraHandleRequest) && Config::Sims3Camera) {
+#if TS2_UC
+		// First disable all the drifting and smoothing.
+		static const char jmpChar = 0xEB;
+		WriteToMemory((DWORD)Addresses::Sims1CameraHandleRequest + 0x92C, (void*)(&jmpChar), 1);
+		WriteToMemory((DWORD)Addresses::Sims1CameraHandleRequest + 0x977, (void*)(&jmpChar), 1);
+		WriteToMemory((DWORD)Addresses::Sims1CameraHandleRequest + 0x98E, (void*)(&jmpChar), 1);
+		Nop((BYTE*)((DWORD)Addresses::Sims1CameraHandleRequest + 0x9BF), 2);
+		Nop((BYTE*)((DWORD)Addresses::Sims1CameraHandleRequest + 0xA85), 2);
+#else
+#endif
+	}
 	return true;
 }
