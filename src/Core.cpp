@@ -29,6 +29,7 @@
 #include "ts2/nsGZWinUtils.h"
 #include "ts2/cGZFramework.h"
 #include "ts2/cTSUserToolObjectDesign.h"
+#include "ts2/Camera.h"
 #include <chrono>
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
@@ -62,9 +63,11 @@ typedef bool(__thiscall* DEVICESETUP)(void* self, cDeviceSetupParam* params);
 typedef void(__thiscall* FILLSCREENSIZE)(void* self);
 typedef void(__thiscall* CANVASSHOW)(void* self, int unk);
 typedef void(__thiscall* DESIGNONBUTTONDOWN)(cTSUserToolObjectDesign* self, void* point);
+typedef void(__thiscall* CAMERAHANDLEREQUEST)(cCameraController* cam, camEvent_t eventId, int unk, cCameraEvent* eventData);
 
 typedef nTSSG::cLotImposterManager* (__thiscall* LOTIMPOSTERMANAGERCTOR)(nTSSG::cLotImposterManager* self);
 
+static CAMERAHANDLEREQUEST fpSims1CameraHandleRequest = NULL;
 static DESIGNONBUTTONDOWN fpDesignOnButtonDown = NULL;
 static CANVASSHOW fpCanvasShow = NULL;
 static FILLSCREENSIZE fpFillScreenSize = NULL;
@@ -121,6 +124,33 @@ static int oldWidth;
 static int oldHeight;
 static LONG oldWinStyle;
 static LONG oldWinExStyle;
+
+#define CAM_EVENT_ORBIT 0xbc17e41c
+
+static float xSensitivity = 0.01f;
+static float ySensitivity = 0.01f;
+
+static void __fastcall DetourSims1CameraHandleRequest(cCameraController* cam, void*, camEvent_t eventId, int unk, cCameraEvent* eventData) {
+	if (Config::Sims3Camera) {
+		if (eventId == CAM_EVENT_ORBIT/* && eventData->m_OrbitX != 0 && eventData->m_OrbitY != 0*/) {
+			//Log("Unk: %X, event vtable: %X\n", unk, *(int*)eventData);
+			cCameraTransform* tf = cam->GetTransform();
+			float dx = (float)eventData->m_OrbitX * xSensitivity;
+			float dy = (float)eventData->m_OrbitY * ySensitivity;
+			
+			float yaw = tf->GetYaw() + dx;
+			float pitch = tf->GetPitch() + dy;
+
+			tf->SetYaw(yaw);
+			tf->SetYawTarget(yaw);
+
+			tf->SetPitch(pitch);
+			tf->SetPitchTarget(pitch);
+			return;
+		}
+	}
+	fpSims1CameraHandleRequest(cam, eventId, unk, eventData);
+}
 
 static void __fastcall DetourDesignOnButtonDown(cTSUserToolObjectDesign* self, void*, void* point) {
 	if (self->GetPrice() > 0) {
@@ -1447,13 +1477,25 @@ bool Core::Initialize() {
 	}
 	if (ADDRESS_VALID(Addresses::Sims1CameraHandleRequest) && Config::Sims3Camera) {
 #if TS2_UC
+		if (MH_CreateHook(Addresses::Sims1CameraHandleRequest, &DetourSims1CameraHandleRequest,
+			reinterpret_cast<LPVOID*>(&fpSims1CameraHandleRequest)) != MH_OK)
+		{
+			Log("Sims1CameraHandleRequest Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::Sims1CameraHandleRequest) != MH_OK)
+		{
+			Log("Sims1CameraHandleRequest Patch Failed!\n");
+			return false;
+		}
 		// First disable all the drifting and smoothing.
+		/*
 		static const char jmpChar = 0xEB;
 		WriteToMemory((DWORD)Addresses::Sims1CameraHandleRequest + 0x92C, (void*)(&jmpChar), 1);
 		WriteToMemory((DWORD)Addresses::Sims1CameraHandleRequest + 0x977, (void*)(&jmpChar), 1);
 		WriteToMemory((DWORD)Addresses::Sims1CameraHandleRequest + 0x98E, (void*)(&jmpChar), 1);
 		Nop((BYTE*)((DWORD)Addresses::Sims1CameraHandleRequest + 0x9BF), 2);
-		Nop((BYTE*)((DWORD)Addresses::Sims1CameraHandleRequest + 0xA85), 2);
+		Nop((BYTE*)((DWORD)Addresses::Sims1CameraHandleRequest + 0xA85), 2);*/
 #else
 #endif
 	}
