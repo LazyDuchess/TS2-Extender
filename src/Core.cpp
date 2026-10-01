@@ -229,9 +229,9 @@ static void __fastcall DetourCanvasShow(void* canvas, void*, int unk) {
 static void __fastcall DetourFillScreenSize(void* self, void*) {
 	cIGZWin* window = *(cIGZWin**)((DWORD)self + 0x1c);
 	bool runFunc = true;
+#if TS2_UC
 	cIGZWin* screenSizesWin = window->GetChildWindowFromIDRecursive(0x35);
 	cIGZWin* refreshRatesWin = window->GetChildWindowFromIDRecursive(0x45);
-#if TS2_UC
 	if (Config::Borderless) {
 		if (isFullscreen) {
 			runFunc = false;
@@ -269,11 +269,6 @@ static void __fastcall DetourFillScreenSize(void* self, void*) {
 #endif
 	if (runFunc)
 		fpFillScreenSize(self);
-	// Enable shadow setting that the game likes to disable in hood view
-	nsGZWinUtils::SetWindowEnabled(window, 0x93, true);
-	nsGZWinUtils::SetWindowEnabled(window, 0x92, true);
-	nsGZWinUtils::SetWindowEnabled(window, 0x91, true);
-	nsGZWinUtils::SetWindowEnabled(window, 0x94, true);
 }
 
 static bool __fastcall DetourDeviceSetup(void* self, void*, cDeviceSetupParam* param) {
