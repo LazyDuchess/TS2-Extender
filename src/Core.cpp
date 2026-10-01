@@ -138,13 +138,19 @@ static void __fastcall DetourSims1CameraHandleRequest(cCameraController* cam, vo
 			float dx = (float)eventData->m_OrbitX * xSensitivity;
 			float dy = (float)eventData->m_OrbitY * ySensitivity;
 			
-			float yaw = tf->GetYaw() + dx;
-			float pitch = tf->GetPitch() + dy;
+			float yaw = tf->GetYawTarget() + dx;
+			float pitch = tf->GetPitchTarget() + dy;
 
-			tf->SetYaw(yaw);
+			if (pitch < 0.0f)
+				pitch = 0.0f;
+
+			if (pitch > 1.0f)
+				pitch = 1.0f;
+
+			//tf->SetYaw(yaw);
 			tf->SetYawTarget(yaw);
 
-			tf->SetPitch(pitch);
+			//tf->SetPitch(pitch);
 			tf->SetPitchTarget(pitch);
 			return;
 		}
