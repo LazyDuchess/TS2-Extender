@@ -135,6 +135,10 @@ namespace Addresses {
 
 	extern void* Sims1CameraHandleRequest;
 
+	extern void* CameraMiddleClickMouseEvent;
+
+	extern void* Sims1CameraUpdate;
+
 	bool Initialize();
 }
 

@@ -55,6 +55,12 @@ typedef int(__thiscall* ADDGAMEVERSION)(void* self);
 typedef cShadowManager*(__thiscall* SHADOWMANAGERCTOR)(cShadowManager* self);
 typedef void(__thiscall* SHADOWUPDATESETTINGS)(cShadow* self);
 
+class cRZPoint {
+public:
+	int m_X;
+	int m_Y;
+};
+
 typedef int(__thiscall* CREATEVISUALEFFECT)(void* self, const char* effectName, void** ppEffect);
 typedef void(__thiscall* POSTLOADLOT)(void* self, int unk);
 typedef void(__thiscall* NHOODENTERED)(void* self, int unk1, int unk2);
@@ -64,9 +70,13 @@ typedef void(__thiscall* FILLSCREENSIZE)(void* self);
 typedef void(__thiscall* CANVASSHOW)(void* self, int unk);
 typedef void(__thiscall* DESIGNONBUTTONDOWN)(cTSUserToolObjectDesign* self, void* point);
 typedef void(__thiscall* CAMERAHANDLEREQUEST)(cCameraController* cam, camEvent_t eventId, int unk, cCameraEvent* eventData);
+typedef bool(__thiscall* MOUSEEVENT)(void* self, int unk, int id, cRZPoint* point, bool release);
+typedef void(__thiscall* CAMERAUPDATE)(void* self, int unk, int unk2);
 
 typedef nTSSG::cLotImposterManager* (__thiscall* LOTIMPOSTERMANAGERCTOR)(nTSSG::cLotImposterManager* self);
 
+static CAMERAUPDATE fpSims1CameraUpdate = NULL;
+static MOUSEEVENT fpMiddleClickMouseEvent;
 static CAMERAHANDLEREQUEST fpSims1CameraHandleRequest = NULL;
 static DESIGNONBUTTONDOWN fpDesignOnButtonDown = NULL;
 static CANVASSHOW fpCanvasShow = NULL;
@@ -130,9 +140,72 @@ static LONG oldWinExStyle;
 static float xSensitivity = 0.01f;
 static float ySensitivity = 0.01f;
 
+static bool isMouseOrbiting = false;
+
+int lockMouseX = 0;
+int lockMouseY = 0;
+
+static void __fastcall DetourSims1CameraUpdate(void* self, void*, int unk, int unk2) {
+	if (Config::Sims3Camera) {
+		if (isMouseOrbiting) {
+			cCameraController* cam = (cCameraController*)((DWORD)self - 0x8);
+			cCameraTransform* tf = cam->GetTransform();
+
+			POINT mousePoint;
+			GetCursorPos(&mousePoint);
+
+			int dx = mousePoint.x - lockMouseX;
+			int dy = mousePoint.y - lockMouseY;
+
+			SetCursorPos(lockMouseX, lockMouseY);
+
+			float finaldx = (float)dx * xSensitivity;
+			float finaldy = (float)dy * ySensitivity;
+
+			float yaw = tf->GetYaw() + finaldx;
+			float pitch = tf->GetPitch() + finaldy;
+
+			if (pitch < 0.0f)
+				pitch = 0.0f;
+
+			if (pitch > 1.0f)
+				pitch = 1.0f;
+
+			tf->SetYaw(yaw);
+			tf->SetYawTarget(yaw);
+
+			tf->SetPitch(pitch);
+			tf->SetPitchTarget(pitch);
+		}
+	}
+	fpSims1CameraUpdate(self, unk, unk2);
+}
+
+static bool __fastcall DetourMiddleClickMouseEvent(void* self, void*, int unk, int id, cRZPoint* point, bool release) {
+	if (Config::Sims3Camera) {
+		// 4 start, 3 move?
+		if ((id == 4 || id == 3)) {
+			if (id == 4) {
+				POINT mousePoint;
+				GetCursorPos(&mousePoint);
+				lockMouseX = mousePoint.x;
+				lockMouseY = mousePoint.y;
+			}
+			isMouseOrbiting = true;
+		}
+		else
+		{
+			isMouseOrbiting = false;
+		}
+	}
+	return fpMiddleClickMouseEvent(self, unk, id, point, release);
+}
+
 static void __fastcall DetourSims1CameraHandleRequest(cCameraController* cam, void*, camEvent_t eventId, int unk, cCameraEvent* eventData) {
 	if (Config::Sims3Camera) {
-		if (eventId == CAM_EVENT_ORBIT/* && eventData->m_OrbitX != 0 && eventData->m_OrbitY != 0*/) {
+		if (eventId == CAM_EVENT_ORBIT && isMouseOrbiting) return;
+		/*
+		if (eventId == CAM_EVENT_ORBIT) {
 			//Log("Unk: %X, event vtable: %X\n", unk, *(int*)eventData);
 			cCameraTransform* tf = cam->GetTransform();
 			float dx = (float)eventData->m_OrbitX * xSensitivity;
@@ -153,7 +226,7 @@ static void __fastcall DetourSims1CameraHandleRequest(cCameraController* cam, vo
 			//tf->SetPitch(pitch);
 			tf->SetPitchTarget(pitch);
 			return;
-		}
+		}*/
 	}
 	fpSims1CameraHandleRequest(cam, eventId, unk, eventData);
 }
@@ -1481,7 +1554,7 @@ bool Core::Initialize() {
 			return false;
 		}
 	}
-	if (ADDRESS_VALID(Addresses::Sims1CameraHandleRequest) && Config::Sims3Camera) {
+	if (ADDRESS_VALID(Addresses::Sims1CameraHandleRequest) && ADDRESS_VALID(Addresses::CameraMiddleClickMouseEvent) && ADDRESS_VALID(Addresses::Sims1CameraUpdate) && Config::Sims3Camera) {
 #if TS2_UC
 		if (MH_CreateHook(Addresses::Sims1CameraHandleRequest, &DetourSims1CameraHandleRequest,
 			reinterpret_cast<LPVOID*>(&fpSims1CameraHandleRequest)) != MH_OK)
@@ -1494,6 +1567,34 @@ bool Core::Initialize() {
 			Log("Sims1CameraHandleRequest Patch Failed!\n");
 			return false;
 		}
+
+		if (MH_CreateHook(Addresses::CameraMiddleClickMouseEvent, &DetourMiddleClickMouseEvent,
+			reinterpret_cast<LPVOID*>(&fpMiddleClickMouseEvent)) != MH_OK)
+		{
+			Log("CameraMiddleClickMouseEvent Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::CameraMiddleClickMouseEvent) != MH_OK)
+		{
+			Log("CameraMiddleClickMouseEvent Patch Failed!\n");
+			return false;
+		}
+
+		if (MH_CreateHook(Addresses::Sims1CameraUpdate, &DetourSims1CameraUpdate,
+			reinterpret_cast<LPVOID*>(&fpSims1CameraUpdate)) != MH_OK)
+		{
+			Log("Sims1CameraUpdate Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::Sims1CameraUpdate) != MH_OK)
+		{
+			Log("Sims1CameraUpdate Patch Failed!\n");
+			return false;
+		}
+
+		// Don't lock mouse
+		Nop((BYTE*)((DWORD)Addresses::CameraMiddleClickMouseEvent + 0x224), 16);
+		//Nop((BYTE*)((DWORD)Addresses::CameraMiddleClickMouseEvent + 0x200), 10);
 		// First disable all the drifting and smoothing.
 		/*
 		static const char jmpChar = 0xEB;

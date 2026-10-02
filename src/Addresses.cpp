@@ -163,6 +163,10 @@ namespace Addresses {
 
 	void* Sims1CameraHandleRequest;
 
+	void* CameraMiddleClickMouseEvent;
+
+	void* Sims1CameraUpdate;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -259,6 +263,8 @@ namespace Addresses {
 		ADDRESS(GetFramework, GetFrameworkLookup);
 		ADDRESS(DesignOnButtonDown, DesignOnButtonDownLookup);
 		ADDRESS(Sims1CameraHandleRequest, Sims1CameraHandleRequestLookup);
+		ADDRESS(CameraMiddleClickMouseEvent, CameraMiddleClickMouseEventLookup);
+		ADDRESS(Sims1CameraUpdate, Sims1CameraUpdateLookup);
 
 		if (ADDRESS_VALID(GetFramework)) {
 			DWORD relativeCall = *(DWORD*)GetFramework;
