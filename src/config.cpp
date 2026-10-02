@@ -28,6 +28,7 @@ namespace Config {
 	bool Sims3Camera;
 	float Sims3CameraX;
 	float Sims3CameraY;
+	bool GenderedThumbnails;
 
 	static bool Dirty = false;
 
@@ -114,6 +115,7 @@ namespace Config {
 		Sims3Camera = GetBool("Sims 3 Camera", "Enabled", false);
 		Sims3CameraX = GetFloat("Sims 3 Camera", "XSensitivity", 1.0f);
 		Sims3CameraY = GetFloat("Sims 3 Camera", "YSensitivity", 1.0f);
+		GenderedThumbnails = GetBool("Misc", "GenderedThumbnails", true);
 
 		if (!iniExisted) {
 			Log("Config file doesn't exist!\n", ConfigFilename);

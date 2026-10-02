@@ -1533,6 +1533,12 @@ bool Core::Initialize() {
 			return false;
 		}
 	}
+
+	if (ADDRESS_VALID(Addresses::RealtimeThumbnailGender) && Config::GenderedThumbnails) {
+		static const char zeroChar = 0x00;
+		WriteToMemory((DWORD)Addresses::RealtimeThumbnailGender, (void*)(&zeroChar), 1);
+	}
+
 	if (ADDRESS_VALID(Addresses::Sims1CameraHandleRequest) && ADDRESS_VALID(Addresses::CameraMiddleClickMouseEvent) && ADDRESS_VALID(Addresses::Sims1CameraUpdate) && ADDRESS_VALID(Addresses::CameraMiddleClickCancelDrag) && Config::Sims3Camera) {
 		if (MH_CreateHook(Addresses::Sims1CameraHandleRequest, &DetourSims1CameraHandleRequest,
 			reinterpret_cast<LPVOID*>(&fpSims1CameraHandleRequest)) != MH_OK)

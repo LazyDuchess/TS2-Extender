@@ -169,6 +169,8 @@ namespace Addresses {
 
 	void* CameraMiddleClickCancelDrag;
 
+	void* RealtimeThumbnailGender;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -267,6 +269,7 @@ namespace Addresses {
 		ADDRESS(Sims1CameraHandleRequest, Sims1CameraHandleRequestLookup);
 		ADDRESS(CameraMiddleClickMouseEvent, CameraMiddleClickMouseEventLookup);
 		ADDRESS(Sims1CameraUpdate, Sims1CameraUpdateLookup);
+		ADDRESS(RealtimeThumbnailGender, RealtimeThumbnailGenderLookup);
 
 		if (ADDRESS_VALID(CameraMiddleClickMouseEvent))
 		{

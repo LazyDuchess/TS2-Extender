@@ -141,6 +141,8 @@ namespace Addresses {
 
 	extern void* CameraMiddleClickCancelDrag;
 
+	extern void* RealtimeThumbnailGender;
+
 	bool Initialize();
 }
 
