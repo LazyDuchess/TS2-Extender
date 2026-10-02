@@ -23,4 +23,6 @@ namespace Config {
 	extern int ImposterQuality;
 	extern int DesignToolPrice;
 	extern bool Sims3Camera;
+	extern float Sims3CameraX;
+	extern float Sims3CameraY;
 }

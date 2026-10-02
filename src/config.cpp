@@ -26,6 +26,8 @@ namespace Config {
 	int ImposterQuality;
 	int DesignToolPrice;
 	bool Sims3Camera;
+	float Sims3CameraX;
+	float Sims3CameraY;
 
 	static bool Dirty = false;
 
@@ -109,7 +111,9 @@ namespace Config {
 		ShadowQuality = GetInt("Enhancements", "ShadowQuality", 0);
 		ImposterQuality = GetInt("Enhancements", "ImposterQuality", 0);
 		DesignToolPrice = GetInt("Enhancements", "DesignToolPrice", 15);
-		Sims3Camera = GetBool("Enhancements", "Sims3Camera", false);
+		Sims3Camera = GetBool("Sims 3 Camera", "Enabled", false);
+		Sims3CameraX = GetFloat("Sims 3 Camera", "XSensitivity", 1.0f);
+		Sims3CameraY = GetFloat("Sims 3 Camera", "YSensitivity", 1.0f);
 
 		if (!iniExisted) {
 			Log("Config file doesn't exist!\n", ConfigFilename);

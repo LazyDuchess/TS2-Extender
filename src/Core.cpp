@@ -168,8 +168,8 @@ static void __fastcall DetourSims1CameraUpdate(void* self, void*, int unk, int u
 
 			SetCursorPos(lockMouseX, lockMouseY);
 
-			float finaldx = (float)dx * xSensitivity;
-			float finaldy = (float)dy * ySensitivity;
+			float finaldx = (float)dx * xSensitivity * Config::Sims3CameraX;
+			float finaldy = (float)dy * ySensitivity * Config::Sims3CameraY;
 
 			float yaw = tf->GetYaw() + finaldx;
 			float pitch = tf->GetPitch() + finaldy;
