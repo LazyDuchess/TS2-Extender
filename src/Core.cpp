@@ -72,9 +72,11 @@ typedef void(__thiscall* DESIGNONBUTTONDOWN)(cTSUserToolObjectDesign* self, void
 typedef void(__thiscall* CAMERAHANDLEREQUEST)(cCameraController* cam, camEvent_t eventId, int unk, cCameraEvent* eventData);
 typedef bool(__thiscall* MOUSEEVENT)(void* self, int unk, int id, cRZPoint* point, bool release);
 typedef void(__thiscall* CAMERAUPDATE)(void* self, int unk, int unk2);
+typedef void(__thiscall* CAMERACANCELDRAG)(void* self);
 
 typedef nTSSG::cLotImposterManager* (__thiscall* LOTIMPOSTERMANAGERCTOR)(nTSSG::cLotImposterManager* self);
 
+static CAMERACANCELDRAG fpCameraCancelDrag = NULL;
 static CAMERAUPDATE fpSims1CameraUpdate = NULL;
 static MOUSEEVENT fpMiddleClickMouseEvent;
 static CAMERAHANDLEREQUEST fpSims1CameraHandleRequest = NULL;
@@ -137,13 +139,20 @@ static LONG oldWinExStyle;
 
 #define CAM_EVENT_ORBIT 0xbc17e41c
 
-static float xSensitivity = 0.01f;
-static float ySensitivity = 0.01f;
+static float xSensitivity = -0.005f;
+static float ySensitivity = 0.005f;
 
 static bool isMouseOrbiting = false;
 
 int lockMouseX = 0;
 int lockMouseY = 0;
+
+static void __fastcall DetourCameraCancelDrag(void* self) {
+	if (Config::Sims3Camera) {
+		isMouseOrbiting = false;
+	}
+	fpCameraCancelDrag(self);
+}
 
 static void __fastcall DetourSims1CameraUpdate(void* self, void*, int unk, int unk2) {
 	if (Config::Sims3Camera) {
@@ -183,19 +192,12 @@ static void __fastcall DetourSims1CameraUpdate(void* self, void*, int unk, int u
 
 static bool __fastcall DetourMiddleClickMouseEvent(void* self, void*, int unk, int id, cRZPoint* point, bool release) {
 	if (Config::Sims3Camera) {
-		// 4 start, 3 move?
-		if ((id == 4 || id == 3)) {
-			if (id == 4) {
-				POINT mousePoint;
-				GetCursorPos(&mousePoint);
-				lockMouseX = mousePoint.x;
-				lockMouseY = mousePoint.y;
-			}
+		if (id == 4) {
+			POINT mousePoint;
+			GetCursorPos(&mousePoint);
+			lockMouseX = mousePoint.x;
+			lockMouseY = mousePoint.y;
 			isMouseOrbiting = true;
-		}
-		else
-		{
-			isMouseOrbiting = false;
 		}
 	}
 	return fpMiddleClickMouseEvent(self, unk, id, point, release);
@@ -204,29 +206,6 @@ static bool __fastcall DetourMiddleClickMouseEvent(void* self, void*, int unk, i
 static void __fastcall DetourSims1CameraHandleRequest(cCameraController* cam, void*, camEvent_t eventId, int unk, cCameraEvent* eventData) {
 	if (Config::Sims3Camera) {
 		if (eventId == CAM_EVENT_ORBIT && isMouseOrbiting) return;
-		/*
-		if (eventId == CAM_EVENT_ORBIT) {
-			//Log("Unk: %X, event vtable: %X\n", unk, *(int*)eventData);
-			cCameraTransform* tf = cam->GetTransform();
-			float dx = (float)eventData->m_OrbitX * xSensitivity;
-			float dy = (float)eventData->m_OrbitY * ySensitivity;
-			
-			float yaw = tf->GetYawTarget() + dx;
-			float pitch = tf->GetPitchTarget() + dy;
-
-			if (pitch < 0.0f)
-				pitch = 0.0f;
-
-			if (pitch > 1.0f)
-				pitch = 1.0f;
-
-			//tf->SetYaw(yaw);
-			tf->SetYawTarget(yaw);
-
-			//tf->SetPitch(pitch);
-			tf->SetPitchTarget(pitch);
-			return;
-		}*/
 	}
 	fpSims1CameraHandleRequest(cam, eventId, unk, eventData);
 }
@@ -1554,7 +1533,7 @@ bool Core::Initialize() {
 			return false;
 		}
 	}
-	if (ADDRESS_VALID(Addresses::Sims1CameraHandleRequest) && ADDRESS_VALID(Addresses::CameraMiddleClickMouseEvent) && ADDRESS_VALID(Addresses::Sims1CameraUpdate) && Config::Sims3Camera) {
+	if (ADDRESS_VALID(Addresses::Sims1CameraHandleRequest) && ADDRESS_VALID(Addresses::CameraMiddleClickMouseEvent) && ADDRESS_VALID(Addresses::Sims1CameraUpdate) && ADDRESS_VALID(Addresses::CameraMiddleClickCancelDrag) && Config::Sims3Camera) {
 #if TS2_UC
 		if (MH_CreateHook(Addresses::Sims1CameraHandleRequest, &DetourSims1CameraHandleRequest,
 			reinterpret_cast<LPVOID*>(&fpSims1CameraHandleRequest)) != MH_OK)
@@ -1592,17 +1571,20 @@ bool Core::Initialize() {
 			return false;
 		}
 
+		if (MH_CreateHook(Addresses::CameraMiddleClickCancelDrag, &DetourCameraCancelDrag,
+			reinterpret_cast<LPVOID*>(&fpCameraCancelDrag)) != MH_OK)
+		{
+			Log("CameraMiddleClickCancelDrag Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::CameraMiddleClickCancelDrag) != MH_OK)
+		{
+			Log("CameraMiddleClickCancelDrag Patch Failed!\n");
+			return false;
+		}
+
 		// Don't lock mouse
 		Nop((BYTE*)((DWORD)Addresses::CameraMiddleClickMouseEvent + 0x224), 16);
-		//Nop((BYTE*)((DWORD)Addresses::CameraMiddleClickMouseEvent + 0x200), 10);
-		// First disable all the drifting and smoothing.
-		/*
-		static const char jmpChar = 0xEB;
-		WriteToMemory((DWORD)Addresses::Sims1CameraHandleRequest + 0x92C, (void*)(&jmpChar), 1);
-		WriteToMemory((DWORD)Addresses::Sims1CameraHandleRequest + 0x977, (void*)(&jmpChar), 1);
-		WriteToMemory((DWORD)Addresses::Sims1CameraHandleRequest + 0x98E, (void*)(&jmpChar), 1);
-		Nop((BYTE*)((DWORD)Addresses::Sims1CameraHandleRequest + 0x9BF), 2);
-		Nop((BYTE*)((DWORD)Addresses::Sims1CameraHandleRequest + 0xA85), 2);*/
 #else
 #endif
 	}

@@ -167,6 +167,8 @@ namespace Addresses {
 
 	void* Sims1CameraUpdate;
 
+	void* CameraMiddleClickCancelDrag;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -265,6 +267,13 @@ namespace Addresses {
 		ADDRESS(Sims1CameraHandleRequest, Sims1CameraHandleRequestLookup);
 		ADDRESS(CameraMiddleClickMouseEvent, CameraMiddleClickMouseEventLookup);
 		ADDRESS(Sims1CameraUpdate, Sims1CameraUpdateLookup);
+
+		if (ADDRESS_VALID(CameraMiddleClickMouseEvent))
+		{
+			DWORD callAddr = (DWORD)CameraMiddleClickMouseEvent + 0x14A;
+			DWORD relativeCall = *(DWORD*)callAddr;
+			CameraMiddleClickCancelDrag = (void*)((DWORD)callAddr + relativeCall + 4);
+		}
 
 		if (ADDRESS_VALID(GetFramework)) {
 			DWORD relativeCall = *(DWORD*)GetFramework;

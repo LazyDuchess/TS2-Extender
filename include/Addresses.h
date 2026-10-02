@@ -139,6 +139,8 @@ namespace Addresses {
 
 	extern void* Sims1CameraUpdate;
 
+	extern void* CameraMiddleClickCancelDrag;
+
 	bool Initialize();
 }
 
