@@ -1534,7 +1534,6 @@ bool Core::Initialize() {
 		}
 	}
 	if (ADDRESS_VALID(Addresses::Sims1CameraHandleRequest) && ADDRESS_VALID(Addresses::CameraMiddleClickMouseEvent) && ADDRESS_VALID(Addresses::Sims1CameraUpdate) && ADDRESS_VALID(Addresses::CameraMiddleClickCancelDrag) && Config::Sims3Camera) {
-#if TS2_UC
 		if (MH_CreateHook(Addresses::Sims1CameraHandleRequest, &DetourSims1CameraHandleRequest,
 			reinterpret_cast<LPVOID*>(&fpSims1CameraHandleRequest)) != MH_OK)
 		{
@@ -1582,10 +1581,11 @@ bool Core::Initialize() {
 			Log("CameraMiddleClickCancelDrag Patch Failed!\n");
 			return false;
 		}
-
 		// Don't lock mouse
-		Nop((BYTE*)((DWORD)Addresses::CameraMiddleClickMouseEvent + 0x224), 16);
+#if TS2_LC
+		Nop((BYTE*)((DWORD)Addresses::CameraMiddleClickMouseEvent + 0x250), 16);
 #else
+		Nop((BYTE*)((DWORD)Addresses::CameraMiddleClickMouseEvent + 0x224), 16);
 #endif
 	}
 	return true;

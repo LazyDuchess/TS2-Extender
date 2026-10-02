@@ -1,5 +1,10 @@
 #include "ts2/Camera.h"
 #define PITCH_OFFSET 0x8C
+#if TS2_LC
+#define TF_OFFSET -0x388
+#else
+#define TF_OFFSET -0x37C
+#endif
 
 float cCameraTransform::GetYaw() {
 	return (*(float*)(this));
@@ -34,5 +39,5 @@ void cCameraTransform::SetPitchTarget(float pitch) {
 }
 
 cCameraTransform* cCameraController::GetTransform() {
-	return (cCameraTransform*)(this - 0x37C);
+	return (cCameraTransform*)(this + TF_OFFSET);
 }

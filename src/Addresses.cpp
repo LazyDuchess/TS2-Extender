@@ -270,7 +270,11 @@ namespace Addresses {
 
 		if (ADDRESS_VALID(CameraMiddleClickMouseEvent))
 		{
+#if TS2_LC
+			DWORD callAddr = (DWORD)CameraMiddleClickMouseEvent + 0x171;
+#else
 			DWORD callAddr = (DWORD)CameraMiddleClickMouseEvent + 0x14A;
+#endif
 			DWORD relativeCall = *(DWORD*)callAddr;
 			CameraMiddleClickCancelDrag = (void*)((DWORD)callAddr + relativeCall + 4);
 		}
