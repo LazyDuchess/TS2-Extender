@@ -34,7 +34,10 @@ function(setup_ts2extender_target target_name compile_defs sources headers inclu
 	thirdparty/mINI/src/mini
     )
 
-    target_link_libraries(${target_name} PRIVATE minhook)
+    target_link_libraries(${target_name} PRIVATE 
+    minhook
+    gdiplus
+    )
 
     set_target_properties(${target_name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"

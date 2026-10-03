@@ -3,6 +3,8 @@
 #include <atomic>
 #include <filesystem>
 #include <random>
+#include <gdiplus.h>
+#include <memory>
 
 constexpr UINT WM_SPLASH_CLOSE = WM_APP + 1;
 
@@ -10,7 +12,9 @@ namespace SplashWindow {
 
 	HMODULE gModule;
 	static std::atomic<bool> sSignalClose(false);
-	static std::string sSplashPath;
+	static std::wstring sSplashPath;
+	static std::unique_ptr<Gdiplus::Image> sImage;
+	static std::unique_ptr<Gdiplus::Bitmap> sBitmap;
 
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		switch (msg) {
@@ -43,7 +47,8 @@ namespace SplashWindow {
 				RECT rect;
 				GetClientRect(hWnd, &rect);
 
-				// DRAW!
+				Gdiplus::Graphics graphics(hdc);
+				graphics.DrawImage(sBitmap.get(), 0, 0);
 
 				EndPaint(hWnd, &ps);
 				return 0;
@@ -54,46 +59,62 @@ namespace SplashWindow {
 	}
 
 	DWORD WINAPI ThreadedCreate(LPVOID param) {
-		
+		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+		ULONG_PTR gdiplusToken;
 
-
-		const char kSplashClassName[] = "TS2ExtenderSplashWin";
-
-		WNDCLASS wc = {};
-		wc.lpfnWndProc = WndProc;
-		wc.hInstance = gModule;
-		wc.lpszClassName = kSplashClassName;
-		wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-
-		if (!RegisterClass(&wc))
-			return 0;
-
-		HWND hWnd = CreateWindowEx(
-			WS_EX_TOOLWINDOW,
-			kSplashClassName,
-			"The Sims 2",
-			WS_POPUP,
-			CW_USEDEFAULT, CW_USEDEFAULT,
-			600, 600,
-			nullptr,
-			nullptr,
-			gModule,
+		Gdiplus::GdiplusStartup(
+			&gdiplusToken,
+			&gdiplusStartupInput,
 			nullptr
 		);
 
-		if (hWnd == nullptr)
-			return 0;
+		sImage = std::make_unique<Gdiplus::Image>(sSplashPath.c_str());
 
-		ShowWindow(hWnd, SW_SHOW);
-		UpdateWindow(hWnd);
+		if (sImage->GetLastStatus() == Gdiplus::Ok) {
+			sBitmap = std::make_unique<Gdiplus::Bitmap>(600, 600, PixelFormat32bppARGB);
+			Gdiplus::Graphics graphics(sBitmap.get());
+			graphics.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
+			graphics.DrawImage(sImage.get(), 0, 0, 600, 600);
+			const char kSplashClassName[] = "TS2ExtenderSplashWin";
 
-		MSG msg = {};
-		while (GetMessage(&msg, nullptr, 0, 0)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			WNDCLASS wc = {};
+			wc.lpfnWndProc = WndProc;
+			wc.hInstance = gModule;
+			wc.lpszClassName = kSplashClassName;
+			wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+			wc.hbrBackground = nullptr;
+
+			if (!RegisterClass(&wc))
+				return 0;
+
+			HWND hWnd = CreateWindowEx(
+				WS_EX_TOOLWINDOW,
+				kSplashClassName,
+				"The Sims 2",
+				WS_POPUP,
+				CW_USEDEFAULT, CW_USEDEFAULT,
+				600, 600,
+				nullptr,
+				nullptr,
+				gModule,
+				nullptr
+			);
+
+			if (hWnd == nullptr)
+				return 0;
+
+			ShowWindow(hWnd, SW_SHOW);
+			UpdateWindow(hWnd);
+
+			MSG msg = {};
+			while (GetMessage(&msg, nullptr, 0, 0)) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 		}
-
+		Gdiplus::GdiplusShutdown(gdiplusToken);
+		sImage.reset();
+		sBitmap.reset();
 		return 0;
 	}
 
@@ -104,7 +125,7 @@ namespace SplashWindow {
 	void Create(const char* splashDirectory) {
 
 		bool foundSplash = false;
-		std::vector<std::string> splashFiles;
+		std::vector<std::wstring> splashFiles;
 
 		std::filesystem::path splashPath = std::filesystem::u8path(splashDirectory);
 
@@ -115,7 +136,7 @@ namespace SplashWindow {
 
 				if (fext == ".png")
 				{
-					splashFiles.push_back(entry.path().u8string());
+					splashFiles.push_back(entry.path().wstring());
 					foundSplash = true;
 				}
 			}
