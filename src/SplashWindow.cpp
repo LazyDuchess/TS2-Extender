@@ -15,6 +15,9 @@ namespace SplashWindow {
 	static std::wstring sSplashPath;
 	static std::unique_ptr<Gdiplus::Image> sImage;
 	static std::unique_ptr<Gdiplus::Bitmap> sBitmap;
+	static int sWidth = 600;
+	static int sHeight = 600;
+	static float sVerticalCoverage = 0.5f;
 
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		switch (msg) {
@@ -44,9 +47,6 @@ namespace SplashWindow {
 				PAINTSTRUCT ps;
 				HDC hdc = BeginPaint(hWnd, &ps);
 
-				RECT rect;
-				GetClientRect(hWnd, &rect);
-
 				Gdiplus::Graphics graphics(hdc);
 				graphics.DrawImage(sBitmap.get(), 0, 0);
 
@@ -71,10 +71,22 @@ namespace SplashWindow {
 		sImage = std::make_unique<Gdiplus::Image>(sSplashPath.c_str());
 
 		if (sImage->GetLastStatus() == Gdiplus::Ok) {
-			sBitmap = std::make_unique<Gdiplus::Bitmap>(600, 600, PixelFormat32bppARGB);
+
+			int screenW = GetSystemMetrics(SM_CXSCREEN);
+			int screenH = GetSystemMetrics(SM_CYSCREEN);
+
+			float ratio = (float)sImage->GetWidth() / (float)sImage->GetHeight();
+
+			sHeight = (float)screenH * Config::SplashVerticalCoverage;
+			sWidth = (float)sHeight * ratio;
+
+			int xPos = (float)(screenW - sWidth) / 2;
+			int yPos = (float)(screenH - sHeight) / 2;
+
+			sBitmap = std::make_unique<Gdiplus::Bitmap>(sWidth, sHeight, PixelFormat32bppARGB);
 			Gdiplus::Graphics graphics(sBitmap.get());
 			graphics.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
-			graphics.DrawImage(sImage.get(), 0, 0, 600, 600);
+			graphics.DrawImage(sImage.get(), 0, 0, sWidth, sHeight);
 			const char kSplashClassName[] = "TS2ExtenderSplashWin";
 
 			WNDCLASS wc = {};
@@ -92,8 +104,8 @@ namespace SplashWindow {
 				kSplashClassName,
 				"The Sims 2",
 				WS_POPUP,
-				CW_USEDEFAULT, CW_USEDEFAULT,
-				600, 600,
+				xPos, yPos,
+				sWidth, sHeight,
 				nullptr,
 				nullptr,
 				gModule,
@@ -112,9 +124,9 @@ namespace SplashWindow {
 				DispatchMessage(&msg);
 			}
 		}
-		Gdiplus::GdiplusShutdown(gdiplusToken);
-		sImage.reset();
 		sBitmap.reset();
+		sImage.reset();
+		Gdiplus::GdiplusShutdown(gdiplusToken);
 		return 0;
 	}
 
@@ -122,8 +134,8 @@ namespace SplashWindow {
 		sSignalClose.store(true, std::memory_order_relaxed);
 	}
 
-	void Create(const char* splashDirectory) {
-
+	void Create(const char* splashDirectory, float verticalCoverage) {
+		sVerticalCoverage = verticalCoverage;
 		bool foundSplash = false;
 		std::vector<std::wstring> splashFiles;
 

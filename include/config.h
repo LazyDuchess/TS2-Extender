@@ -27,4 +27,6 @@ namespace Config {
 	extern float Sims3CameraY;
 	extern bool GenderedThumbnails;
 	extern bool OceanReflections;
+	extern bool Splash;
+	extern float SplashVerticalCoverage;
 }

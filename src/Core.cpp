@@ -1026,7 +1026,7 @@ bool Core::Create() {
 
 bool Core::Initialize() {
 	Config::Load(DllPath);
-
+	
 #if !FORCE_CONSOLE
 	if (Config::Console) {
 		AllocConsole();
@@ -1038,7 +1038,9 @@ bool Core::Initialize() {
 
 	std::string splashDir = DllPath + "\\Splash";
 
-	SplashWindow::Create(splashDir.c_str());
+	if (Config::Splash) {
+		SplashWindow::Create(splashDir.c_str(), Config::SplashVerticalCoverage);
+	}
 
 	Log("TS2 Extender %s\n", Version);
 
