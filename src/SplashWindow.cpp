@@ -18,13 +18,22 @@ namespace SplashWindow {
 	static int sWidth = 600;
 	static int sHeight = 600;
 	static float sVerticalCoverage = 0.5f;
+	static HCURSOR sLoadCursor = NULL;
 
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		switch (msg) {
 
 		case WM_CREATE:
-			SetTimer(hWnd, 1, 50, nullptr);
+			SetTimer(hWnd, 1, 10, nullptr);
 			return 0;
+
+		case WM_SETCURSOR:
+			if (LOWORD(lParam) == HTCAPTION) {
+				if (sLoadCursor != NULL)
+					SetCursor(sLoadCursor);
+				return TRUE;
+			}
+			break;
 
 		case WM_TIMER:
 			if (sSignalClose.load(std::memory_order_relaxed))
@@ -96,7 +105,7 @@ namespace SplashWindow {
 			int xPos = (float)(screenW - sWidth) / 2;
 			int yPos = (float)(screenH - sHeight) / 2;
 
-			sBitmap = std::make_unique<Gdiplus::Bitmap>(sWidth, sHeight, PixelFormat32bppARGB);
+			sBitmap = std::make_unique<Gdiplus::Bitmap>(sWidth, sHeight, PixelFormat32bppRGB);
 			Gdiplus::Graphics graphics(sBitmap.get());
 			graphics.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
 			graphics.DrawImage(sImage.get(), 0, 0, sWidth, sHeight);
@@ -106,7 +115,7 @@ namespace SplashWindow {
 			wc.lpfnWndProc = WndProc;
 			wc.hInstance = gModule;
 			wc.lpszClassName = kSplashClassName;
-			wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+			wc.hCursor = sLoadCursor;
 			wc.hbrBackground = nullptr;
 
 			if (!RegisterClass(&wc))
@@ -147,12 +156,22 @@ namespace SplashWindow {
 		sSignalClose.store(true, std::memory_order_relaxed);
 	}
 
-	void Create(const char* splashDirectory, float verticalCoverage) {
+	void Create(const char* splashDirectory, const wchar_t* baseDirectory, float verticalCoverage) {
 		sVerticalCoverage = verticalCoverage;
 		bool foundSplash = false;
 		std::vector<std::wstring> splashFiles;
 
 		std::filesystem::path splashPath = std::filesystem::u8path(splashDirectory);
+
+		std::filesystem::path cursorPath = std::filesystem::path(baseDirectory) / "TSData" / "Res" / "UI" / "Cursors" / "Hourglass_8.ani";
+
+		sLoadCursor = (HCURSOR)LoadImageW(
+			NULL,                       
+			cursorPath.wstring().c_str(),
+			IMAGE_CURSOR,                
+			0, 0,                        
+			LR_LOADFROMFILE | LR_DEFAULTSIZE
+		);
 
 		for (const auto& entry : std::filesystem::recursive_directory_iterator(splashPath)) {
 			if (entry.is_regular_file()) {

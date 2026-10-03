@@ -31,6 +31,7 @@
 #include "ts2/cTSUserToolObjectDesign.h"
 #include "ts2/Camera.h"
 #include "SplashWindow.h"
+#include <filesystem>
 #include <chrono>
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
@@ -956,6 +957,65 @@ void Core::DoDefaultUserData() {
 	}
 }
 
+static std::string GetProcessDirectory() {
+	wchar_t path[MAX_PATH];
+	if (GetModuleFileNameW(NULL, path, MAX_PATH)) {
+		std::string dir = WCharToString(path);
+		size_t pos = dir.find_last_of("\\/");
+		if (pos != std::string::npos) {
+			return dir.substr(0, pos);
+		}
+	}
+	return "";
+}
+
+bool Core::GetBaseDirectory(std::wstring *outstr) {
+#if TS2_LC
+	std::string dir = GetProcessDirectory();
+	std::filesystem::path basePath = std::filesystem::u8path(dir) / ".." / ".." / ".." / "Double Deluxe\\Base";
+	outstr->assign(basePath.wstring());
+#else
+	HKEY nameKey;
+
+	LSTATUS keyStatus = RegOpenKeyExW(
+		HKEY_LOCAL_MACHINE,
+		L"SOFTWARE\\EA GAMES\\The Sims 2",
+		0,
+		KEY_READ | KEY_WOW64_32KEY,
+		&nameKey
+	);
+
+	if (keyStatus != ERROR_SUCCESS) return false;
+
+	DWORD finalSize = 0;
+	const wchar_t keyName[] = L"install dir";
+
+	LSTATUS valueStatus = RegGetValueW(
+		nameKey,
+		NULL,
+		keyName,
+		RRF_RT_REG_SZ,
+		NULL,
+		NULL,
+		&finalSize
+	);
+
+	if (valueStatus != ERROR_SUCCESS) return false;
+
+	outstr->resize(finalSize / sizeof(wchar_t));
+
+	RegGetValueW(
+		nameKey,
+		NULL,
+		keyName,
+		RRF_RT_REG_SZ,
+		NULL,
+		outstr->data(),
+		&finalSize
+	);
+#endif
+}
+
 bool Core::CacheUserData() {
 	HKEY nameKey;
 
@@ -1037,9 +1097,12 @@ bool Core::Initialize() {
 #endif
 
 	std::string splashDir = DllPath + "\\Splash";
+	std::wstring baseDir = L"";
+
+	Core::_instance->GetBaseDirectory(&baseDir);
 
 	if (Config::Splash) {
-		SplashWindow::Create(splashDir.c_str(), Config::SplashVerticalCoverage);
+		SplashWindow::Create(splashDir.c_str(), baseDir.c_str(), Config::SplashVerticalCoverage);
 	}
 
 	Log("TS2 Extender %s\n", Version);

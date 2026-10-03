@@ -33,6 +33,7 @@ public:
 	cEdithObjectTestSim* m_CurrentTestSim = nullptr;
 	bool m_LoadUIScriptDebug = false;
 private:
+	bool GetBaseDirectory(std::wstring *outstr);
 	bool CacheUserData();
 	void DoDefaultUserData();
 };

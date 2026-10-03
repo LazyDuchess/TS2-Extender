@@ -2,6 +2,6 @@
 
 namespace SplashWindow {
 	extern HMODULE gModule;
-	void Create(const char* splashDirectory, float verticalCoverage);
+	void Create(const char* splashDirectory, const wchar_t* baseDirectory, float verticalCoverage);
 	void SignalClose();
 }
