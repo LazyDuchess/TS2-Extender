@@ -344,6 +344,11 @@ static void __fastcall DetourCanvasShow(void* canvas, void*, int unk) {
 
 		AttachThreadInput(thisThread, splashThread, FALSE);
 	}
+	else
+	{
+		SetForegroundWindow(win);
+		SetFocus(win);
+	}
 	SplashWindow::SignalClose();
 }
 
