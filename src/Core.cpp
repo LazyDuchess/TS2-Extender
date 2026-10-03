@@ -339,6 +339,7 @@ static void __fastcall DetourCanvasShow(void* canvas, void*, int unk) {
 		DWORD thisThread = GetWindowThreadProcessId(win, nullptr);
 		AttachThreadInput(thisThread, splashThread, TRUE);
 
+		BringWindowToTop(win);
 		SetForegroundWindow(win);
 		SetFocus(win);
 
@@ -346,6 +347,7 @@ static void __fastcall DetourCanvasShow(void* canvas, void*, int unk) {
 	}
 	else
 	{
+		BringWindowToTop(win);
 		SetForegroundWindow(win);
 		SetFocus(win);
 	}
