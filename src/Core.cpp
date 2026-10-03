@@ -30,6 +30,7 @@
 #include "ts2/cGZFramework.h"
 #include "ts2/cTSUserToolObjectDesign.h"
 #include "ts2/Camera.h"
+#include "SplashWindow.h"
 #include <chrono>
 
 typedef unsigned int(__thiscall* RANDOMUINT32UNIFORM)(TS2::cRZRandom*);
@@ -315,6 +316,7 @@ static void RecalculateWindow() {
 }
 
 static void __fastcall DetourCanvasShow(void* canvas, void*, int unk) {
+	SplashWindow::SignalClose();
 	fpCanvasShow(canvas, unk);
 	if (canvasInstance == nullptr) {
 		if (isFullscreen) {
@@ -1034,6 +1036,10 @@ bool Core::Initialize() {
 	}
 #endif
 
+	std::string splashDir = DllPath + "\\Splash";
+
+	SplashWindow::Create(splashDir.c_str());
+
 	Log("TS2 Extender %s\n", Version);
 
 	Log("Core initializing\n");
@@ -1053,6 +1059,10 @@ bool Core::Initialize() {
 	{
 		Log("Failed to initialize MinHook\n");
 		return false;
+	}
+
+	if (ADDRESS_INVALID(Addresses::CanvasShow)) {
+		SplashWindow::SignalClose();
 	}
 
 	if (Config::FixRNG && ADDRESS_VALID(Addresses::RandomUint32Uniform)) {

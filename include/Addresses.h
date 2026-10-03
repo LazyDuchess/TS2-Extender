@@ -149,3 +149,4 @@ namespace Addresses {
 }
 
 #define ADDRESS_VALID(name) name != nullptr
+#define ADDRESS_INVALID(name) name == nullptr

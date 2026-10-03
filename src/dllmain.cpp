@@ -4,6 +4,7 @@
 #include "Logging.h"
 #include "Utils.h"
 #include <iostream>
+#include "SplashWindow.h"
 
 static bool IsGame() {
 #if TS2_UC
@@ -49,8 +50,10 @@ BOOL WINAPI DllMain(HMODULE hModule,
         DisableThreadLibraryCalls(hModule);
         if (!IsGame()) return TRUE;
         CacheCoreDirectory(hModule);
+        SplashWindow::gModule = hModule;
         if (!Core::Create()) {
             Log("Failed to initialize Core!\n");
+            SplashWindow::SignalClose();
             return TRUE;
         }
         Log("Core initialized.\n");
