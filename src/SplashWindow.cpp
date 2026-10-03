@@ -47,8 +47,21 @@ namespace SplashWindow {
 				PAINTSTRUCT ps;
 				HDC hdc = BeginPaint(hWnd, &ps);
 
-				Gdiplus::Graphics graphics(hdc);
+				HDC memDC = CreateCompatibleDC(hdc);
+				HBITMAP memBitmap = CreateCompatibleBitmap(hdc, sWidth, sHeight);
+				HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, memBitmap);
+
+				Gdiplus::Graphics graphics(memDC);
+
+				graphics.Clear(Gdiplus::Color::White);
+
 				graphics.DrawImage(sBitmap.get(), 0, 0);
+
+				BitBlt(hdc, 0, 0, sWidth, sHeight, memDC, 0, 0, SRCCOPY);
+
+				SelectObject(memDC, oldBitmap);
+				DeleteObject(memBitmap);
+				DeleteDC(memDC);
 
 				EndPaint(hWnd, &ps);
 				return 0;
