@@ -317,7 +317,6 @@ static void RecalculateWindow() {
 }
 
 static void __fastcall DetourCanvasShow(void* canvas, void*, int unk) {
-	SplashWindow::SignalClose();
 	fpCanvasShow(canvas, unk);
 	if (canvasInstance == nullptr) {
 		if (isFullscreen) {
@@ -325,6 +324,27 @@ static void __fastcall DetourCanvasShow(void* canvas, void*, int unk) {
 		}
 		canvasInstance = canvas;
 	}
+	HWND win;
+	cIGZApp* app = nullptr;
+	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+	{
+		win = app->GetMainHWND();
+		app->Release();
+	}
+	else {
+		return;
+	}
+	if (SplashWindow::gSplashWindow != NULL && GetForegroundWindow() == SplashWindow::gSplashWindow) {
+		DWORD splashThread = GetWindowThreadProcessId(SplashWindow::gSplashWindow, nullptr);
+		DWORD thisThread = GetWindowThreadProcessId(win, nullptr);
+		AttachThreadInput(thisThread, splashThread, TRUE);
+
+		SetForegroundWindow(win);
+		SetFocus(win);
+
+		AttachThreadInput(thisThread, splashThread, FALSE);
+	}
+	SplashWindow::SignalClose();
 }
 
 static void __fastcall DetourFillScreenSize(void* self, void*) {

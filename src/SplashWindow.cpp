@@ -19,6 +19,7 @@ namespace SplashWindow {
 	static int sHeight = 600;
 	static float sVerticalCoverage = 0.5f;
 	static HCURSOR sLoadCursor = NULL;
+	HWND gSplashWindow = NULL;
 
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		switch (msg) {
@@ -137,6 +138,8 @@ namespace SplashWindow {
 			if (hWnd == nullptr)
 				return 0;
 
+			gSplashWindow = hWnd;
+
 			ShowWindow(hWnd, SW_SHOW);
 			UpdateWindow(hWnd);
 
@@ -149,6 +152,7 @@ namespace SplashWindow {
 		sBitmap.reset();
 		sImage.reset();
 		Gdiplus::GdiplusShutdown(gdiplusToken);
+		gSplashWindow = NULL;
 		return 0;
 	}
 
