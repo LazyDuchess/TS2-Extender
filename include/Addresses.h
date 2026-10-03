@@ -143,6 +143,8 @@ namespace Addresses {
 
 	extern void* RealtimeThumbnailGender;
 
+	extern void* OceanReflectionCheck;
+
 	bool Initialize();
 }
 

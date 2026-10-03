@@ -171,6 +171,8 @@ namespace Addresses {
 
 	void* RealtimeThumbnailGender;
 
+	void* OceanReflectionCheck;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -270,6 +272,7 @@ namespace Addresses {
 		ADDRESS(CameraMiddleClickMouseEvent, CameraMiddleClickMouseEventLookup);
 		ADDRESS(Sims1CameraUpdate, Sims1CameraUpdateLookup);
 		ADDRESS(RealtimeThumbnailGender, RealtimeThumbnailGenderLookup);
+		ADDRESS(OceanReflectionCheck, OceanReflectionCheckLookup);
 
 		if (ADDRESS_VALID(CameraMiddleClickMouseEvent))
 		{

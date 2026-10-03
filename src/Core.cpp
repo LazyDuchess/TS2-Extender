@@ -1594,5 +1594,14 @@ bool Core::Initialize() {
 		Nop((BYTE*)((DWORD)Addresses::CameraMiddleClickMouseEvent + 0x224), 16);
 #endif
 	}
+
+	if (ADDRESS_VALID(Addresses::OceanReflectionCheck) && Config::OceanReflections) {
+#if TS2_LC
+		Nop((BYTE*)((DWORD)Addresses::OceanReflectionCheck), 27);
+#else
+		Nop((BYTE*)((DWORD)Addresses::OceanReflectionCheck), 28);
+#endif
+	}
+
 	return true;
 }
