@@ -69,7 +69,11 @@ typedef void(__thiscall* NHOODENTERED)(void* self, int unk1, int unk2);
 typedef bool(__thiscall* DEVICEISFULLSCREEN)(void* self);
 typedef bool(__thiscall* DEVICESETUP)(void* self, cDeviceSetupParam* params);
 typedef void(__thiscall* FILLSCREENSIZE)(void* self);
+#if TS2_LC
+typedef void(__thiscall* CANVASSHOW)(void* self, int unk, bool unk2);
+#else
 typedef void(__thiscall* CANVASSHOW)(void* self, int unk);
+#endif
 typedef void(__thiscall* DESIGNONBUTTONDOWN)(cTSUserToolObjectDesign* self, void* point);
 typedef void(__thiscall* CAMERAHANDLEREQUEST)(cCameraController* cam, camEvent_t eventId, int unk, cCameraEvent* eventData);
 typedef bool(__thiscall* MOUSEEVENT)(void* self, int unk, int id, cRZPoint* point, bool release);
@@ -316,13 +320,48 @@ static void RecalculateWindow() {
 	}
 }
 
+#if TS2_LC
+static void __fastcall DetourCanvasShow(void* canvas, void*, int unk, bool unk2) {
+	fpCanvasShow(canvas, unk, unk2);
+	HWND win;
+	cIGZApp* app = nullptr;
+	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+	{
+		win = app->GetMainHWND();
+		app->Release();
+	}
+	else {
+		return;
+	}
+	if (SplashWindow::gSplashWindow != NULL && GetForegroundWindow() == SplashWindow::gSplashWindow) {
+		DWORD splashThread = GetWindowThreadProcessId(SplashWindow::gSplashWindow, nullptr);
+		DWORD thisThread = GetWindowThreadProcessId(win, nullptr);
+		AttachThreadInput(thisThread, splashThread, TRUE);
+
+		BringWindowToTop(win);
+		SetForegroundWindow(win);
+		SetFocus(win);
+
+		AttachThreadInput(thisThread, splashThread, FALSE);
+	}
+	else
+	{
+		BringWindowToTop(win);
+		SetForegroundWindow(win);
+		SetFocus(win);
+	}
+	SplashWindow::SignalClose();
+}
+#else
 static void __fastcall DetourCanvasShow(void* canvas, void*, int unk) {
 	fpCanvasShow(canvas, unk);
-	if (canvasInstance == nullptr) {
-		if (isFullscreen) {
-			MakeBorderlessFromWindowed();
+	if (Config::Borderless) {
+		if (canvasInstance == nullptr) {
+			if (isFullscreen) {
+				MakeBorderlessFromWindowed();
+			}
+			canvasInstance = canvas;
 		}
-		canvasInstance = canvas;
 	}
 	HWND win;
 	cIGZApp* app = nullptr;
@@ -353,6 +392,7 @@ static void __fastcall DetourCanvasShow(void* canvas, void*, int unk) {
 	}
 	SplashWindow::SignalClose();
 }
+#endif
 
 static void __fastcall DetourFillScreenSize(void* self, void*) {
 	cIGZWin* window = *(cIGZWin**)((DWORD)self + 0x1c);
@@ -999,7 +1039,7 @@ static std::string GetProcessDirectory() {
 bool Core::GetBaseDirectory(std::wstring *outstr) {
 #if TS2_LC
 	std::string dir = GetProcessDirectory();
-	std::filesystem::path basePath = std::filesystem::u8path(dir) / ".." / ".." / ".." / "Double Deluxe\\Base";
+	std::filesystem::path basePath = std::filesystem::u8path(dir).parent_path().parent_path() / "Base";
 	outstr->assign(basePath.wstring());
 #else
 	HKEY nameKey;
@@ -1562,6 +1602,20 @@ bool Core::Initialize() {
 		}
 	}
 
+	if (ADDRESS_VALID(Addresses::CanvasShow)) {
+		if (MH_CreateHook(Addresses::CanvasShow, &DetourCanvasShow,
+			reinterpret_cast<LPVOID*>(&fpCanvasShow)) != MH_OK)
+		{
+			Log("CanvasShow Patch Failed!\n");
+			return false;
+		}
+		if (MH_EnableHook(Addresses::CanvasShow) != MH_OK)
+		{
+			Log("CanvasShow Patch Failed!\n");
+			return false;
+		}
+	}
+
 #if TS2_UC
 	if (Config::Borderless) {
 
@@ -1575,20 +1629,6 @@ bool Core::Initialize() {
 			if (MH_EnableHook(Addresses::DeviceIsFullscreen) != MH_OK)
 			{
 				Log("DeviceIsFullscreen Patch Failed!\n");
-				return false;
-			}
-		}
-
-		if (ADDRESS_VALID(Addresses::CanvasShow)) {
-			if (MH_CreateHook(Addresses::CanvasShow, &DetourCanvasShow,
-				reinterpret_cast<LPVOID*>(&fpCanvasShow)) != MH_OK)
-			{
-				Log("CanvasShow Patch Failed!\n");
-				return false;
-			}
-			if (MH_EnableHook(Addresses::CanvasShow) != MH_OK)
-			{
-				Log("CanvasShow Patch Failed!\n");
 				return false;
 			}
 		}

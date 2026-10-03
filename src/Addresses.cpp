@@ -263,8 +263,8 @@ namespace Addresses {
 		ADDRESS(DeviceIsFullscreen, DeviceIsFullscreenLookup);
 		ADDRESS(DeviceSetup, DeviceSetupLookup);
 		ADDRESS(OptionsFillScreenSizeListBox, OptionsFillScreenSizeListBoxLookup);
-		ADDRESS(CanvasShow, CanvasShowLookup);
 #endif
+		ADDRESS(CanvasShow, CanvasShowLookup);
 		ADDRESS(SetWindowEnabled, SetWindowEnabledLookup);
 		ADDRESS(GetFramework, GetFrameworkLookup);
 		ADDRESS(DesignOnButtonDown, DesignOnButtonDownLookup);
