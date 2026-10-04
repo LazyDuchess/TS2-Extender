@@ -1268,7 +1268,7 @@ bool Core::Initialize() {
 		Log("Failed to find registry for game user folder, using default Documents/EA Games/The Sims 2 folder.");
 	}
 
-	if (!Addresses::Initialize()) return false;
+	if (!Addresses::Initialize(Core::_instance->m_UserDataPath)) return false;
 
 	// Initialize MinHook.
 	if (MH_Initialize() != MH_OK)

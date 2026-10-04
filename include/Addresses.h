@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 namespace Addresses {
 	extern void* RandomUint32Uniform;
@@ -157,7 +158,7 @@ namespace Addresses {
 	
 	extern void* SaveGroupMap;
 
-	bool Initialize();
+	bool Initialize(std::wstring userDir);
 }
 
 #define ADDRESS_VALID(name) name != nullptr

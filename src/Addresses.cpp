@@ -6,16 +6,34 @@
 #include "ts2/cUserInput.h"
 #include <memory>
 #include "AddressCache.h"
+#include <filesystem>
 
 #define ADDRESS(name, lookup) \
-Log("Scanning for %s...\n", #name);\
-name = ScanInternal(lookup, lookup##Mask, modBase, size);\
-if (name == nullptr) {\
-	Log("Failed to find address for %s!\n", #name);\
-}\
-else\
+name = sAddressCache->Get(#name);\
+if (name != nullptr)\
 {\
-	Log("Found %s at %p (Sims2.exe+%p)\n", #name, name, (void*)((DWORD)name - (DWORD)modBase));\
+	name = (void*)((DWORD)name + (DWORD)modBase);\
+	if (CheckPattern(lookup, lookup##Mask, (char*)name))\
+	{\
+		Log("Loaded %s from cache at %p (Sims2.exe+%p)\n", #name, name, (void*)((DWORD)name - (DWORD)modBase));\
+	}\
+	else\
+	{\
+		name = nullptr;\
+	}\
+}\
+if (name == nullptr)\
+{\
+	Log("Scanning for %s...\n", #name);\
+	name = ScanInternal(lookup, lookup##Mask, modBase, size);\
+	if (name == nullptr) {\
+		Log("Failed to find address for %s!\n", #name);\
+	}\
+	else\
+	{\
+		Log("Found %s at %p (Sims2.exe+%p)\n", #name, name, (void*)((DWORD)name - (DWORD)modBase));\
+		sAddressCache->Set(#name,(void*)((DWORD)name - (DWORD)modBase));\
+	}\
 }\
 
 namespace Addresses {
@@ -340,7 +358,15 @@ namespace Addresses {
 		return true;
 	}
 
-	bool Initialize() {
+	bool Initialize(std::wstring userDir) {
+
+		std::filesystem::path userPath = std::filesystem::path(userDir);
+		std::filesystem::create_directories(userPath);
+
+		std::wstring userCachePath = userDir + L"\\ts2e_cache.bin";
+
+		sAddressCache->Read(userCachePath);
+
 		HMODULE module = GetModuleHandleA(NULL);
 		char* modBase = (char*)module;
 		HANDLE proc = GetCurrentProcess();
@@ -352,6 +378,11 @@ namespace Addresses {
 			result = false;
 		if (!ScanCheatAddresses(modBase, size))
 			result = false;
+
+		if (result) {
+			sAddressCache->Write(userCachePath);
+		}
+
 		sAddressCache.reset();
 		return result;
 	}
