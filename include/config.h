@@ -31,4 +31,5 @@ namespace Config {
 	extern float SplashVerticalCoverage;
 	extern bool ExtendedSimAntics;
 	extern bool SingleCore;
+	extern bool DisableGroupsCache;
 }

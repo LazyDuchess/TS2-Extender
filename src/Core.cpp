@@ -159,6 +159,7 @@ static bool togglingFullscreen = false;
 static bool dirtyWindow = false;
 
 static const char jmpChar = 0xEB;
+static const char retChar = 0xC3;
 
 static bool __stdcall DetourToggleFullscreen() {
 	togglingFullscreen = true;
@@ -1261,13 +1262,13 @@ bool Core::Initialize() {
 
 	Log("Core Path: %s\n", DllPath);
 
-	if (!Addresses::Initialize()) return false;
-
 	if (!Core::_instance->CacheUserData())
 	{
 		Core::_instance->DoDefaultUserData();
 		Log("Failed to find registry for game user folder, using default Documents/EA Games/The Sims 2 folder.");
 	}
+
+	if (!Addresses::Initialize()) return false;
 
 	// Initialize MinHook.
 	if (MH_Initialize() != MH_OK)
@@ -1282,6 +1283,15 @@ bool Core::Initialize() {
 
 	if (Config::SingleCore) {
 		DoSingleCorePatch();
+	}
+
+	if (Config::DisableGroupsCache) {
+		if (ADDRESS_VALID(Addresses::LoadGroupMap)) {
+			WriteToMemory((DWORD)Addresses::LoadGroupMap, (void*)(&retChar), 1);
+		}
+		if (ADDRESS_VALID(Addresses::SaveGroupMap)) {
+			WriteToMemory((DWORD)Addresses::SaveGroupMap, (void*)(&retChar), 1);
+		}
 	}
 
 	if (Config::ExtendedSimAntics) {

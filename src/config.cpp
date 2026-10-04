@@ -34,6 +34,7 @@ namespace Config {
 	float SplashVerticalCoverage;
 	bool ExtendedSimAntics;
 	bool SingleCore;
+	bool DisableGroupsCache;
 
 	static bool Dirty = false;
 
@@ -110,6 +111,7 @@ namespace Config {
 		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
 		ExtendedSimAntics = GetBool("Advanced", "ExtendedSimAntics", true);
 		SingleCore = GetBool("Advanced", "SingleCore", false);
+		DisableGroupsCache = GetBool("Advanced", "DisableGroupsCache", true);
 		Separates4All = GetBool("Enhancements", "Separates4All", false);
 		FreeZodiac = GetBool("Enhancements", "FreeZodiac", false);
 #if TS2_LC

@@ -169,6 +169,10 @@ namespace Addresses {
 
 	int* MaxIterations;
 
+	void* LoadGroupMap;
+
+	void* SaveGroupMap;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -272,6 +276,8 @@ namespace Addresses {
 		ADDRESS(OceanReflectionCheck, OceanReflectionCheckLookup);
 		ADDRESS(RequestAnimationError, RequestAnimationErrorLookup);
 		ADDRESS(Iterations, IterationsLookup);
+		ADDRESS(LoadGroupMap, LoadGroupMapLookup);
+		ADDRESS(SaveGroupMap, SaveGroupMapLookup);
 
 		if (ADDRESS_VALID(Iterations)) {
 			MaxIterations = *(int**)Iterations;

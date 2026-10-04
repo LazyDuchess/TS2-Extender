@@ -153,6 +153,10 @@ namespace Addresses {
 
 	extern int* MaxIterations;
 
+	extern void* LoadGroupMap;
+	
+	extern void* SaveGroupMap;
+
 	bool Initialize();
 }
 
