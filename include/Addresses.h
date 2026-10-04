@@ -147,6 +147,12 @@ namespace Addresses {
 
 	extern void* ToggleFullscreen;
 
+	extern void* RequestAnimationError;
+
+	extern void* Iterations;
+
+	extern int* MaxIterations;
+
 	bool Initialize();
 }
 

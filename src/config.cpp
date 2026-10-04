@@ -32,6 +32,8 @@ namespace Config {
 	bool OceanReflections;
 	bool Splash;
 	float SplashVerticalCoverage;
+	bool ExtendedSimAntics;
+	bool SingleCore;
 
 	static bool Dirty = false;
 
@@ -106,6 +108,8 @@ namespace Config {
 		FixOutdoorShadows = GetBool("Fixes", "FixOutdoorShadows", true);
 		FixSun = GetBool("Fixes", "FixSun", true);
 		ExtendedLua = GetBool("Advanced", "ExtendedLua", true);
+		ExtendedSimAntics = GetBool("Advanced", "ExtendedSimAntics", true);
+		SingleCore = GetBool("Advanced", "SingleCore", false);
 		Separates4All = GetBool("Enhancements", "Separates4All", false);
 		FreeZodiac = GetBool("Enhancements", "FreeZodiac", false);
 #if TS2_LC

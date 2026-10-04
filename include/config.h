@@ -29,4 +29,6 @@ namespace Config {
 	extern bool OceanReflections;
 	extern bool Splash;
 	extern float SplashVerticalCoverage;
+	extern bool ExtendedSimAntics;
+	extern bool SingleCore;
 }

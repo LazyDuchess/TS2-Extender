@@ -5,18 +5,6 @@
 #include "Logging.h"
 #include "ts2/cUserInput.h"
 
-#define ADDRESS_REQUIRE(name, lookup) \
-Log("Scanning for %s...\n", #name);\
-name = ScanInternal(lookup, lookup##Mask, modBase, size);\
-if (name == nullptr) {\
-	Log("FATAL: Failed to find address for %s!\n", #name);\
-	return false;\
-}\
-else\
-{\
-	Log("Found %s at %p\n", #name, name);\
-}\
-
 #define ADDRESS(name, lookup) \
 Log("Scanning for %s...\n", #name);\
 name = ScanInternal(lookup, lookup##Mask, modBase, size);\
@@ -25,7 +13,7 @@ if (name == nullptr) {\
 }\
 else\
 {\
-	Log("Found %s at %p\n", #name, name);\
+	Log("Found %s at %p (Sims2.exe+%p)\n", #name, name, (void*)((DWORD)name - (DWORD)modBase));\
 }\
 
 namespace Addresses {
@@ -175,6 +163,12 @@ namespace Addresses {
 
 	void* ToggleFullscreen;
 
+	void* RequestAnimationError;
+
+	void* Iterations;
+
+	int* MaxIterations;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -276,6 +270,12 @@ namespace Addresses {
 		ADDRESS(Sims1CameraUpdate, Sims1CameraUpdateLookup);
 		ADDRESS(RealtimeThumbnailGender, RealtimeThumbnailGenderLookup);
 		ADDRESS(OceanReflectionCheck, OceanReflectionCheckLookup);
+		ADDRESS(RequestAnimationError, RequestAnimationErrorLookup);
+		ADDRESS(Iterations, IterationsLookup);
+
+		if (ADDRESS_VALID(Iterations)) {
+			MaxIterations = *(int**)Iterations;
+		}
 
 		if (ADDRESS_VALID(CameraMiddleClickMouseEvent))
 		{
