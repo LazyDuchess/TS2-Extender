@@ -50,3 +50,5 @@ The mod can be configured via the .ini file.
 ## Troubleshooting
 
 If the mod doesn't work on Legacy Collection, try deleting the "wininet.dll" file from TSBin, instead putting in the "winmm.dll" file from [here](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases) (winmm.dll under Win32, latest release) If it now works, keep the "winmm.dll" file in your TSBin and make sure the "wininet.dll" file is always removed if you download an update.
+
+Antiviruses might flag the contents of the "TSBin" folder, most specifically the .asi file. It's recommended to add an exception to your "TSBin" folder to ensure the mod works and isn't blocked by AV software.
