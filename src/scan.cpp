@@ -133,3 +133,34 @@ void MakeJMP(BYTE* pAddress, DWORD dwJumpTo, DWORD dwLen)
     return;
 
 }
+
+bool CheckPattern(char* pattern, char* mask, char* at)
+{
+    int patternLen = strlen(mask);
+
+    MEMORY_BASIC_INFORMATION mbi{};
+
+    if (!VirtualQuery(at, &mbi, sizeof(mbi)))
+        return false;
+
+    char* regionBase = static_cast<char*>(mbi.BaseAddress);
+    char* regionEnd = regionBase + mbi.RegionSize;
+
+    char* scanBegin = max(at, regionBase);
+    char* scanEnd = min(at + patternLen, regionEnd);
+
+    if (mbi.State == MEM_COMMIT &&
+        !(mbi.Protect & PAGE_NOACCESS))
+    {
+        char* match = ScanBasic(
+            pattern,
+            mask,
+            scanBegin,
+            scanEnd - scanBegin
+        );
+
+        if (match)
+            return true;
+    }
+    return false;
+}

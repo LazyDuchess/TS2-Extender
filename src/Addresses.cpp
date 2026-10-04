@@ -4,6 +4,8 @@
 #include "scan.h"
 #include "Logging.h"
 #include "ts2/cUserInput.h"
+#include <memory>
+#include "AddressCache.h"
 
 #define ADDRESS(name, lookup) \
 Log("Scanning for %s...\n", #name);\
@@ -172,6 +174,8 @@ namespace Addresses {
 	void* LoadGroupMap;
 
 	void* SaveGroupMap;
+
+	static std::unique_ptr<AddressCache> sAddressCache = std::make_unique<AddressCache>();
 
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
@@ -343,8 +347,12 @@ namespace Addresses {
 		MODULEINFO modInfo;
 		GetModuleInformation(proc, module, &modInfo, sizeof(MODULEINFO));
 		int size = modInfo.SizeOfImage;
-		if (!ScanBaseAddresses(modBase, size)) return false;
-		if (!ScanCheatAddresses(modBase, size)) return false;
-		return true;
+		bool result = true;
+		if (!ScanBaseAddresses(modBase, size))
+			result = false;
+		if (!ScanCheatAddresses(modBase, size))
+			result = false;
+		sAddressCache.reset();
+		return result;
 	}
 }
