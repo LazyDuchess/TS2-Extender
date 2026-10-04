@@ -6,11 +6,12 @@ Tested to work with the Steam version of Legacy Collection and The Sims 2 Ultima
 
 ## Features
 
-* Skip intro videos.
+* Skip intro videos, play in native borderless.
 * Adds completely new Lua functionality for modders, and a text Lua script loader for easier modding.
 * Allows use of separate top/bottoms for all clothing categories if you have appropriate CC.
 * Configurable UI scaling for Legacy Collection.
 * Allows editing personality in Create-A-Sim without refreshing their zodiac sign.
+* And more.
 
 ## Fixes
 
@@ -21,6 +22,7 @@ Tested to work with the Steam version of Legacy Collection and The Sims 2 Ultima
 * Fixes broken date stood up timer.
 * Fixes aging and other timed events randomly breaking permanently in saves.
 * Fixes broken wall cutaway textures.
+* Fixes broken shadows, lighting, and more.
 
 ## Lua Features
 
@@ -29,13 +31,14 @@ Check out the [Documentation](https://lazyduchess.github.io/TS2-Extender-Docs) i
 ## Installation
 
 * Firstly, download the appropriate latest version from the [releases](https://github.com/LazyDuchess/TS2-Extender/releases/latest) tab. If you're on Legacy, download the "TS2.Extender.x.x.x.LC.zip" file, otherwise get the "TS2.Extender.x.x.x.UC.zip" file.
-* Extract the zip. Inside you will find "TSBin", "Downloads", "TSData" and "Lua" folders.
+* Extract the zip. Inside you will find "TSBin", "Documents", and "TSData" folders.
 * The "TSBin" and "TSData" folders go into your game's installation directory -> EP9, overriding the folders that are already there. Example: "E:\Steam\steamapps\common\The Sims 2 Legacy Collection\EP9"
 * Note: If you're on UC/Retail and already have an ASI Loader, because you already use .asi mods, you should skip copying the "TSBin/dsound.dll" file.
 * Note: If you had a version of TS2 Extender already installed older than 0.8.0, you might have a Lua folder in TSBin. Remove it, as this folder now lives in the Documents folder below.
-* The "Downloads" and "Lua" folders go into your "Documents/EA Games/The Sims 2 Legacy" folder. Make sure custom content is enabled in your in-game settings.
-* If everything went well, you should have the new features in your game, and you will also have a new cheat command: "ts2extender", which will tell you the current TS2 Extender version (Cheat console can be opened with Shift+Control+C) :
+* The "Downloads" and "Lua" folders go into your "Documents/EA Games/The Sims 2 (Legacy/Ultimate Collection)" folder. Make sure custom content is enabled in your in-game settings.
+* If everything went well, you should have the new features in your game, the splash screen, and you will also have a new cheat command: "ts2extender", which will tell you the current TS2 Extender version (Cheat console can be opened with Shift+Control+C) :
   <img width="1912" height="232" alt="image" src="https://github.com/user-attachments/assets/20dbb242-33c3-40e6-8e1f-65a0cacab284" />
+* In case a feature doesn't work correctly, you will see helpful logs if you enable the "Console" feature in the TS2Extender .ini.
 
 ## On Wine/Linux
 
