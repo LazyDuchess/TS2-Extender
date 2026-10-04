@@ -1106,7 +1106,10 @@ bool Core::GetBaseDirectory(std::wstring *outstr) {
 		&finalSize
 	);
 
-	if (valueStatus != ERROR_SUCCESS) return false;
+	if (valueStatus != ERROR_SUCCESS) {
+		RegCloseKey(nameKey);
+		return false;
+	}
 
 	outstr->resize(finalSize / sizeof(wchar_t));
 
@@ -1119,6 +1122,11 @@ bool Core::GetBaseDirectory(std::wstring *outstr) {
 		outstr->data(),
 		&finalSize
 	);
+
+	RegCloseKey(nameKey);
+
+	outstr->resize(wcslen(outstr->c_str()));
+	return true;
 #endif
 }
 
@@ -1158,7 +1166,10 @@ bool Core::CacheUserData() {
 		&finalSize
 	);
 
-	if (valueStatus != ERROR_SUCCESS) return false;
+	if (valueStatus != ERROR_SUCCESS) {
+		RegCloseKey(nameKey);
+		return false;
+	}
 
 	m_GameDisplayName.resize(finalSize / sizeof(wchar_t));
 
@@ -1171,6 +1182,10 @@ bool Core::CacheUserData() {
 		m_GameDisplayName.data(),
 		&finalSize
 	);
+
+	RegCloseKey(nameKey);
+
+	m_GameDisplayName.resize(wcslen(m_GameDisplayName.c_str()));
 
 	PWSTR path_pwstr;
 	HRESULT hr = SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &path_pwstr);

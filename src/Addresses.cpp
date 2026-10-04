@@ -298,7 +298,9 @@ namespace Addresses {
 		ADDRESS(OceanReflectionCheck, OceanReflectionCheckLookup);
 		ADDRESS(RequestAnimationError, RequestAnimationErrorLookup);
 		ADDRESS(Iterations, IterationsLookup);
+#if TS2_UC
 		ADDRESS(LoadGroupMap, LoadGroupMapLookup);
+#endif
 		ADDRESS(SaveGroupMap, SaveGroupMapLookup);
 
 		if (ADDRESS_VALID(Iterations)) {
@@ -363,7 +365,7 @@ namespace Addresses {
 		std::filesystem::path userPath = std::filesystem::path(userDir);
 		std::filesystem::create_directories(userPath);
 
-		std::wstring userCachePath = userDir + L"\\ts2e_cache.bin";
+		std::wstring userCachePath = userPath.wstring() + L"\\ts2e_cache.bin";
 
 		sAddressCache->Read(userCachePath);
 
