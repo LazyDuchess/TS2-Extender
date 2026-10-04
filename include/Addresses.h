@@ -158,6 +158,8 @@ namespace Addresses {
 	
 	extern void* SaveGroupMap;
 
+	extern void* WinManager;
+
 	bool Initialize(std::wstring userDir);
 }
 

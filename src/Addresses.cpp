@@ -193,6 +193,8 @@ namespace Addresses {
 
 	void* SaveGroupMap;
 
+	void* WinManager;
+
 	static std::unique_ptr<AddressCache> sAddressCache = std::make_unique<AddressCache>();
 
 	static bool ScanBaseAddresses(char* modBase, int size) {
@@ -302,6 +304,11 @@ namespace Addresses {
 		ADDRESS(LoadGroupMap, LoadGroupMapLookup);
 #endif
 		ADDRESS(SaveGroupMap, SaveGroupMapLookup);
+		ADDRESS(WinManager, WinManagerLookup);
+		if (ADDRESS_VALID(WinManager)) {
+			DWORD relativeCall = *(DWORD*)WinManager;
+			WinManager = (void*)((DWORD)WinManager + relativeCall + 4);
+		}
 
 		if (ADDRESS_VALID(Iterations)) {
 			MaxIterations = *(int**)Iterations;

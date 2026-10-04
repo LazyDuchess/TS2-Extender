@@ -15,6 +15,7 @@
 #include <fstream>
 #include "scan.h"
 #include <Windows.h>
+#include "ts2/cGZFramework.h"
 #define KEY_COUNT 256
 
 namespace LuaExtensions {
@@ -77,8 +78,29 @@ namespace LuaExtensions {
 		return 1;
 	}
 
+	static bool CanTakeInput() {
+		HWND win;
+		cIGZApp* app = nullptr;
+		if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+		{
+			win = app->GetMainHWND();
+			app->Release();
+		}
+		else {
+			return false;
+		}
+		if (win == nullptr) return false;
+		if (GetForegroundWindow() != win) return false;
+		return true;
+	}
+
 	// KBM_GetKeyDown(number vk)
 	static int __cdecl LuaGetKeyDown(lua_State* luaState) {
+		if (!CanTakeInput())
+		{
+			lua_pushboolean(luaState, 0);
+			return 1;
+		}
 		int vk = static_cast<int>(lua_tonumber(luaState, 1));
 		bool res = (currentInputState[vk] & 0x8000) && !(lastInputState[vk] & 0x8000);
 		lua_pushboolean(luaState, res ? 1 : 0);
@@ -87,6 +109,11 @@ namespace LuaExtensions {
 
 	// KBM_GetKey(number vk)
 	static int __cdecl LuaGetKeyHeld(lua_State* luaState) {
+		if (!CanTakeInput())
+		{
+			lua_pushboolean(luaState, 0);
+			return 1;
+		}
 		int vk = static_cast<int>(lua_tonumber(luaState, 1));
 		bool res = (currentInputState[vk] & 0x8000);
 		lua_pushboolean(luaState, res ? 1 : 0);
@@ -95,6 +122,11 @@ namespace LuaExtensions {
 
 	// KBM_GetKeyUp(number vk)
 	static int __cdecl LuaGetKeyUp(lua_State* luaState) {
+		if (!CanTakeInput())
+		{
+			lua_pushboolean(luaState, 0);
+			return 1;
+		}
 		int vk = static_cast<int>(lua_tonumber(luaState, 1));
 		bool res = !(currentInputState[vk] & 0x8000) && (lastInputState[vk] & 0x8000);
 		lua_pushboolean(luaState, res ? 1 : 0);
