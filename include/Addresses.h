@@ -145,6 +145,8 @@ namespace Addresses {
 
 	extern void* OceanReflectionCheck;
 
+	extern void* ToggleFullscreen;
+
 	bool Initialize();
 }
 

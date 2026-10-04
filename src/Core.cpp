@@ -79,9 +79,11 @@ typedef void(__thiscall* CAMERAHANDLEREQUEST)(cCameraController* cam, camEvent_t
 typedef bool(__thiscall* MOUSEEVENT)(void* self, int unk, int id, cRZPoint* point, bool release);
 typedef void(__thiscall* CAMERAUPDATE)(void* self, int unk, int unk2);
 typedef void(__thiscall* CAMERACANCELDRAG)(void* self);
+typedef bool(__stdcall* TOGGLEFULLSCREEN)();
 
 typedef nTSSG::cLotImposterManager* (__thiscall* LOTIMPOSTERMANAGERCTOR)(nTSSG::cLotImposterManager* self);
 
+static TOGGLEFULLSCREEN fpToggleFullscreen = NULL;
 static CAMERACANCELDRAG fpCameraCancelDrag = NULL;
 static CAMERAUPDATE fpSims1CameraUpdate = NULL;
 static MOUSEEVENT fpMiddleClickMouseEvent;
@@ -153,6 +155,16 @@ static bool isMouseOrbiting = false;
 int lockMouseX = 0;
 int lockMouseY = 0;
 
+static bool togglingFullscreen = false;
+static bool dirtyWindow = false;
+
+static bool __stdcall DetourToggleFullscreen() {
+	togglingFullscreen = true;
+	bool res = fpToggleFullscreen();
+	togglingFullscreen = false;
+	return res;
+}
+
 static void __fastcall DetourCameraCancelDrag(void* self) {
 	if (Config::Sims3Camera) {
 		isMouseOrbiting = false;
@@ -223,7 +235,7 @@ static void __fastcall DetourDesignOnButtonDown(cTSUserToolObjectDesign* self, v
 	fpDesignOnButtonDown(self, point);
 }
 
-static void RecalculateWindowedLocation() {
+static void RecalculateWindowLocation() {
 	HWND win;
 	cIGZApp* app = nullptr;
 	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
@@ -234,26 +246,33 @@ static void RecalculateWindowedLocation() {
 	else {
 		return;
 	}
-	RECT clientRect;
-	GetClientRect(win, &clientRect);
-
-	DWORD dwStyle = GetWindowLong(win, GWL_STYLE);
-	DWORD dwExStyle = GetWindowLong(win, GWL_EXSTYLE);
-	BOOL bHasMenu = (GetMenu(win) != NULL);
-
-	RECT winRect = clientRect;
-	AdjustWindowRectEx(&winRect, dwStyle, bHasMenu, dwExStyle);
-
-	oldWidth = winRect.right - winRect.left;
-	oldHeight = winRect.bottom - winRect.top;
 
 	int sw = GetSystemMetrics(SM_CXSCREEN);
 	int sh = GetSystemMetrics(SM_CYSCREEN);
 
-	int x = (sw - oldWidth) / 2;
-	int y = (sh - oldHeight) / 2;
+	if (!isFullscreen) {
+		RECT clientRect;
+		GetClientRect(win, &clientRect);
 
-	SetWindowPos(win, HWND_TOP, x, y, oldWidth, oldHeight, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+		DWORD dwStyle = GetWindowLong(win, GWL_STYLE);
+		DWORD dwExStyle = GetWindowLong(win, GWL_EXSTYLE);
+		BOOL bHasMenu = (GetMenu(win) != NULL);
+
+		RECT winRect = clientRect;
+		AdjustWindowRectEx(&winRect, dwStyle, bHasMenu, dwExStyle);
+
+		oldWidth = winRect.right - winRect.left;
+		oldHeight = winRect.bottom - winRect.top;
+
+		int x = (sw - oldWidth) / 2;
+		int y = (sh - oldHeight) / 2;
+
+		SetWindowPos(win, HWND_TOP, x, y, oldWidth, oldHeight, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+	}
+	else
+	{
+		SetWindowPos(win, HWND_TOP, 0, 0, sw, sh, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+	}
 }
 
 static void MakeWindowedFromBorderless() {
@@ -271,7 +290,7 @@ static void MakeWindowedFromBorderless() {
 	SetWindowLong(win, GWL_EXSTYLE, oldWinExStyle);
 
 	SetWindowPos(win, HWND_TOP, 0, 0, oldWidth, oldHeight, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
-	RecalculateWindowedLocation();
+	RecalculateWindowLocation();
 }
 
 static void MakeBorderlessFromWindowed() {
@@ -441,7 +460,17 @@ static void __fastcall DetourFillScreenSize(void* self, void*) {
 
 static bool __fastcall DetourDeviceSetup(void* self, void*, cDeviceSetupParam* param) {
 	bool wasFullscreen = isFullscreen;
-	isFullscreen = !param->IsWindowed();
+
+	if (Config::Borderless) {
+		if (togglingFullscreen)
+			isFullscreen = !isFullscreen;
+		if (canvasInstance == nullptr)
+			isFullscreen = !param->IsWindowed();
+	}
+	else
+	{
+		isFullscreen = !param->IsWindowed();
+	}
 
 	if (Config::Borderless) {
 		param->MakeWindowed();
@@ -453,10 +482,14 @@ static bool __fastcall DetourDeviceSetup(void* self, void*, cDeviceSetupParam* p
 			WriteToMemory((DWORD)Addresses::DeviceSetup + 0x2F, (void*)(&jmpChar), 1);
 		}
 		wasDeviceSetup = true;
-		if (canvasInstance != nullptr && wasFullscreen != isFullscreen)
-			RecalculateWindow();
+		if (canvasInstance != nullptr)
+		{
+			if (wasFullscreen != isFullscreen)
+				RecalculateWindow();
+			dirtyWindow = true;
+		}
 		if (!isFullscreen)
-			RecalculateWindowedLocation();
+			RecalculateWindowLocation();
 		return res;
 	}
 	return fpDeviceSetup(self, param);
@@ -841,6 +874,10 @@ static void __fastcall DetourOncePerFrameUpdate(void* self, void* _) {
 			Log("Error calling Lua callback: %s\n", lua_tostring(cb.m_luaState, -1));
 			lua_pop(cb.m_luaState, 1);
 		}
+	}
+	if (dirtyWindow) {
+		RecalculateWindowLocation();
+		dirtyWindow = false;
 	}
 	LuaExtensions::FrameUpdate();
 }
@@ -1629,6 +1666,20 @@ bool Core::Initialize() {
 			if (MH_EnableHook(Addresses::DeviceIsFullscreen) != MH_OK)
 			{
 				Log("DeviceIsFullscreen Patch Failed!\n");
+				return false;
+			}
+		}
+
+		if (ADDRESS_VALID(Addresses::ToggleFullscreen)) {
+			if (MH_CreateHook(Addresses::ToggleFullscreen, &DetourToggleFullscreen,
+				reinterpret_cast<LPVOID*>(&fpToggleFullscreen)) != MH_OK)
+			{
+				Log("ToggleFullscreen Patch Failed!\n");
+				return false;
+			}
+			if (MH_EnableHook(Addresses::ToggleFullscreen) != MH_OK)
+			{
+				Log("ToggleFullscreen Patch Failed!\n");
 				return false;
 			}
 		}

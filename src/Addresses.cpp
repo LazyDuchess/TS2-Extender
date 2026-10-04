@@ -173,6 +173,8 @@ namespace Addresses {
 
 	void* OceanReflectionCheck;
 
+	void* ToggleFullscreen;
+
 	static bool ScanBaseAddresses(char* modBase, int size) {
 		ADDRESS(RandomUint32Uniform, randomUint32Lookup);
 		ADDRESS(EALogoPush, eaLogoPushLookup);
@@ -263,6 +265,7 @@ namespace Addresses {
 		ADDRESS(DeviceIsFullscreen, DeviceIsFullscreenLookup);
 		ADDRESS(DeviceSetup, DeviceSetupLookup);
 		ADDRESS(OptionsFillScreenSizeListBox, OptionsFillScreenSizeListBoxLookup);
+		ADDRESS(ToggleFullscreen, ToggleFullscreenLookup);
 #endif
 		ADDRESS(CanvasShow, CanvasShowLookup);
 		ADDRESS(SetWindowEnabled, SetWindowEnabledLookup);
