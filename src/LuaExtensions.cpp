@@ -16,6 +16,8 @@
 #include "scan.h"
 #include <Windows.h>
 #include "ts2/cGZFramework.h"
+#include "ts2/RZ.h"
+#include "ts2/cIGZWin.h"
 #define KEY_COUNT 256
 
 namespace LuaExtensions {
@@ -81,7 +83,7 @@ namespace LuaExtensions {
 	static bool CanTakeInput() {
 		HWND win;
 		cIGZApp* app = nullptr;
-		if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+		if (RZGetFramework()->QueryInterface(IID_GZAPP, (cIGZUnknown**)&app))
 		{
 			win = app->GetMainHWND();
 			app->Release();
@@ -92,6 +94,36 @@ namespace LuaExtensions {
 		if (win == nullptr) return false;
 		if (GetForegroundWindow() != win) return false;
 		return true;
+	}
+
+	// UI_IsBusy()
+	static int __cdecl LuaUIIsBusy(lua_State* luaState) {
+		if (!CanTakeInput())
+		{
+			lua_pushboolean(luaState, 1);
+			return 1;
+		}
+		cGZWinMgrBase* wm = RZ::WM();
+		if (wm == nullptr) {
+			lua_pushboolean(luaState, 1);
+			return 1;
+		}
+		if (wm->IsModal()) {
+			lua_pushboolean(luaState, 1);
+			return 1;
+		}
+		
+		cIGZWin* focusedWin = wm->GZGetFocus();
+		if (focusedWin != nullptr) {
+			cIGZUnknown* winInterface;
+			if (focusedWin->QueryInterface(IID_GZWINTEXTEDIT, &winInterface)) {
+				winInterface->Release();
+				lua_pushboolean(luaState, 1);
+				return 1;
+			}
+		}
+		lua_pushboolean(luaState, 0);
+		return 1;
 	}
 
 	// KBM_GetKeyDown(number vk)
@@ -427,6 +459,7 @@ namespace LuaExtensions {
 			luaThread->Register(&LuaExecuteCommand, "ExecuteCommand");
 			luaThread->Register(&LuaMatSetVariable, "MAT_SetVariable");
 			luaThread->Register(&LuaMatRemoveVariable, "MAT_RemoveVariable");
+			luaThread->Register(&LuaUIIsBusy, "UI_IsBusy");
 		}
 		return res;
 	}

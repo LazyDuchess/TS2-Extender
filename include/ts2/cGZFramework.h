@@ -1,4 +1,5 @@
 #pragma once
+#include "ts2/cIGZUnknown.h"
 #include "ts2.h"
 
 struct HWND__;
@@ -6,7 +7,7 @@ typedef HWND__* HWND;
 
 class cGZFramework {
 public:
-    bool QueryInterface(iid_t id, void** out);
+    bool QueryInterface(iid_t id, cIGZUnknown** out);
     int AddRef();
     int Release();
 };

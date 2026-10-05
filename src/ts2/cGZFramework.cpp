@@ -1,9 +1,9 @@
 #include "ts2/cGZFramework.h"
 #include "Addresses.h"
 
-bool cGZFramework::QueryInterface(iid_t id, void** out) {
+bool cGZFramework::QueryInterface(iid_t id, cIGZUnknown** out) {
 	int vTableAddr = *(int*)this;
-	return ((bool(__thiscall*)(cGZFramework*, iid_t, void**)) * (int*)(vTableAddr))(this, id, out);
+	return ((bool(__thiscall*)(cGZFramework*, iid_t, cIGZUnknown**)) * (int*)(vTableAddr))(this, id, out);
 }
 
 int cGZFramework::AddRef() {

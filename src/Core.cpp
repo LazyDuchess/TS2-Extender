@@ -241,7 +241,7 @@ static void __fastcall DetourDesignOnButtonDown(cTSUserToolObjectDesign* self, v
 static void RecalculateWindowLocation() {
 	HWND win;
 	cIGZApp* app = nullptr;
-	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+	if (RZGetFramework()->QueryInterface(IID_GZAPP, (cIGZUnknown**)&app))
 	{
 		win = app->GetMainHWND();
 		app->Release();
@@ -281,7 +281,7 @@ static void RecalculateWindowLocation() {
 static void MakeWindowedFromBorderless() {
 	HWND win;
 	cIGZApp* app = nullptr;
-	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+	if (RZGetFramework()->QueryInterface(IID_GZAPP, (cIGZUnknown**)&app))
 	{
 		win = app->GetMainHWND();
 		app->Release();
@@ -299,7 +299,7 @@ static void MakeWindowedFromBorderless() {
 static void MakeBorderlessFromWindowed() {
 	HWND win;
 	cIGZApp* app = nullptr;
-	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+	if (RZGetFramework()->QueryInterface(IID_GZAPP, (cIGZUnknown**)&app))
 	{
 		win = app->GetMainHWND();
 		app->Release();
@@ -347,7 +347,7 @@ static void __fastcall DetourCanvasShow(void* canvas, void*, int unk, bool unk2)
 	fpCanvasShow(canvas, unk, unk2);
 	HWND win;
 	cIGZApp* app = nullptr;
-	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+	if (RZGetFramework()->QueryInterface(IID_GZAPP, (cIGZUnknown**)&app))
 	{
 		win = app->GetMainHWND();
 		app->Release();
@@ -387,7 +387,7 @@ static void __fastcall DetourCanvasShow(void* canvas, void*, int unk) {
 	}
 	HWND win;
 	cIGZApp* app = nullptr;
-	if (RZGetFramework()->QueryInterface(IID_GZAPP, (void**)&app))
+	if (RZGetFramework()->QueryInterface(IID_GZAPP, (cIGZUnknown**)&app))
 	{
 		win = app->GetMainHWND();
 		app->Release();

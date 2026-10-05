@@ -1,9 +1,9 @@
 #include "ts2/cIGZWin.h"
 #include "ts2/ts2.h"
 
-bool cIGZWin::QueryInterface(iid_t id, void** out) {
+bool cIGZWin::QueryInterface(iid_t id, cIGZUnknown** out) {
 	int vTableAddr = *(int*)this;
-	return ((bool(__thiscall*)(cIGZWin*, iid_t, void**)) * (int*)(vTableAddr))(this, id, out);
+	return ((bool(__thiscall*)(cIGZWin*, iid_t, cIGZUnknown**)) * (int*)(vTableAddr))(this, id, out);
 }
 
 bool cIGZWin::ChildDeleteAll() {

@@ -1,4 +1,5 @@
 #pragma once
+#include "ts2/cIGZUnknown.h"
 #define ENUM_ALL 0x22ba0121
 #define WINFLAG_ENABLED 0x2
 #define WINFLAG_VISIBLE 0x1
@@ -11,7 +12,7 @@ typedef bool(__cdecl* FNENUMCHILDREN)(cIGZWin* parent, int id, cIGZWin* current,
 
 class cIGZWin {
 public:
-	bool QueryInterface(iid_t id, void** out);
+	bool QueryInterface(iid_t id, cIGZUnknown** out);
 	bool ChildDeleteAll();
 	cIGZWin* GetChildWindowFromID(int id);
 	cIGZWin* GetChildWindowFromIDRecursive(int id);
