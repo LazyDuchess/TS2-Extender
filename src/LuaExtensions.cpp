@@ -18,6 +18,7 @@
 #include "ts2/cGZFramework.h"
 #include "ts2/RZ.h"
 #include "ts2/cIGZWin.h"
+#include "ts2/cTSGlobals.h"
 #define KEY_COUNT 256
 
 namespace LuaExtensions {
@@ -46,6 +47,31 @@ namespace LuaExtensions {
 			}
 		}
 		return "";
+	}
+
+	// RunTreeEx(treeName, myObjectId, treeObjectId, targetObjectId, param0, param1, param2)
+	static int __cdecl LuaRunTreeEx(lua_State* luaState) {
+		const char* treeName = lua_tostring(luaState, 1);
+		short objectId = static_cast<short>(lua_tonumber(luaState, 2));
+		short param0 = static_cast<short>(lua_tonumber(luaState, 3));
+		short param1 = static_cast<short>(lua_tonumber(luaState, 4));
+		short param2 = static_cast<short>(lua_tonumber(luaState, 5));
+		cTSGlobals* pGlobals = cTSGlobals::GetInstance();
+		if (pGlobals == nullptr) {
+			lua_pushboolean(luaState, 0);
+			return 1;
+		}
+		cEdithObjectModule* pObjectMgr = pGlobals->ObjectManager();
+		if (pObjectMgr == nullptr) {
+			lua_pushboolean(luaState, 0);
+			return 1;
+		}
+		cTSObject* obj = pObjectMgr->GetObjectFromID(objectId);
+		if (obj == nullptr) {
+			lua_pushboolean(luaState, 0);
+			return 1;
+		}
+
 	}
 
 	// MAT_RemoveVariable(string name)
